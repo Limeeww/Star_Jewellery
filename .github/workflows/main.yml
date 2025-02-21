@@ -13,43 +13,45 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '20'
-        cache: 'npm'
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          cache: 'npm'
 
-    - name: Install dependencies
-      run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-    # Check code
-    - name: Lint with ESLint
-      run: npm run lint
+      - name: Lint with ESLint # Check code style
+        run: npm run lint
 
-    # Testing
-    - name: Run tests
-      run: npm test
+      - name: Run tests # Run unit tests
+        run: npm test
 
-    # Optimisation and build
-    - name: Build project
-      run: npm run build
+      - name: Build project # Build the application
+        run: npm run build
 
-    # Lighthouse audit
-    - name: Lighthouse Audit
-      uses: treosh/lighthouse-ci-action@v11
-      with:
-        urls: |
-          http://localhost:3000/
-        uploadArtifacts: true
-        temporaryPublicStorage: true
+      - name: Start server # Start local server in the background
+        run: npm start &
+      
+      - name: Wait for server # Ensure server is ready before audit
+        run: npx wait-on http://localhost:3000
+      
+      - name: Lighthouse Audit # Run performance and SEO audit
+        uses: treosh/lighthouse-ci-action@v11
+        with:
+          urls: |
+            http://localhost:3000/
+          uploadArtifacts: true
+          temporaryPublicStorage: true
 
-    - name: Deploy to Firebase
-      uses: FirebaseExtended/action-hosting-deploy@v0
-      with:
-        repoToken: '${{ github.token }}'
-        firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
-        projectId: your-project-id
-      if: github.ref == 'refs/heads/main'
+      - name: Deploy to Firebase # Deploy to Firebase Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: '${{ github.token }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+          projectId: your-project-id
+        if: github.ref == 'refs/heads/main'
