@@ -38,7 +38,7 @@ jobs:
         run: npm start &
       
       - name: Wait for server # Ensure server is ready before audit
-        run: npx wait-on http://localhost:3000
+        run: npx wait-on http://localhost:3000 --timeout 60000
       
       - name: Lighthouse Audit # Run performance and SEO audit
         uses: treosh/lighthouse-ci-action@v11
@@ -46,7 +46,7 @@ jobs:
           urls: |
             http://localhost:3000/
           uploadArtifacts: true
-          temporaryPublicStorage: true
+          temporaryPublicStorage: true  
 
       - name: Deploy to Firebase # Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
