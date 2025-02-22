@@ -57,4 +57,5 @@ jobs:
           repoToken: '${{ github.token }}'
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
           projectId: star-jewellery-3db16
+          channelId: preview-${{ github.sha }}
         if: github.ref == 'refs/heads/main'
