@@ -13,45 +13,48 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout code 
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js 
         uses: actions/setup-node@v3
         with:
           node-version: '20'
           cache: 'npm'
 
-      - name: Install dependencies
+      - name: Install dependencies 
         run: npm ci
 
-      - name: Lint with ESLint # Check code style
+      - name: Install wait-on 
+        run: npm install wait-on --save-dev
+
+      - name: Lint with ESLint 
         run: npm run lint
 
-      - name: Run tests # Run unit tests
+      - name: Run tests 
         run: npm test -- --passWithNoTests
 
-      - name: Build project # Build the application
+      - name: Build project 
         run: npm run build
 
-      - name: Start server # Start local server in the background
-        run: npm start &
+      - name: Start static server 
+        run: npx serve out -p 3000 &
       
-      - name: Wait for server # Ensure server is ready before audit
-        run: npx wait-on http://localhost:3000
+      - name: Wait for server 
+        run: npx wait-on http://localhost:3000 --timeout 60000
       
-      - name: Lighthouse Audit # Run performance and SEO audit
+      - name: Lighthouse Audit 
         uses: treosh/lighthouse-ci-action@v11
         with:
           urls: |
             http://localhost:3000/
           uploadArtifacts: true
-          temporaryPublicStorage: true
+          temporaryPublicStorage: true  
 
-      - name: Deploy to Firebase # Deploy to Firebase Hosting
+      - name: Deploy to Firebase 
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ github.token }}'
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
-          projectId: your-project-id
+          projectId: star-jewellery-3db16
         if: github.ref == 'refs/heads/main'
