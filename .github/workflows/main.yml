@@ -35,7 +35,7 @@ jobs:
         run: npm test -- --passWithNoTests
 
       - name: Build project 
-        run: npm run build && npx next export
+        run: npm run build
 
       - name: Start static server 
         run: npx serve out -p 3000 &
