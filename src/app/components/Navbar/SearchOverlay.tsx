@@ -215,11 +215,11 @@ export default function SearchOverlay({ open, onClose }: SearchOverlayProps) {
           </h2>
           <Items items={filteredItems} />
 
-          {filteredItems.length > 0 && searchTerm.length > 0  && (
+          {filteredItems.length > 0 && searchTerm.length > 0 && (
             <div className="flex justify-center mt-4">
               <Link
                 href="/all-products"
-                className="px-4 py-2 bg-black text-white text-sm hover:bg-gray-800 transition-colors"
+                className="px-4 py-2 mb-2 bg-black text-white text-sm hover:bg-gray-800 transition-colors"
               >
                 View All
               </Link>
