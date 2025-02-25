@@ -47,7 +47,7 @@ export default function MobileMenu({
           className="text-lg font-semibold"
           style={{ fontFamily: "var(--font-poppins)" }}
         >
-          Menu\
+          Menu
         </span>
         <button onClick={onClose}>
           <FiX size={24} />

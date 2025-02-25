@@ -28,7 +28,7 @@ export default function Items({ items }: ItemsProps) {
 
   return (
     <div
-      className="grid grid-cols-2 sm:grid-cols-3 pb-6 gap-y-2"
+      className="grid grid-cols-2 sm:grid-cols-3 pb-6 gap-2"
       style={{ fontFamily: "var(--font-poppins)" }}
     >
       {items.map((product) => (
