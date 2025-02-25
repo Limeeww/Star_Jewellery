@@ -28,14 +28,14 @@ export default function Items({ items }: ItemsProps) {
 
   return (
     <div
-      className="grid grid-cols-2 sm:grid-cols-3 pb-6"
+      className="grid grid-cols-2 sm:grid-cols-3 pb-6 gap-y-2"
       style={{ fontFamily: "var(--font-poppins)" }}
     >
       {items.map((product) => (
         <Link
           key={product.id}
           href={`/${product.slug}/?variantID=${product.variantID}`}
-          className="border p-2 text-gray-800 hover:shadow scale-95"
+          className="border p-2 text-gray-800 hover:shadow"
         >
           <Image
             src={product.image}

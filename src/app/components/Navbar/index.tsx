@@ -2,51 +2,46 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-
-import { LuSearch, LuUserRound, LuShoppingBag } from "react-icons/lu";
+import { LuSearch, LuShoppingBag, LuMenu } from "react-icons/lu";
 import SearchOverlay from "./SearchOverlay";
+import MobileMenu from "./MobileMenu";
+import NavLinks from "./NavLinks";
+import UserBlock from "./UserBlock";
 
-const Navbar = () => {
+
+const NAV_LINKS = [
+  { href: "/about-us", label: "ABOUT US" },
+  { href: "/catalog", label: "CATALOG" },
+  { href: "/collections", label: "COLLECTIONS" },
+  { href: "/projects", label: "PROJECTS" },
+];
+
+export default function Navbar() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [cartItemCount, setCartItemCount] = useState<number>(100);
-  const [open, setOpen] = useState<boolean>(false);
+  const [openSearch, setOpenSearch] = useState<boolean>(false);
+  const [openMenu, setOpenMenu] = useState<boolean>(false);
+
+  const isLoggedIn = false;
 
   return (
-    <header className="w-full bg-gray-100">
-      <nav className="container mx-auto flex items-center justify-between py-4 px-4 md:px-0">
-        <div className="hidden md:flex space-x-8">
-          <Link
-            href="/about-us"
-            className="text-sm font-medium text-gray-800 hover:text-gray-500 transition-colors"
-            style={{ fontFamily: "var(--font-poppins)" }}
-          >
-            ABOUT US
-          </Link>
-          <Link
-            href="/catalog"
-            className="text-sm font-medium text-gray-800 hover:text-gray-500 transition-colors"
-            style={{ fontFamily: "var(--font-poppins)" }}
-          >
-            CATALOG
-          </Link>
-          <Link
-            href="/collections"
-            className="text-sm font-medium text-gray-800 hover:text-gray-500 transition-colors"
-            style={{ fontFamily: "var(--font-poppins)" }}
-          >
-            COLLECTIONS
-          </Link>
-          <Link
-            href="/projects"
-            className="text-sm font-medium text-gray-800 hover:text-gray-500 transition-colors"
-            style={{ fontFamily: "var(--font-poppins)" }}
-          >
-            PROJECTS
-          </Link>
-        </div>
+    <header className="w-full bg-gray-100 relative">
+      <MobileMenu
+        open={openMenu}
+        onClose={() => setOpenMenu(false)}
+        isLoggedIn={isLoggedIn}
+      />
+
+      <nav className="container mx-auto flex items-center justify-between py-4 px-4 xl:px-0">
+        <button
+          onClick={() => setOpenMenu(true)}
+          className="text-gray-800 hover:text-gray-500 border-none outline-none focus:outline-none xl:hidden"
+        >
+          <LuMenu size={24} />
+        </button>
 
         <div
-          className="absolute left-1/2 transform text-gray-800 -translate-x-1/2 text-3xl md:text-3xl font-bold tracking-wide"
+          className="absolute left-1/2 transform text-gray-800 -translate-x-1/2 text-3xl xl:text-3xl font-bold tracking-wide"
           style={{
             fontFamily: "var(--font-playfair)",
             letterSpacing: "0.05em",
@@ -55,13 +50,28 @@ const Navbar = () => {
           <Link href="/">STAR</Link>
         </div>
 
+        <div
+          className="hidden xl:flex space-x-8"
+          style={{ fontFamily: "var(--font-poppins)" }}
+        >
+          <NavLinks
+            links={NAV_LINKS}
+            linkClass="text-md font-medium text-gray-800 hover:text-gray-500 transition-colors"
+          />
+        </div>
+
         <div className="flex items-center space-x-7">
-          <Link href="/profile" className="text-gray-800 hover:text-gray-500">
-            <LuUserRound size={20} />
-          </Link>
-          <button className="text-gray-800 hover:text-gray-500 border-none outline-none focus:outline-none shadow-none focus:shadow-none border-none">
-            <LuSearch onClick={() => setOpen(true)} size={20} />
+          <div className="hidden xl:flex xl:space-x-4 text-gray-800">
+            <UserBlock isLoggedIn={isLoggedIn} />
+          </div>
+
+          <button
+            onClick={() => setOpenSearch(true)}
+            className="text-gray-800 hover:text-gray-500 border-none outline-none focus:outline-none"
+          >
+            <LuSearch size={20} />
           </button>
+
           <Link
             href="/cart"
             className="relative text-gray-800 hover:text-gray-500"
@@ -75,9 +85,8 @@ const Navbar = () => {
           </Link>
         </div>
       </nav>
-      <SearchOverlay open={open} onClose={() => setOpen(false)} />
+
+      <SearchOverlay open={openSearch} onClose={() => setOpenSearch(false)} />
     </header>
   );
-};
-
-export default Navbar;
+}
