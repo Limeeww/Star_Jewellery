@@ -1,5 +1,6 @@
 import React from "react";
 import Navbar from "./components/Navbar";
+import Link from "next/link";
 
 export default function HomePage() {
   return (
@@ -14,10 +15,7 @@ export default function HomePage() {
           muted
           playsInline
         >
-          <source
-            src="/videos/background.mp4"
-            type="video/mp4"
-          />
+          <source src="/videos/background.mp4" type="video/mp4" />
           Your browser does not support video format.
         </video>
 
@@ -35,23 +33,25 @@ export default function HomePage() {
             >
               Discover the beauty and elegance of our jewellery collection.
             </p>
-            <button
-              className="
+            <Link href="/all-products">
+              <button
+                className="
           mt-6 
           px-6 
           py-2 
           border 
           border-white 
           text-white 
-          hover:bg-white 
+          hover:bg-white  
           hover:text-gray-800 
           transition-colors 
           duration-300
         "
-              style={{ fontFamily: "var(--font-poppins)" }}
-            >
-              Shop Now
-            </button>
+                style={{ fontFamily: "var(--font-poppins)" }}
+              >
+                Shop Now
+              </button>
+            </Link>
           </div>
         </div>
       </div>
