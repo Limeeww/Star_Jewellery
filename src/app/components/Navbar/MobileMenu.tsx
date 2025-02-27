@@ -3,7 +3,7 @@
 import { FiX } from "react-icons/fi";
 import NavLinks from "./NavLinks";
 import UserBlock from "./UserBlock";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 const NAV_LINKS = [
   { href: "/about-us", label: "About Us" },
@@ -21,6 +21,8 @@ export default function MobileMenu({
   onClose: () => void;
   isLoggedIn: boolean;
 }) {
+  const menuRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const handleEsc = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -33,10 +35,24 @@ export default function MobileMenu({
     };
   }, [onClose]);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        onClose();
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [onClose]);
+
   return (
     <div
+      ref={menuRef}
       className={`
-          fixed top-0 left-0 h-full w-64 bg-white z-50 transform
+          fixed top-0 left-0 h-full w-64 bg-gray-100 z-50 transform
           ${open ? "translate-x-0" : "-translate-x-full"}
           transition-transform duration-300 shadow-md flex flex-col
           xl:hidden
