@@ -1,13 +1,34 @@
-import React from "react";
+"use client";
+
+import React, {useRef, useEffect, useState} from "react";
 import Navbar from "./components/Navbar";
 import Link from "next/link";
+import Collection from "./Collection";
+
+
 
 export default function HomePage() {
+
+  const [isScrolled, setIsScrolled] = useState(false);
+  const header = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const videoHeight = header.current?.clientHeight || 0;
+      setIsScrolled(window.scrollY > videoHeight);
+    };
+  
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
   return (
     <>
-      <Navbar />
+      <Navbar isScrolled={isScrolled} />
 
-      <div className="relative w-full h-screen">
+      <div className="relative w-full h-screen" ref={header}>
         <video
           className="absolute top-0 left-0 w-full h-full object-cover -z-10"
           autoPlay
@@ -55,6 +76,9 @@ export default function HomePage() {
           </div>
         </div>
       </div>
+
+      <Collection/>
+
     </>
   );
 }

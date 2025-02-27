@@ -52,7 +52,7 @@ export default function MobileMenu({
     <div
       ref={menuRef}
       className={`
-          fixed top-0 left-0 h-full w-64 bg-gray-100 z-50 transform
+          fixed top-0 left-0 h-full w-64 bg-white z-50 transform
           ${open ? "translate-x-0" : "-translate-x-full"}
           transition-transform duration-300 shadow-md flex flex-col
           xl:hidden
@@ -79,7 +79,7 @@ export default function MobileMenu({
           linkClass="hover:underline"
           onClick={onClose}
         />
-        <UserBlock isLoggedIn={isLoggedIn} onClose={onClose} />
+        <UserBlock isScrolled={true} isLoggedIn={isLoggedIn} onClose={onClose} />
       </nav>
     </div>
   );

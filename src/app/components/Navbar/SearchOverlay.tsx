@@ -7,7 +7,7 @@ import { LuSearch } from "react-icons/lu";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-import Items from "./Items";
+import Items from "../Items/Items";
 
 type SearchOverlayProps = {
   open: boolean;
@@ -124,8 +124,6 @@ export default function SearchOverlay({ open, onClose }: SearchOverlayProps) {
     setLastSearches((prev) => prev.filter((t) => t !== term));
   };
 
-
-  
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 bg-white flex flex-col text-gray-800">
