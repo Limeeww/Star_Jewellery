@@ -99,6 +99,18 @@ export default function SearchOverlay({ open, onClose }: SearchOverlayProps) {
     };
   }, [onClose]);
 
+  useEffect(() => {
+    const handleEnter = (event: KeyboardEvent) => {
+      if (event.key === "Enter" && searchTerm.trim()) {
+        handleCategoryClick(searchTerm);
+      }
+    };
+    window.addEventListener("keydown", handleEnter);
+    return () => {
+      window.removeEventListener("keydown", handleEnter);
+    };
+  }, [searchTerm]);
+
   const handleCategoryClick = (category: string) => {
     if (!category.trim()) return;
     if (!lastSearches.includes(category)) {
@@ -112,6 +124,8 @@ export default function SearchOverlay({ open, onClose }: SearchOverlayProps) {
     setLastSearches((prev) => prev.filter((t) => t !== term));
   };
 
+
+  
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 bg-white flex flex-col text-gray-800">
