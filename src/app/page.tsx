@@ -4,13 +4,20 @@ import React, {useRef, useEffect, useState} from "react";
 import Navbar from "./components/Navbar";
 import Link from "next/link";
 import Collection from "./Collection";
-
+import {useAuthState} from 'react-firebase-hooks/auth';
+import { auth } from '../firebase/firebaseConfig';
 
 
 export default function HomePage() {
 
   const [isScrolled, setIsScrolled] = useState(false);
   const header = useRef<HTMLDivElement>(null);
+  const [user, loading] = useAuthState(auth);
+  let isLoggedIn = false;
+
+  if (!loading && user) {
+    isLoggedIn = true;
+  }
 
   useEffect(() => {
     const handleScroll = () => {
@@ -26,7 +33,7 @@ export default function HomePage() {
 
   return (
     <>
-      <Navbar isScrolled={isScrolled} />
+      <Navbar isScrolled={isScrolled} isLoggedIn={isLoggedIn} />
 
       <div className="relative w-full h-screen" ref={header}>
         <video
@@ -78,7 +85,7 @@ export default function HomePage() {
       </div>
 
       <Collection/>
-
+      
     </>
   );
 }

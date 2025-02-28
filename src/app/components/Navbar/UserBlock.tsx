@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { LuLogOut, LuUserRound } from "react-icons/lu";
+import { useRouter } from 'next/navigation';
 
 type UserBlockProps = {
   isScrolled: boolean;
@@ -8,13 +9,11 @@ type UserBlockProps = {
   onClose?: () => void;
 };
 
-export default function UserBlock({
-  isScrolled,
-  isLoggedIn,
-  onClose,
-}: UserBlockProps) {
+
+export default function UserBlock({isScrolled, isLoggedIn, onClose}: UserBlockProps) {
+  const router = useRouter();
   const handleLogout = () => {
-    if (onClose) onClose();
+    router.push('/sign-out');
   };
 
   const linkClass = `
@@ -39,7 +38,7 @@ export default function UserBlock({
           onClick={onClose}
         >
           <LuUserRound size={18} />
-          <span>My Account</span>
+          <span>My Account</span> {/* TO DO create model type User and import it to get users name*/}
         </Link>
         <button
           className={`${linkClass} ${textColor} text-left`}
@@ -53,7 +52,7 @@ export default function UserBlock({
   } else {
     return (
       <Link
-        href="/login"
+        href="/sign-in"
         className={`${linkClass} ${textColor}`}
         onClick={onClose}
       >
