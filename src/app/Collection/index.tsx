@@ -62,7 +62,7 @@ export default function CollectionPage() {
         className="text-center text-3xl text-gray-800 mb-2"
         style={{ fontFamily: "var(--font-playfair)" }}
       >
-        Catallog
+        CATALOG
       </h1>
 
       <div className="text-center mb-6">
