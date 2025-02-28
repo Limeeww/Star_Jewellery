@@ -1,14 +1,12 @@
 "use client";
 
-import React, {useRef, useEffect, useState} from "react";
+import React, { useRef, useEffect, useState } from "react";
 import Navbar from "./components/Navbar";
 import Link from "next/link";
 import Collection from "./Collection";
-
-
+import Image from "next/image";
 
 export default function HomePage() {
-
   const [isScrolled, setIsScrolled] = useState(false);
   const header = useRef<HTMLDivElement>(null);
 
@@ -17,7 +15,7 @@ export default function HomePage() {
       const videoHeight = header.current?.clientHeight || 0;
       setIsScrolled(window.scrollY > videoHeight);
     };
-  
+
     window.addEventListener("scroll", handleScroll);
     return () => {
       window.removeEventListener("scroll", handleScroll);
@@ -77,8 +75,38 @@ export default function HomePage() {
         </div>
       </div>
 
-      <Collection/>
+      <Collection />
 
+      <div
+        className="flex flex-col md:flex-row w-full h-screen"
+        style={{ fontFamily: "var(--font-poppins)" }}
+      >
+        <div className="w-full md:w-1/2 h-1/2 md:h-full relative">
+          <Image
+            src="/images/bestseller/bestseller4.jpg"
+            alt="Jewelry Image"
+            layout="fill"
+            objectFit="cover"
+            className="rounded-b-lg md:rounded-none"
+          />
+        </div>
+
+        <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-10">
+          <div className="text-center max-w-md">
+            <h2 className="font-serif text-3xl tracking-widest text-gray-800 mb-4">
+              LUXURY JEWELRY COLLECTION
+            </h2>
+            <p className="text-lg text-gray-600 mb-8">
+              Discover the elegance of timeless design with our newest luxury
+              jewelry pieces. Celebrate the art of craftsmanship and add a touch
+              of glamour to your style.
+            </p>
+            <button className="bg-black text-white px-6 py-3 hover:bg-gray-800 transition duration-300">
+              Explore The Collection
+            </button>
+          </div>
+        </div>
+      </div>
     </>
   );
 }
