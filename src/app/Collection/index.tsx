@@ -1,6 +1,8 @@
 import React from "react";
 import Link from "next/link";
 import Item from "../components/Item/Item";
+import EmblaCarousel from '../components/EmblaCarousel/EmblaCarousel'
+import { EmblaOptionsType } from 'embla-carousel'
 
 type Product = {
   id: number;
@@ -11,6 +13,10 @@ type Product = {
   variantID: string;
   price?: number;
 };
+
+const OPTIONS: EmblaOptionsType = { dragFree: true }
+const SLIDE_COUNT = 10
+const SLIDES = Array.from(Array(SLIDE_COUNT).keys())
 
 export default function CollectionPage() {
   const items: Product[] = [
@@ -79,6 +85,7 @@ export default function CollectionPage() {
           <Item key={product.id} product={product} />
         ))}
       </div>
+      <EmblaCarousel slides={SLIDES} options={OPTIONS} />
     </div>
   );
 }
