@@ -128,7 +128,12 @@ export default function SearchOverlay({ open, onClose }: SearchOverlayProps) {
   return (
     <div className="fixed inset-0 z-50 bg-white flex flex-col text-gray-800">
       <div className="flex items-center justify-between p-4 border-b border-gray-200">
-        <LuSearch className="text-gray-500 mr-2" size={20} />
+        <button
+          onClick={() => handleCategoryClick(searchTerm)}
+          className="text-gray-800 mr-2 p-2 focus:outline-none"
+        >
+          <LuSearch size={20} />
+        </button>
         <input
           type="text"
           placeholder="Search..."
