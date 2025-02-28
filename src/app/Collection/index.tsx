@@ -1,8 +1,6 @@
-
 import React from "react";
 import Link from "next/link";
-import Items from "../components/Items/Items";
-
+import Item from "../components/Item/Item";
 
 type Product = {
   id: number;
@@ -11,7 +9,7 @@ type Product = {
   image: string;
   slug: string;
   variantID: string;
-  price?: number; 
+  price?: number;
 };
 
 export default function CollectionPage() {
@@ -60,17 +58,27 @@ export default function CollectionPage() {
 
   return (
     <div className="px-4 py-8" style={{ fontFamily: "var(--font-poppins)" }}>
-      <h1 className="text-center text-3xl text-gray-800 mb-2" style={{ fontFamily: "var(--font-playfair)" }}>
+      <h1
+        className="text-center text-3xl text-gray-800 mb-2"
+        style={{ fontFamily: "var(--font-playfair)" }}
+      >
         Catallog
       </h1>
 
       <div className="text-center mb-6">
-        <Link href="/all-collections" className="text-sm text-gray-600 hover:text-gray-800 underline">
+        <Link
+          href="/all-collections"
+          className="text-sm text-gray-600 hover:text-gray-800 underline"
+        >
           VIEW ALL
         </Link>
       </div>
 
-      <Items items={items} />
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {items.map((product) => (
+          <Item key={product.id} product={product} />
+        ))}
+      </div>
     </div>
   );
 }

@@ -7,7 +7,7 @@ import { LuSearch } from "react-icons/lu";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-import Items from "../Items/Items";
+import Item from "../Item/Item";
 
 type SearchOverlayProps = {
   open: boolean;
@@ -230,7 +230,12 @@ export default function SearchOverlay({ open, onClose }: SearchOverlayProps) {
           <h2 className="text-lg font-semibold mb-2">
             {searchTerm ? `Top Results for "${searchTerm}"` : "Bestsellers"}
           </h2>
-          <Items items={filteredItems} />
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {items.map((item) => {
+              return <Item key={item.id} product={item} />;
+            })}
+          </div>
 
           {filteredItems.length > 0 && searchTerm.length > 0 && (
             <div className="flex justify-center mt-4">
