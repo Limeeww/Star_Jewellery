@@ -4,10 +4,9 @@ import React, { useRef, useEffect, useState } from "react";
 import Navbar from "./components/Navbar";
 import Link from "next/link";
 import Collection from "./Collection";
-import {useAuthState} from 'react-firebase-hooks/auth';
-import { auth } from '../firebase/firebaseConfig';
-import Image from 'next/image';
-
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "../firebase/firebaseConfig";
+import Image from "next/image";
 
 export default function HomePage() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -110,9 +109,11 @@ export default function HomePage() {
               jewelry pieces. Celebrate the art of craftsmanship and add a touch
               of glamour to your style.
             </p>
-            <button className="bg-black text-white px-6 py-3 hover:bg-gray-800 transition duration-300">
-              Explore The Collection
-            </button>
+            <Link href="/all-products">
+              <button className="bg-black text-white px-6 py-3 hover:bg-gray-800 transition duration-300">
+                Explore The Collection
+              </button>
+            </Link>
           </div>
         </div>
       </div>
