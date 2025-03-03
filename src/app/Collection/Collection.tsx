@@ -67,6 +67,7 @@ export default function CollectionsSection() {
           font-bold 
           mb-8 
           text-gray-800
+          text-center
         "
         style={{
           fontFamily: "var(--font-playfair)",
