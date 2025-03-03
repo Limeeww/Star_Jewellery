@@ -3,10 +3,12 @@
 import React, { useRef, useEffect, useState } from "react";
 import Navbar from "./components/Navbar";
 import Link from "next/link";
-import Collection from "./Collection";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../firebase/firebaseConfig";
 import Image from "next/image";
+import Catalog from "./Catalog/Catalog";
+
+import Collection from "./Collection/Collection";
 
 export default function HomePage() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -83,7 +85,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      <Collection />
+      <Catalog />
 
       <div
         className="flex flex-col md:flex-row w-full h-screen"
@@ -117,6 +119,8 @@ export default function HomePage() {
           </div>
         </div>
       </div>
+
+      <Collection/>
     </>
   );
 }
