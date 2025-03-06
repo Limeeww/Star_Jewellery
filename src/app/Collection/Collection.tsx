@@ -77,27 +77,25 @@ export default function CollectionsSection() {
         COLLECTIONS
       </h2>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 2xl:grid-cols-2 gap-4">
+        <div className="order-2 2xl:order-1 grid grid-cols-2 gap-2">
           {items.map((product) => (
             <Item key={product.id} product={product} />
           ))}
         </div>
 
-        <div className="overflow-hidden">
-          <div className="h-screen">
-            <Image
-              src="/images/collection/model.jpg"
-              alt="Model wearing jewelry"
-              width={600}
-              height={800}
-              className="
+        <div className="overflow-hidden order-1 2xl:order-2 overflow-hidden">
+          <Image
+            src="/images/collection/model.jpg"
+            alt="Model wearing jewelry"
+            width={600}
+            height={800}
+            className="
               w-full
-              object-cover
-              
+             h-[50vh] md:h-[65vh] 2xl:h-[105vh] object-cover
+
             "
-            />
-          </div>
+          />
         </div>
       </div>
     </section>

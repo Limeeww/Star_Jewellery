@@ -1,8 +1,8 @@
 import React from "react";
 import Link from "next/link";
 import Item from "../components/Item/Item";
-import EmblaCarousel from '../components/EmblaCarousel/EmblaCarousel'
-import { EmblaOptionsType } from 'embla-carousel'
+import EmblaCarousel from "../components/EmblaCarousel/EmblaCarousel";
+import { EmblaOptionsType } from "embla-carousel";
 
 type Product = {
   id: number;
@@ -14,9 +14,9 @@ type Product = {
   price?: number;
 };
 
-const OPTIONS: EmblaOptionsType = { dragFree: true }
-const SLIDE_COUNT = 10
-const SLIDES = Array.from(Array(SLIDE_COUNT).keys())
+const OPTIONS: EmblaOptionsType = { dragFree: true };
+const SLIDE_COUNT = 10;
+const SLIDES = Array.from(Array(SLIDE_COUNT).keys());
 
 export default function CollectionPage() {
   const items: Product[] = [
@@ -63,7 +63,10 @@ export default function CollectionPage() {
   ];
 
   return (
-    <div className="px-4 py-8" style={{ fontFamily: "var(--font-poppins)" }}>
+    <div
+      className="sm:px-6 lg:px-6 py-8"
+      style={{ fontFamily: "var(--font-poppins)" }}
+    >
       <h1
         className="text-center text-3xl text-gray-800 mb-2"
         style={{ fontFamily: "var(--font-playfair)" }}

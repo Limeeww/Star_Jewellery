@@ -9,6 +9,8 @@ import Image from "next/image";
 import Catalog from "./Catalog/Catalog";
 
 import Collection from "./Collection/Collection";
+import AboutUsSection from "./AboutUsSection/AboutUsSection";
+import { FaGift, FaHeadset, FaShippingFast } from "react-icons/fa";
 
 export default function HomePage() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -87,40 +89,78 @@ export default function HomePage() {
 
       <Catalog />
 
-      <div
-        className="flex flex-col md:flex-row w-full h-screen"
-        style={{ fontFamily: "var(--font-poppins)" }}
-      >
-        <div className="w-full md:w-1/2 h-1/2 md:h-full relative">
-          <Image
-            src="/images/bestseller/bestseller4.jpg"
-            alt="Jewelry Image"
-            layout="fill"
-            objectFit="cover"
-            className="rounded-b-lg md:rounded-none"
-          />
-        </div>
+      <section className="py-12" style={{ fontFamily: "var(--font-poppins)" }}>
+        <div className="grid grid-cols-1 xl:grid-cols-2">
+          <div className="overflow-hidden order-1 2xl:order-1">
+            <Image
+              src="/images/bestseller/bestseller4.jpg"
+              alt="Jewelry Image"
+              width={600}
+              height={800}
+              className="w-full xl:h-[60vh] sm:h-[40vh] h-auto object-contain"
+            />
+          </div>
 
-        <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-10">
-          <div className="text-center max-w-md">
-            <h2 className="font-serif text-3xl tracking-widest text-gray-800 mb-4">
-              LUXURY JEWELRY COLLECTION
-            </h2>
-            <p className="text-lg text-gray-600 mb-8">
-              Discover the elegance of timeless design with our newest luxury
-              jewelry pieces. Celebrate the art of craftsmanship and add a touch
-              of glamour to your style.
-            </p>
-            <Link href="/all-products">
-              <button className="bg-black text-white px-6 py-3 hover:bg-gray-800 transition duration-300">
-                Explore The Collection
-              </button>
-            </Link>
+          <div className="flex flex-col justify-center items-center lg:p-12 order-2 xl:order-2">
+            <div className="text-center max-w-lg">
+              <h2 className="font-serif text-2xl md:text-3xl tracking-widest text-gray-800 mb-4">
+                LUXURY JEWELRY COLLECTION
+              </h2>
+              <p className="text-base md:text-lg text-gray-600 mb-6 md:mb-10">
+                Discover the elegance of timeless design with our newest luxury
+                jewelry pieces. Celebrate the art of craftsmanship and add a
+                touch of glamour to your style.
+              </p>
+              <Link href="/all-products">
+                <button className="bg-black text-white px-6 py-3 hover:bg-gray-800 transition duration-300">
+                  Explore The Collection
+                </button>
+              </Link>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      <Collection/>
+      <Collection />
+
+      <section
+        className="py-12 px-4 sm:px-6 lg:px-8 bg-white"
+        style={{ fontFamily: "var(--font-poppins)" }}
+      >
+        <h2
+          className="text-center text-3xl sm:text-3xl mb-10 font-bold"
+          style={{ fontFamily: "var(--font-playfair)" }}
+        >
+          Star Services
+        </h2>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+          <div className="flex flex-col items-center space-y-2">
+            <FaShippingFast className="text-3xl text-gray-800 mb-2" />
+            <h3 className="text-md font-semibold">FAST DELIVERY</h3>
+            <p className="text-sm text-gray-600">
+              Enjoy fast and reliable delivery with every order.
+            </p>
+          </div>
+
+          <div className="flex flex-col items-center space-y-2">
+            <FaHeadset className="text-3xl text-gray-800 mb-2" />
+            <h3 className="text-md font-semibold">CUSTOMER SERVICE</h3>
+            <p className="text-sm text-gray-600">
+              Find answers to your frequently asked questions or contact our
+              team of experts.
+            </p>
+          </div>
+
+          <div className="flex flex-col items-center space-y-2">
+            <FaGift className="text-3xl text-gray-800 mb-2" />
+            <h3 className="text-md font-semibold">GIFT SERVICES</h3>
+            <p className="text-sm text-gray-600">Add a personal touch.</p>
+          </div>
+        </div>
+      </section>
+
+      <AboutUsSection />
     </>
   );
 }
