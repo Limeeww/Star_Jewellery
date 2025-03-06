@@ -53,7 +53,6 @@ export default function AboutUsSection() {
           </Link>
         </div>
 
-        {/* Правая колонка: изображение */}
         <div className="overflow-hidden">
           <Image
             src="/images/about-us.jpg"
