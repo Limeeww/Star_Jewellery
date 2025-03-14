@@ -10,9 +10,9 @@ import UserBlock from "./UserBlock";
 
 
 const NAV_LINKS = [
-  { href: "/about-us", label: "ABOUT US" },
-  { href: "/catalog", label: "CATALOG" },
-  { href: "/collections", label: "COLLECTIONS" },
+  { href: "#about-us", label: "ABOUT US" },
+  { href: "#catalog", label: "CATALOG" },
+  { href: "#collections", label: "COLLECTIONS" },
   { href: "/projects", label: "PROJECTS" },
 ];
 

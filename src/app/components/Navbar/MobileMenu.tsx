@@ -6,9 +6,9 @@ import UserBlock from "./UserBlock";
 import { useEffect, useRef } from "react";
 
 const NAV_LINKS = [
-  { href: "/about-us", label: "About Us" },
-  { href: "/catalog", label: "Catalog" },
-  { href: "/collections", label: "Collections" },
+  { href: "#about-us", label: "About Us" },
+  { href: "#catalog", label: "Catalog" },
+  { href: "#collections", label: "Collections" },
   { href: "/projects", label: "Projects" },
 ];
 

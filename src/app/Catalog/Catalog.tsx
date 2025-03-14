@@ -66,6 +66,7 @@ export default function CollectionPage() {
     <div
       className="sm:px-6 lg:px-6 py-8"
       style={{ fontFamily: "var(--font-poppins)" }}
+      id="catalog"
     >
       <h1
         className="text-center text-3xl text-gray-800 mb-2"
