@@ -8,20 +8,15 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import Item from "../Item/Item";
+import { Product } from "../../types/product";
+
 
 type SearchOverlayProps = {
   open: boolean;
   onClose: () => void;
 };
 
-type Product = {
-  id: number;
-  name: string;
-  description: string;
-  image: string;
-  slug: string;
-  variantID: string;
-};
+
 
 export default function SearchOverlay({ open, onClose }: SearchOverlayProps) {
   const [searchTerm, setSearchTerm] = useState("");
