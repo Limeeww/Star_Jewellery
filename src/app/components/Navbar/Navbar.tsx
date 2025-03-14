@@ -8,7 +8,6 @@ import MobileMenu from "./MobileMenu";
 import NavLinks from "./NavLinks";
 import UserBlock from "./UserBlock";
 
-
 const NAV_LINKS = [
   { href: "#about-us", label: "ABOUT US" },
   { href: "#catalog", label: "CATALOG" },
@@ -21,11 +20,14 @@ type NavbarProps = {
   isLoggedIn: boolean;
 };
 
+
 export default function Navbar({ isScrolled, isLoggedIn }: NavbarProps) {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [cartItemCount, setCartItemCount] = useState<number>(100);
   const [openSearch, setOpenSearch] = useState<boolean>(false);
   const [openMenu, setOpenMenu] = useState<boolean>(false);
+
+
   
   return (
     <header
@@ -35,7 +37,11 @@ export default function Navbar({ isScrolled, isLoggedIn }: NavbarProps) {
       left-0 
       w-full 
       z-50 
-      ${isScrolled ? "bg-white text-gray-800 shadow-md" : "bg-transparent text-white" }
+      ${
+        isScrolled
+          ? "bg-white text-gray-800 shadow-md"
+          : "bg-transparent text-white"
+      }
       transition-colors 
       duration-300
     `}
@@ -99,7 +105,7 @@ export default function Navbar({ isScrolled, isLoggedIn }: NavbarProps) {
 
         <div className="flex items-center space-x-7">
           <div className="hidden xl:flex xl:space-x-4">
-            <UserBlock isScrolled={isScrolled}  isLoggedIn={isLoggedIn} />
+            <UserBlock isScrolled={isScrolled} isLoggedIn={isLoggedIn} />
           </div>
 
           <button
