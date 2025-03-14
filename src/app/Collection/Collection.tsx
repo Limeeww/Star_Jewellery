@@ -59,6 +59,7 @@ export default function CollectionsSection() {
         lg:px-8
       "
       style={{ fontFamily: "var(--font-poppins)" }}
+      id="collections"
     >
       <h2
         className="

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef, useEffect, useState } from "react";
-import Navbar from "./components/Navbar";
+import Navbar from "./components/Navbar/Navbar";
 import Link from "next/link";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../firebase/firebaseConfig";
@@ -52,22 +52,22 @@ export default function HomePage() {
         </video>
 
         <div className="absolute top-0 left-0 w-full h-full flex items-center">
-            <div className="container mx-auto px-4">
-              <h1
-                className="text-6xl font-bold text-white text-left"
-                style={{ fontFamily: "var(--font-playfair)" }}
-              >
-                Welcome to Star Jewellery
-              </h1>
-              <p
-                className="text-lg text-white mt-4 text-left"
-                style={{ fontFamily: "var(--font-poppins)" }}
-              >
-                Discover the beauty and elegance of our jewellery collection.
-              </p>
-              <Link href="/all-products">
-                <button
-                  className="
+          <div className="container mx-auto px-4">
+            <h1
+              className="text-6xl font-bold text-white text-left"
+              style={{ fontFamily: "var(--font-playfair)" }}
+            >
+              Welcome to Star Jewellery
+            </h1>
+            <p
+              className="text-lg text-white mt-4 text-left"
+              style={{ fontFamily: "var(--font-poppins)" }}
+            >
+              Discover the beauty and elegance of our jewellery collection.
+            </p>
+            <Link href="/all-products">
+              <button
+                className="
             mt-6 
             px-6 
             py-2 
@@ -79,14 +79,14 @@ export default function HomePage() {
             transition-colors 
             duration-300
           "
-                  style={{ fontFamily: "var(--font-poppins)" }}
-                >
-                  Shop Now
-                </button>
-              </Link>
-            </div>
+                style={{ fontFamily: "var(--font-poppins)" }}
+              >
+                Shop Now
+              </button>
+            </Link>
           </div>
         </div>
+      </div>
 
       <Catalog />
 
@@ -163,7 +163,7 @@ export default function HomePage() {
 
       <AboutUsSection />
 
-      <Footer/> 
+      <Footer />
     </>
   );
 }

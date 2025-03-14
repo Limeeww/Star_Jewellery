@@ -3,7 +3,7 @@ import Link from "next/link";
 export default function Footer() {
   return (
     <footer
-      className="bg-white border-t border-gray-200 py-10"
+      className="bg-white border-t border-gray-200 py-10 shadow-md"
       style={{ fontFamily: "var(--font-poppins)" }}
     >
       <div
@@ -14,16 +14,21 @@ export default function Footer() {
         <div className="flex flex-col md:flex-row justify-between">
           <div className="mb-4 md:mb-0">
             <h2
-              className="text-2xl font-bold uppercase"
-              style={{ fontFamily: "var(--font-playfair)" }}
+              className="text-2xl font-bold uppercase font-bold tracking-wide"
+              style={{
+                fontFamily: "var(--font-playfair)",
+                letterSpacing: "0.05em",
+              }}
             >
-              STAR
+              <Link href="/">STAR</Link>
             </h2>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-sm md:mx-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-sm md:mx-8 text-center">
             <div>
-              <h3 className="font-semibold uppercase mb-2">Projects</h3>
+              <h3 className="font-semibold uppercase mb-2">
+                <Link href="/projects">Projects</Link>
+              </h3>
               <ul className="space-y-1">
                 <li>
                   <Link href="#">Exhibition at the GIM</Link>
@@ -34,7 +39,9 @@ export default function Footer() {
               </ul>
             </div>
             <div>
-              <h3 className="font-semibold uppercase mb-2">Catalog</h3>
+              <h3 className="font-semibold text-md uppercase mb-2">
+                <Link href="#catalog">Catalog</Link>
+              </h3>
               <ul className="space-y-1">
                 <li>
                   <Link href="#">Necklace</Link>
@@ -54,7 +61,9 @@ export default function Footer() {
               </ul>
             </div>
             <div>
-              <h3 className="font-semibold uppercase mb-2">Collections</h3>
+              <h3 className="font-semibold uppercase mb-2">
+                <Link href="#collections">Collections</Link>
+              </h3>
               <ul className="space-y-1">
                 <li>
                   <Link href="#">Coronation</Link>
@@ -74,7 +83,9 @@ export default function Footer() {
               </ul>
             </div>
             <div>
-              <h3 className="font-semibold uppercase mb-2">About Us</h3>
+              <h3 className="font-semibold uppercase mb-2">
+                <Link href="#about-us">About Us</Link>
+              </h3>
               <ul className="space-y-1">
                 <li>
                   <Link href="#">Home</Link>
@@ -90,8 +101,21 @@ export default function Footer() {
             <h3 className="font-semibold mt-4 md:mt-0 uppercase mb-2">
               Contacts
             </h3>
-            <p className="text-sm">+38 (044) 123-45-67</p>
-            <p className="text-sm">Kyiv, Khreshchatyk Street, 1</p>
+            <p className="text-sm">
+              <a href="tel:+380441234567" className="hover:underline">
+                +38 (044) 123-45-67
+              </a>
+            </p>
+            <p className="text-sm">
+              <a
+                href="https://www.google.com/maps/search/?api=1&query=Kyiv,+Khreshchatyk+Street,+1"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:underline"
+              >
+                Kyiv, Khreshchatyk Street, 1
+              </a>
+            </p>
           </div>
         </div>
 

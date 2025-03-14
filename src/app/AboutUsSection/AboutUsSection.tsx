@@ -6,6 +6,7 @@ export default function AboutUsSection() {
     <section
       className="px-4 py-8 sm:px-6 lg:px-8"
       style={{ fontFamily: "var(--font-poppins)" }}
+      id="about-us"
     >
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 items-center">
         <div>
@@ -38,7 +39,7 @@ export default function AboutUsSection() {
             heritage, innovation, and the brilliance of rare gemstones.
           </p>
 
-          <Link href="/about" className="inline-block text-right md:text-left">
+          <Link href="/about-us" className="inline-block text-right md:text-left">
             <p
               className="
                 text-sm 
