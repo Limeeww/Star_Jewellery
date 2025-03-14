@@ -8,10 +8,13 @@ import { auth } from "../firebase/firebaseConfig";
 import Image from "next/image";
 import Catalog from "./Catalog/Catalog";
 
+
 import Collection from "./Collection/Collection";
 import AboutUsSection from "./AboutUsSection/AboutUsSection";
 import { FaGift, FaHeadset, FaShippingFast } from "react-icons/fa";
 import Footer from "./components/Footer/Footer";
+
+
 
 export default function HomePage() {
   const [isScrolled, setIsScrolled] = useState(false);

@@ -3,16 +3,8 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { Product } from "../../types/product";
 
-type Product = {
-  id: number;
-  name: string;
-  description: string;
-  image: string;
-  slug: string;
-  variantID: string;
-  price?: number;
-};
 
 type ItemProps = {
   product: Product;
