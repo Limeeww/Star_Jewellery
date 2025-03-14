@@ -21,6 +21,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
+import Loading from "../components/Loading/Loading";
 
 const validationSchema = yup.object().shape({
   firstName: yup.string().required("First Name is required"),
@@ -126,9 +127,7 @@ export default function SignUpPage() {
   // Show loading / error states
   if (loading || loadingEmail) {
     return (
-      <div className="flex flex-col justify-center items-center w-full h-full">
-        <p className="font-semibold text-5xl mt-20 mb-12">Loading...</p>
-      </div>
+      <Loading/>
     );
   }
 
