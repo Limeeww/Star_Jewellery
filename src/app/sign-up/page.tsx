@@ -288,7 +288,7 @@ export default function SignUpPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword((prev) => !prev)}
-                  className="absolute right-3 top-2 text-gray-600 hover:text-gray-800"
+                  className="absolute right-3 top-3 text-gray-600 hover:text-gray-800"
                 >
                   {showPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
                 </button>
@@ -351,7 +351,7 @@ export default function SignUpPage() {
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword((prev) => !prev)}
-                  className="absolute right-3 top-2 text-gray-600 hover:text-gray-800"
+                  className="absolute right-3 top-3 text-gray-600 hover:text-gray-800"
                 >
                   {showConfirmPassword ? (
                     <AiOutlineEyeInvisible />
