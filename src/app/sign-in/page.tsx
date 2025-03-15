@@ -27,7 +27,7 @@ export default function SignInPage() {
 
   useEffect(() => {
     if (userGoogle || userEmail) {
-      router.push("/profile");
+      router.push("/Account/Overview");
     }
   }, [userGoogle, userEmail, router]);
 

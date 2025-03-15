@@ -120,7 +120,7 @@ export default function SignUpPage() {
 
       await setDoc(doc(db, "users", userCredential.user.uid), userData);
 
-      router.push("/profile");
+      router.push("/Account/Overview");
     }
   };
 

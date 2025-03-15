@@ -9,7 +9,6 @@ const NAV_LINKS = [
   { href: "#about-us", label: "About Us" },
   { href: "#catalog", label: "Catalog" },
   { href: "#collections", label: "Collections" },
-  { href: "/projects", label: "Projects" },
 ];
 
 export default function MobileMenu({
@@ -77,7 +76,6 @@ export default function MobileMenu({
         <NavLinks
           links={NAV_LINKS}
           linkClass="hover:underline"
-          onClick={onClose}
         />
         <UserBlock isScrolled={true} isLoggedIn={isLoggedIn} onClose={onClose} />
       </nav>

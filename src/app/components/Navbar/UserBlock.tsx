@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { LuLogOut, LuUserRound } from "react-icons/lu";
 import { useRouter } from 'next/navigation';
+import { signOutUser } from "@/app/utils/auth";
 
 type UserBlockProps = {
   isScrolled: boolean;
@@ -12,9 +13,6 @@ type UserBlockProps = {
 
 export default function UserBlock({isScrolled, isLoggedIn, onClose}: UserBlockProps) {
   const router = useRouter();
-  const handleLogout = () => {
-    router.push('/sign-out');
-  };
 
   const linkClass = `
     transition-colors 
@@ -33,7 +31,7 @@ export default function UserBlock({isScrolled, isLoggedIn, onClose}: UserBlockPr
     return (
       <>
         <Link
-          href="/profile"
+          href="/Account/Overview"
           className={`${linkClass} ${textColor}`}
           onClick={onClose}
         >
@@ -42,7 +40,7 @@ export default function UserBlock({isScrolled, isLoggedIn, onClose}: UserBlockPr
         </Link>
         <button
           className={`${linkClass} ${textColor} text-left`}
-          onClick={handleLogout}
+          onClick={() => signOutUser(router)}
         >
           <LuLogOut size={18} />
           <span>Log out</span>
