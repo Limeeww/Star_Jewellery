@@ -2,22 +2,31 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 export default function NavLinks({
   links,
-  linkClass = "",
 }: {
   links: { href: string; label: string }[];
   linkClass?: string;
 }) {
-  const handleClick = (e: React.MouseEvent, href: string) => {
-    e.preventDefault();
+  const router = useRouter();
+  const handleClick = (
+    e: React.MouseEvent,
+    href: string,
+    router: ReturnType<typeof useRouter>
+  ) => {
+    if (href.startsWith("#")) {
+      e.preventDefault();
+      const targetId = href.replace("#", "");
+      const element = document.getElementById(targetId);
 
-    const targetId = href.replace(/.*\#/, "");
-    const element = document.getElementById(targetId);
-
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    } else {
+      e.preventDefault();
+      router.push(href);
     }
   };
 
@@ -31,8 +40,7 @@ export default function NavLinks({
         >
           <Link
             href={link.href}
-            className={linkClass}
-            onClick={(e) => handleClick(e, link.href)}
+            onClick={(e) => handleClick(e, link.href, router)}
           >
             {link.label}
           </Link>

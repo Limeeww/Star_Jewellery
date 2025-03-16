@@ -1,4 +1,4 @@
-import React from "react";
+import React, { JSX } from "react";
 import { signOutUser } from "@/app/utils/auth";
 import { useRouter } from "next/navigation";
 
@@ -7,7 +7,7 @@ interface WelcomeBlockProps {
   lastName?: string;
 }
 
-const WelcomeBlock: React.FC<WelcomeBlockProps> = ({ firstName, lastName }) => {
+function WelcomeBlock({ firstName, lastName }: WelcomeBlockProps): JSX.Element {
   const router = useRouter();
 
   return (
@@ -23,9 +23,9 @@ const WelcomeBlock: React.FC<WelcomeBlockProps> = ({ firstName, lastName }) => {
           WELCOME, {firstName ?? ""} {lastName ?? ""}
         </h2>
         <p className="text-sm text-gray-700 mb-4">
-          In your My Cartier account, you can manage your personal details and
-          view your orders in one place. Feel free to explore your profile,
-          update your addresses, manage your payment methods, and more.
+          In your My Star account, you can manage your personal details and view
+          your orders in one place. Feel free to explore your profile, update
+          your addresses, manage your payment methods, and more.
         </p>
         <button
           onClick={() => signOutUser(router)}
@@ -36,6 +36,6 @@ const WelcomeBlock: React.FC<WelcomeBlockProps> = ({ firstName, lastName }) => {
       </div>
     </div>
   );
-};
+}
 
 export default WelcomeBlock;
