@@ -16,48 +16,15 @@ import {
 } from "react-firebase-hooks/auth";
 
 import { useForm, Controller } from "react-hook-form";
-import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import Loading from "../components/Loading/Loading";
+import { UserData } from "../types/userTypes";
+import { validationSchema } from "../utils/validationSchema";
 
-const validationSchema = yup.object().shape({
-  firstName: yup.string().required("First Name is required"),
-  lastName: yup.string().required("Last Name is required"),
-  email: yup
-    .string()
-    .email("Invalid email address")
-    .required("Email is required"),
-  password: yup
-    .string()
-    .required("Password is required")
-    .matches(/^(?=.*[0-9])/, "At least one number")
-    .matches(/^(?=.*[A-Z])/, "At least one uppercase letter")
-    .matches(/^(?=.*[a-z])/, "At least one lowercase letter")
-    .matches(/^(?=.*[^a-zA-Z0-9])/, "At least one special character")
-    .min(8, "Minimum 8 characters"),
-  confirmPassword: yup
-    .string()
-    .oneOf([yup.ref("password"), undefined], "Passwords do not match")
-    .required("Please confirm your password"),
-  phoneNumber: yup
-    .string()
-    .required("Phone number is required")
-    .test("valid-phone", "Invalid phone number", (value) => {
-      return !!(value && value.replace(/\D/g, "").length >= 7);
-    }),
-  birthDay: yup.string().optional(),
-  birthMonth: yup.string().optional(),
-  birthYear: yup.string().optional(),
-  gender: yup.string().optional(),
-  relationshipStatus: yup.string().optional(),
-  anniversaryDay: yup.string().optional(),
-  anniversaryMonth: yup.string().optional(),
-  anniversaryYear: yup.string().optional(),
-  marketingConsent: yup.boolean().optional(),
-});
+
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -78,7 +45,7 @@ export default function SignUpPage() {
 
   useEffect(() => {
     if (user || userEmail) {
-      router.push("/profile");
+      router.push("/Account/Overview");
     }
   }, [user, userEmail, router]);
 
@@ -94,7 +61,7 @@ export default function SignUpPage() {
   const hasLowercase = /[a-z]/.test(passwordValue);
   const hasSpecialChar = /[^a-zA-Z0-9]/.test(passwordValue);
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: UserData) => {
     const userCredential = await createUserWithEmailAndPassword(
       data.email,
       data.password
@@ -116,6 +83,10 @@ export default function SignUpPage() {
         marketingConsent: data.marketingConsent || false,
         email: data.email,
         createdAt: new Date(),
+        wishList: data.wishList || [],
+        orders: data.orders || [],
+        addresses: data.addresses || [],
+        bonuses: data.bonuses || "0",
       };
 
       await setDoc(doc(db, "users", userCredential.user.uid), userData);
@@ -124,11 +95,8 @@ export default function SignUpPage() {
     }
   };
 
-  // Show loading / error states
   if (loading || loadingEmail) {
-    return (
-      <Loading/>
-    );
+    return <Loading />;
   }
 
   if (error || errorEmail) {
@@ -440,7 +408,10 @@ export default function SignUpPage() {
                 {...register("birthYear")}
               >
                 <option value="">Year</option>
-                {Array.from({ length: 80 }, (_, i) => 2025 - i).map((year) => (
+                {Array.from(
+                  { length: 80 },
+                  (_, i) => new Date().getFullYear() - i
+                ).map((year) => (
                   <option key={year} value={year}>
                     {year}
                   </option>

@@ -8,19 +8,16 @@ import MobileMenu from "./MobileMenu";
 import NavLinks from "./NavLinks";
 import UserBlock from "./UserBlock";
 
-const NAV_LINKS = [
-  { href: "#about-us", label: "ABOUT US" },
-  { href: "#catalog", label: "CATALOG" },
-  { href: "#collections", label: "COLLECTIONS" },
-];
+
 
 type NavbarProps = {
   isScrolled: boolean;
   isLoggedIn: boolean;
+  navLinks: { label: string; href: string }[];
 };
 
 
-export default function Navbar({ isScrolled, isLoggedIn }: NavbarProps) {
+export default function Navbar({ isScrolled, isLoggedIn, navLinks }: NavbarProps) {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [cartItemCount, setCartItemCount] = useState<number>(100);
   const [openSearch, setOpenSearch] = useState<boolean>(false);
@@ -88,7 +85,7 @@ export default function Navbar({ isScrolled, isLoggedIn }: NavbarProps) {
 
         <div className="hidden xl:flex space-x-8">
           <NavLinks
-            links={NAV_LINKS}
+            links={navLinks}
             linkClass={`
             text-md 
             font-medium 

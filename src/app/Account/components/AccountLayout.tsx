@@ -1,18 +1,20 @@
 import React, { useState } from "react";
+import { JSX } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import AccountSidebar from "./AccountSidebar";
+import { FiChevronUp, FiChevronDown } from "react-icons/fi";
 
 interface AccountLayoutProps {
   children: React.ReactNode;
-  navLinks: { label: string; href: string }[];
+  sideLinks: { label: string; href: string }[];
   pathname: string;
 }
 
-const AccountLayout: React.FC<AccountLayoutProps> = ({
+export default function AccountLayout({
   children,
-  navLinks,
+  sideLinks,
   pathname,
-}) => {
+}: AccountLayoutProps): JSX.Element {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
@@ -29,7 +31,7 @@ const AccountLayout: React.FC<AccountLayoutProps> = ({
             MY STAR
           </h2>
           <nav className="space-y-2 flex flex-col text-sm text-gray-700">
-            <AccountSidebar navLinks={navLinks} pathname={pathname} />
+            <AccountSidebar navLinks={sideLinks} pathname={pathname} />
           </nav>
         </aside>
 
@@ -38,8 +40,19 @@ const AccountLayout: React.FC<AccountLayoutProps> = ({
             className="border-b border-gray-300 py-2 flex items-center justify-between"
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
           >
-            <span className="uppercase text-sm font-bold">MY STAR</span>
-            <span className="text-sm">{isSidebarOpen ? "▲" : "▼"}</span>
+            <span
+              className="uppercase text-xl font-bold"
+              style={{ fontFamily: "var(--font-playfair)" }}
+            >
+              MY STAR
+            </span>
+            <span className="text-sm">
+              {isSidebarOpen ? (
+                <FiChevronUp size={20} />
+              ) : (
+                <FiChevronDown size={20} />
+              )}
+            </span>
           </div>
           <AnimatePresence>
             {isSidebarOpen && (
@@ -51,7 +64,7 @@ const AccountLayout: React.FC<AccountLayoutProps> = ({
                 transition={{ duration: 0.3 }}
                 className="overflow-hidden space-y-2 text-sm text-gray-700 mt-2"
               >
-                <AccountSidebar navLinks={navLinks} pathname={pathname} />
+                <AccountSidebar navLinks={sideLinks} pathname={pathname} />
               </motion.nav>
             )}
           </AnimatePresence>
@@ -61,6 +74,4 @@ const AccountLayout: React.FC<AccountLayoutProps> = ({
       </div>
     </main>
   );
-};
-
-export default AccountLayout;
+}

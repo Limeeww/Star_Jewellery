@@ -12,21 +12,15 @@ import { fetchUserData } from "@/app/utils/auth";
 import WelcomeBlock from "@/app/Account/components/WelcomeBlock";
 import AccountLayout from "../components/AccountLayout";
 
-export default function Profile() {
+import { UserData } from "@/app/types/userTypes";
+import ProfileCard from "../components/ProfileCard";
+
+export default function Overview() {
   const [user, loading] = useAuthState(auth);
   const router = useRouter();
   const pathname = usePathname();
 
-  interface ProfileData {
-    email?: string;
-    firstName?: string;
-    lastName?: string;
-    birthDay?: number;
-    birthMonth?: number;
-    birthYear?: number;
-  }
-
-  const [profileData, setProfileData] = useState<ProfileData | null>(null);
+  const [profileData, setProfileData] = useState<UserData | null>(null);
 
   const isLoggedIn = !loading && !!user;
 
@@ -40,7 +34,7 @@ export default function Profile() {
     const getProfileData = async () => {
       if (user) {
         const data = await fetchUserData(user.uid);
-        if (data) setProfileData(data);
+        if (data !== null) setProfileData(data as UserData);
       }
     };
     getProfileData();
@@ -50,100 +44,95 @@ export default function Profile() {
     return <Loading />;
   }
 
-  const navLinks = [
+  const SIDE_LINKS = [
     { label: "Overview", href: "/Account/Overview" },
     { label: "My Profile", href: "/Account/Profile" },
     { label: "My Orders", href: "/Account/Orders" },
     { label: "My Addresses", href: "/Account/Addresses" },
-    { label: "My Payment Methods", href: "/Account/Payment" },
     { label: "My Wish List", href: "/Account/Wishlist" },
+    { label: "My Bonuses", href: "/Account/Bonuses" },
+  ];
+
+  const NAV_LINKS = [
+    { href: "/about-us", label: "ABOUT US" },
+    { href: "/Catalog", label: "CATALOG" },
+    { href: "/Collections", label: "COLLECTIONS" },
   ];
 
   return (
     <>
-      <Navbar isScrolled={true} isLoggedIn={isLoggedIn}  />
-      <AccountLayout navLinks={navLinks} pathname={pathname}>
+      <Navbar isScrolled={true} isLoggedIn={isLoggedIn} navLinks={NAV_LINKS} />
+      <AccountLayout sideLinks={SIDE_LINKS} pathname={pathname}>
         <WelcomeBlock
           firstName={profileData?.firstName}
           lastName={profileData?.lastName}
         />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="border p-4">
-            <h3
-              className="text-lg font-semibold mb-2"
-              style={{ fontFamily: "var(--font-playfair)" }}
-            >
-              MY PROFILE
-            </h3>
+          <ProfileCard title="MY PROFILE" linkHref="/Account/Profile">
             <div className="text-sm text-gray-600 space-y-1">
               <p>
-                <strong>Email:</strong> {profileData?.email || user?.email}
+                <strong>Email:</strong>{" "}
+                {profileData?.email || "No email provided"}
               </p>
               <p>
-                <strong>Name:</strong> {profileData?.firstName || "N/A"}
+                <strong>Name:</strong>{" "}
+                {profileData?.firstName || "No first name provided"}
               </p>
               <p>
-                <strong>Last Name:</strong> {profileData?.lastName || "N/A"}
+                <strong>Last Name:</strong>{" "}
+                {profileData?.lastName || "No last name provided"}
               </p>
               <p>
-                <strong>Birth Date:</strong> {profileData?.birthDay}.
-                {profileData?.birthMonth}.{profileData?.birthYear}
+                <strong>Birth Date:</strong>{" "}
+                {profileData?.birthDay &&
+                profileData?.birthMonth &&
+                profileData?.birthYear
+                  ? `${profileData.birthDay}.${profileData.birthMonth}.${profileData.birthYear}`
+                  : "Birth date not provided"}
               </p>
             </div>
-            <div className="mt-2">
-              <a className="underline text-sm cursor-pointer">View Your Data</a>
-            </div>
-          </div>
+          </ProfileCard>
 
-          <div className="border p-4">
-            <h3
-              className="text-lg font-semibold mb-2"
-              style={{ fontFamily: "var(--font-playfair)" }}
-            >
-              MY ORDERS
-            </h3>
-            <p className="text-sm text-gray-600">
-              Check the status of your recent orders and view your order
-              history.
-            </p>
-          </div>
+          <ProfileCard
+            title="MY ORDERS"
+            description={
+              profileData?.orders && profileData.orders.length
+                ? `You have ${profileData.orders.length} orders.`
+                : "You have no orders yet."
+            }
+            linkHref="/Account/Orders"
+          />
 
-          <div className="border p-4">
-            <h3
-              className="text-lg font-semibold mb-2"
-              style={{ fontFamily: "var(--font-playfair)" }}
-            >
-              MY ADDRESSES
-            </h3>
-            <p className="text-sm text-gray-600">
-              Save and manage shipping and billing addresses for quick checkout.
-            </p>
-          </div>
+          <ProfileCard
+            title="MY ADDRESSES"
+            description={
+              profileData?.addresses && profileData.addresses.length
+                ? `You have ${profileData.addresses.length} saved addresses.`
+                : "No addresses saved. Please add your shipping or billing address."
+            }
+            linkHref="/Account/Addresses"
+          />
 
-          <div className="border p-4">
-            <h3
-              className="text-lg font-semibold mb-2"
-              style={{ fontFamily: "var(--font-playfair)" }}
-            >
-              MY PAYMENT METHODS
-            </h3>
-            <p className="text-sm text-gray-600">
-              Add or remove payment methods and keep them up to date.
-            </p>
-          </div>
+          <ProfileCard
+            title="MY WISH LIST"
+            description={
+              profileData?.wishList && profileData.wishList.length
+                ? `You have ${profileData.wishList.length} items in your wish list.`
+                : "Your wish list is empty."
+            }
+            linkHref="/Account/Wishlist"
+          />
 
-          <div className="border p-4">
-            <h3
-              className="text-lg font-semibold mb-2"
-              style={{ fontFamily: "var(--font-playfair)" }}
-            >
-              MY WISH LIST
-            </h3>
-            <p className="text-sm text-gray-600">
-              Keep track of the items you love and shop them whenever you like.
-            </p>
-          </div>
+          <ProfileCard
+            title="MY BONUSES"
+            description={
+              profileData?.bonuses && profileData.bonuses !== "0"
+                ? `You have ${profileData.bonuses} bonus points.`
+                : "You currently have no bonuses."
+            }
+            linkHref="/Account/Bonuses"
+          />
         </div>
       </AccountLayout>
       ;

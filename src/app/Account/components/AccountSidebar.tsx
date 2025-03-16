@@ -10,7 +10,10 @@ interface AccountSidebarProps {
   pathname: string;
 }
 
-export default function AccountSidebar({ navLinks, pathname }: AccountSidebarProps) {
+export default function AccountSidebar({
+  navLinks,
+  pathname,
+}: AccountSidebarProps) {
   return (
     <nav className="space-y-4 text-sm text-gray-700 flex flex-col">
       {navLinks.map((link) => {
@@ -27,5 +30,4 @@ export default function AccountSidebar({ navLinks, pathname }: AccountSidebarPro
       })}
     </nav>
   );
-};
-
+}
