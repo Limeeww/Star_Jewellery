@@ -4,27 +4,30 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 
 import { doc, setDoc } from "firebase/firestore";
-import { db } from "../../firebase/firebaseConfig";
+import { db, auth } from "../../firebase/firebaseConfig";
 
-import { auth } from "../../firebase/firebaseConfig";
 import {
   useCreateUserWithEmailAndPassword,
   useAuthState,
 } from "react-firebase-hooks/auth";
 
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
-import PhoneInput from "react-phone-input-2";
-import "react-phone-input-2/lib/style.css";
-import Loading from "../components/Loading/Loading";
 import { UserData } from "../types/userTypes";
 import { validationSchema } from "../utils/validationSchema";
 
+import TextField from "../components/FormComponents/TextField";
+import PasswordField from "../components/FormComponents/Passwordfield";
+import PhoneNumberField from "../components/FormComponents/PhoneNumberField";
+import SelectField from "../components/FormComponents/SelectField";
+import CheckboxField from "../components/FormComponents/CheckboxField";
+import DayInput from "../components/FormComponents/DayInput";
 
+import Loading from "../components/Loading/Loading";
+import SubmitButton from "../components/FormComponents/SubmitButton";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -39,7 +42,7 @@ export default function SignUpPage() {
     watch,
     control,
     formState: { errors },
-  } = useForm({
+  } = useForm<UserData>({
     resolver: yupResolver(validationSchema),
   });
 
@@ -49,11 +52,7 @@ export default function SignUpPage() {
     }
   }, [user, userEmail, router]);
 
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
-
   const passwordValue = watch("password") || "";
   const hasMinLength = passwordValue.length >= 8;
   const hasNumber = /\d/.test(passwordValue);
@@ -69,19 +68,7 @@ export default function SignUpPage() {
 
     if (userCredential && userCredential.user) {
       const userData = {
-        firstName: data.firstName,
-        lastName: data.lastName,
-        phoneNumber: data.phoneNumber,
-        birthDay: data.birthDay,
-        birthMonth: data.birthMonth,
-        birthYear: data.birthYear,
-        gender: data.gender,
-        relationshipStatus: data.relationshipStatus,
-        anniversaryDay: data.anniversaryDay,
-        anniversaryMonth: data.anniversaryMonth,
-        anniversaryYear: data.anniversaryYear,
-        marketingConsent: data.marketingConsent || false,
-        email: data.email,
+        ...data,
         createdAt: new Date(),
         wishList: data.wishList || [],
         orders: data.orders || [],
@@ -90,7 +77,6 @@ export default function SignUpPage() {
       };
 
       await setDoc(doc(db, "users", userCredential.user.uid), userData);
-
       router.push("/Account/Overview");
     }
   };
@@ -99,6 +85,7 @@ export default function SignUpPage() {
     return <Loading />;
   }
 
+  // TODO: Add styling for error messages
   if (error || errorEmail) {
     return (
       <div className="flex flex-col justify-center items-center w-full h-full mt-20">
@@ -171,101 +158,39 @@ export default function SignUpPage() {
           </div>
 
           <div className="flex flex-col md:flex-row gap-4">
-            <div className="w-full">
-              <label
-                htmlFor="firstName"
-                className="block text-sm font-semibold mb-1"
-              >
-                First Name *
-              </label>
-              <input
-                id="firstName"
-                type="text"
-                className={`w-full border p-2 ${
-                  errors.firstName ? "border-red-500" : "border-gray-300"
-                }`}
-                {...register("firstName")}
-              />
-              {errors.firstName && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.firstName.message}
-                </p>
-              )}
-            </div>
-            <div className="w-full">
-              <label
-                htmlFor="lastName"
-                className="block text-sm font-semibold mb-1"
-              >
-                Last Name *
-              </label>
-              <input
-                id="lastName"
-                type="text"
-                className={`w-full border p-2 ${
-                  errors.lastName ? "border-red-500" : "border-gray-300"
-                }`}
-                {...register("lastName")}
-              />
-              {errors.lastName && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.lastName.message}
-                </p>
-              )}
-            </div>
+            <TextField
+              label="First Name *"
+              id="firstName"
+              register={register("firstName")}
+              error={errors.firstName}
+              className="w-full"
+            />
+            <TextField
+              label="Last Name *"
+              id="lastName"
+              register={register("lastName")}
+              error={errors.lastName}
+              className="w-full"
+            />
           </div>
 
-          <div>
-            <label htmlFor="email" className="block text-sm font-semibold mb-1">
-              Email Address *
-            </label>
-            <input
-              id="email"
-              type="email"
-              className={`w-full border p-2 ${
-                errors.email ? "border-red-500" : "border-gray-300"
-              }`}
-              {...register("email")}
-            />
-            {errors.email && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.email.message}
-              </p>
-            )}
-          </div>
+          <TextField
+            label="Email Address *"
+            id="email"
+            type="email"
+            register={register("email")}
+            error={errors.email}
+          />
 
           <div className="flex flex-col md:flex-row gap-4">
             <div className="w-full">
-              <label
-                htmlFor="password"
-                className="block text-sm font-semibold mb-1"
-              >
-                Password *
-              </label>
-              <div className="relative">
-                <input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  className={`w-full border p-2 pr-10 ${
-                    errors.password ? "border-red-500" : "border-gray-300"
-                  }`}
-                  {...register("password")}
-                  onFocus={() => setIsPasswordFocused(true)}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((prev) => !prev)}
-                  className="absolute right-3 top-3 text-gray-600 hover:text-gray-800"
-                >
-                  {showPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
-                </button>
-              </div>
-              {errors.password && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.password.message}
-                </p>
-              )}
-
+              <PasswordField
+                label="Password *"
+                id="password"
+                register={register("password")}
+                onFocus={() => setIsPasswordFocused(true)}
+                error={errors.password}
+              />
               {(isPasswordFocused || passwordValue.length > 0) && (
                 <ul className="mt-2 text-sm space-y-1">
                   <li
@@ -297,235 +222,73 @@ export default function SignUpPage() {
               )}
             </div>
 
-            <div className="w-full">
-              <label
-                htmlFor="confirmPassword"
-                className="block text-sm font-semibold mb-1"
-              >
-                Confirm Password *
-              </label>
-              <div className="relative">
-                <input
-                  id="confirmPassword"
-                  type={showConfirmPassword ? "text" : "password"}
-                  className={`w-full border p-2 pr-10 ${
-                    errors.confirmPassword
-                      ? "border-red-500"
-                      : "border-gray-300"
-                  }`}
-                  {...register("confirmPassword")}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword((prev) => !prev)}
-                  className="absolute right-3 top-3 text-gray-600 hover:text-gray-800"
-                >
-                  {showConfirmPassword ? (
-                    <AiOutlineEyeInvisible />
-                  ) : (
-                    <AiOutlineEye />
-                  )}
-                </button>
-              </div>
-              {errors.confirmPassword && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.confirmPassword.message}
-                </p>
-              )}
-            </div>
-          </div>
-
-          <div>
-            <label
-              htmlFor="phoneNumber"
-              className="block text-sm font-semibold mb-1"
-            >
-              Phone Number *
-            </label>
-            <Controller
-              name="phoneNumber"
-              control={control}
-              defaultValue=""
-              render={({
-                field: { onChange, value },
-                fieldState: { error },
-              }) => (
-                <div>
-                  <PhoneInput
-                    country="de" // Default country
-                    value={value}
-                    onChange={onChange}
-                    enableSearch
-                    containerClass="w-full"
-                    inputClass="!border-0 !border-b !border-gray-300 !rounded-none !bg-transparent focus:!border-black !outline-none "
-                    buttonClass="!border-0 !border-b !border-gray-300 !bg-transparent !rounded-none"
-                    dropdownClass="!bg-white !border !border-gray-200"
-                    preferredCountries={["de", "us", "gb", "fr"]}
-                  />
-                  {error && (
-                    <p className="text-red-500 text-sm mt-1">{error.message}</p>
-                  )}
-                </div>
-              )}
+            <PasswordField
+              label="Confirm Password *"
+              id="confirmPassword"
+              register={register("confirmPassword")}
+              error={errors.confirmPassword}
+              className="w-full"
             />
           </div>
 
-          <div>
-            <label
-              htmlFor="birthDay"
-              className="block text-sm font-semibold mb-1"
-            >
-              Date of Birth
-            </label>
-            <div className="flex gap-2">
-              <select
-                id="birthDay"
-                className="w-1/3 border border-gray-300 p-2"
-                {...register("birthDay")}
-              >
-                <option value="">Day</option>
-                {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
-                  <option key={day} value={day}>
-                    {day}
-                  </option>
-                ))}
-              </select>
-              <select
-                id="birthMonth"
-                className="w-1/3 border border-gray-300 p-2"
-                {...register("birthMonth")}
-              >
-                <option value="">Month</option>
-                {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
-                  <option key={month} value={month}>
-                    {month}
-                  </option>
-                ))}
-              </select>
-              <select
-                id="birthYear"
-                className="w-1/3 border border-gray-300 p-2"
-                {...register("birthYear")}
-              >
-                <option value="">Year</option>
-                {Array.from(
-                  { length: 80 },
-                  (_, i) => new Date().getFullYear() - i
-                ).map((year) => (
-                  <option key={year} value={year}>
-                    {year}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
+          <PhoneNumberField
+            label="Phone Number *"
+            name="phoneNumber"
+            control={control}
+            error={errors.phoneNumber}
+          />
+
+          <DayInput
+            label="Date of Birth"
+            register={register}
+            dayName="birthDay"
+            monthName="birthMonth"
+            yearName="birthYear"
+          />
 
           <h2 className="text-base font-semibold mt-8">Optional Info</h2>
           <div className="space-y-4">
-            <div>
-              <label
-                htmlFor="gender"
-                className="block text-sm font-semibold mb-1"
-              >
-                Gender
-              </label>
-              <select
-                id="gender"
-                className="w-full border-b border-gray-300 p-2 
-                           focus:outline-none focus:border-black bg-transparent"
-                {...register("gender")}
-              >
-                <option value="">Select</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-                <option value="Other">Other</option>
-              </select>
-            </div>
-
-            <div>
-              <label
-                htmlFor="relationshipStatus"
-                className="block text-sm font-semibold mb-1"
-              >
-                Relationship Status
-              </label>
-              <select
-                id="relationshipStatus"
-                className="w-full border-b border-gray-300 p-2 
-                           focus:outline-none focus:border-black bg-transparent"
-                {...register("relationshipStatus")}
-              >
-                <option value="">Select</option>
-                <option value="Single">Single</option>
-                <option value="Married">Married</option>
-                <option value="Engaged">Engaged</option>
-              </select>
-            </div>
-
-            <div>
-              <label
-                htmlFor="anniversaryDay"
-                className="block text-sm font-semibold mb-1"
-              >
-                Anniversary/Wedding Date
-              </label>
-              <div className="flex gap-2">
-                <select
-                  id="anniversaryDay"
-                  className="w-1/3 border border-gray-300 p-2"
-                  {...register("anniversaryDay")}
-                >
-                  <option value="">Day</option>
-                  {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
-                    <option key={day} value={day}>
-                      {day}
-                    </option>
-                  ))}
-                </select>
-                <select
-                  id="anniversaryMonth"
-                  className="w-1/3 border border-gray-300 p-2"
-                  {...register("anniversaryMonth")}
-                >
-                  <option value="">Month</option>
-                  {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
-                    <option key={month} value={month}>
-                      {month}
-                    </option>
-                  ))}
-                </select>
-                <select
-                  id="anniversaryYear"
-                  className="w-1/3 border border-gray-300 p-2"
-                  {...register("anniversaryYear")}
-                >
-                  <option value="">Year</option>
-                  {Array.from({ length: 80 }, (_, i) => 2025 - i).map(
-                    (year) => (
-                      <option key={year} value={year}>
-                        {year}
-                      </option>
-                    )
-                  )}
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-2 mt-6">
-            <input
-              id="marketingConsent"
-              type="checkbox"
-              className="mt-1"
-              {...register("marketingConsent")}
+            <SelectField
+              label="Gender"
+              id="gender"
+              register={register("gender")}
+              error={errors.gender}
+              options={[
+                { value: "", label: "Select" },
+                { value: "Male", label: "Male" },
+                { value: "Female", label: "Female" },
+                { value: "Other", label: "Other" },
+              ]}
             />
-            <label htmlFor="marketingConsent" className="text-sm text-gray-600">
-              I agree to receive newsletters, emails, text messages, and social
-              media updates about new collections, exclusive jewellery pieces,
-              watches, fragrances, and other premium products from Star
-              Jewellery.
-            </label>
+
+            <SelectField
+              label="Relationship Status"
+              id="relationshipStatus"
+              register={register("relationshipStatus")}
+              error={errors.relationshipStatus}
+              options={[
+                { value: "", label: "Select" },
+                { value: "Single", label: "Single" },
+                { value: "Married", label: "Married" },
+                { value: "Engaged", label: "Engaged" },
+              ]}
+            />
+
+            <DayInput
+              label="Anniversary/Wedding Date"
+              register={register}
+              dayName="anniversaryDay"
+              monthName="anniversaryMonth"
+              yearName="anniversaryYear"
+            />
           </div>
+
+          <CheckboxField
+            label="I agree to receive newsletters, emails, text messages, and social media updates about new collections, exclusive jewellery pieces, watches, fragrances, and other premium products from Star Jewellery."
+            id="marketingConsent"
+            register={register("marketingConsent")}
+            error={errors.marketingConsent}
+          />
 
           <p className="text-xs text-gray-500 leading-relaxed">
             By clicking &quot;Create Account,&quot; you confirm that you accept
@@ -543,12 +306,10 @@ export default function SignUpPage() {
             .
           </p>
 
-          <button
-            type="submit"
-            className="w-full py-3 bg-black text-white text-sm font-semibold hover:bg-gray-800 transition-colors mt-4"
-          >
-            CREATE ACCOUNT
-          </button>
+          <SubmitButton
+            label="CREATE ACCOUNT"
+            isLoading={loading || loadingEmail}
+          />
 
           <p className="text-sm text-gray-600 font-light pt-2">
             *Required Fields

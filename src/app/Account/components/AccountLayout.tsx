@@ -12,7 +12,6 @@ interface AccountLayoutProps {
 
 export default function AccountLayout({
   children,
-  sideLinks,
   pathname,
 }: AccountLayoutProps): JSX.Element {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -31,7 +30,7 @@ export default function AccountLayout({
             MY STAR
           </h2>
           <nav className="space-y-2 flex flex-col text-sm text-gray-700">
-            <AccountSidebar navLinks={sideLinks} pathname={pathname} />
+            <AccountSidebar pathname={pathname} />
           </nav>
         </aside>
 
@@ -64,7 +63,7 @@ export default function AccountLayout({
                 transition={{ duration: 0.3 }}
                 className="overflow-hidden space-y-2 text-sm text-gray-700 mt-2"
               >
-                <AccountSidebar navLinks={sideLinks} pathname={pathname} />
+                <AccountSidebar pathname={pathname} />
               </motion.nav>
             )}
           </AnimatePresence>
