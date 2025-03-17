@@ -35,3 +35,5 @@ export const validationSchema = yup.object().shape({
   anniversaryYear: yup.string().optional(),
   marketingConsent: yup.boolean().optional(),
 });
+
+

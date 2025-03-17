@@ -44,25 +44,13 @@ export default function Overview() {
     return <Loading />;
   }
 
-  const SIDE_LINKS = [
-    { label: "Overview", href: "/Account/Overview" },
-    { label: "My Profile", href: "/Account/Profile" },
-    { label: "My Orders", href: "/Account/Orders" },
-    { label: "My Addresses", href: "/Account/Addresses" },
-    { label: "My Wish List", href: "/Account/Wishlist" },
-    { label: "My Bonuses", href: "/Account/Bonuses" },
-  ];
 
-  const NAV_LINKS = [
-    { href: "/about-us", label: "ABOUT US" },
-    { href: "/Catalog", label: "CATALOG" },
-    { href: "/Collections", label: "COLLECTIONS" },
-  ];
+
 
   return (
     <>
-      <Navbar isScrolled={true} isLoggedIn={isLoggedIn} navLinks={NAV_LINKS} />
-      <AccountLayout sideLinks={SIDE_LINKS} pathname={pathname}>
+      <Navbar isScrolled={true} isLoggedIn={isLoggedIn} />
+      <AccountLayout pathname={pathname}>
         <WelcomeBlock
           firstName={profileData?.firstName}
           lastName={profileData?.lastName}

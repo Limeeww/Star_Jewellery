@@ -10,8 +10,17 @@ interface AccountSidebarProps {
   pathname: string;
 }
 
+const SIDE_LINKS = [
+  { label: "Overview", href: "/Account/Overview" },
+  { label: "My Profile", href: "/Account/Profile" },
+  { label: "My Orders", href: "/Account/Orders" },
+  { label: "My Addresses", href: "/Account/Addresses" },
+  { label: "My Wish List", href: "/Account/Wishlist" },
+  { label: "My Bonuses", href: "/Account/Bonuses" },
+];
+
 export default function AccountSidebar({
-  navLinks,
+  navLinks=SIDE_LINKS,
   pathname,
 }: AccountSidebarProps) {
   return (
