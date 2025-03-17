@@ -20,7 +20,7 @@ import { UserData } from "../types/userTypes";
 import { validationSchema } from "../utils/validationSchema";
 
 import TextField from "../components/FormComponents/TextField";
-import PasswordField from "../components/FormComponents/Passwordfield";
+import PasswordField from "../components/FormComponents/PasswordField";
 import PhoneNumberField from "../components/FormComponents/PhoneNumberField";
 import SelectField from "../components/FormComponents/SelectField";
 import CheckboxField from "../components/FormComponents/CheckboxField";
@@ -28,6 +28,7 @@ import DayInput from "../components/FormComponents/DayInput";
 
 import Loading from "../components/Loading/Loading";
 import SubmitButton from "../components/FormComponents/SubmitButton";
+import ErrorMessage from "../components/MessageHandling/ErrorMessagePage";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -85,13 +86,21 @@ export default function SignUpPage() {
     return <Loading />;
   }
 
-  // TODO: Add styling for error messages
   if (error || errorEmail) {
     return (
-      <div className="flex flex-col justify-center items-center w-full h-full mt-20">
-        <p className="text-red-500 text-lg">
-          Error: {error?.message || errorEmail?.message}
-        </p>
+      <div className="flex flex-col justify-center items-center w-full h-full mt-20 space-y-4">
+        {error && (
+          <ErrorMessage
+            message={error.message}
+            retry={() => window.location.reload()}
+          />
+        )}
+        {errorEmail && (
+          <ErrorMessage
+            message={errorEmail.message}
+            retry={() => window.location.reload()}
+          />
+        )}
       </div>
     );
   }

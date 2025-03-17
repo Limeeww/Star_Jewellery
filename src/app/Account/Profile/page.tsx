@@ -18,6 +18,7 @@ import Footer from "@/app/components/Footer/Footer";
 import Loading from "@/app/components/Loading/Loading";
 import AccountLayout from "../components/AccountLayout";
 import WelcomeBlock from "../components/WelcomeBlock";
+import Notification from "../../components/MessageHandling/Notification";
 
 import TextField from "../../components/FormComponents/TextField";
 import PhoneNumberField from "../../components/FormComponents/PhoneNumberField";
@@ -25,14 +26,23 @@ import SelectField from "../../components/FormComponents/SelectField";
 import CheckboxField from "../../components/FormComponents/CheckboxField";
 import DayInput from "../../components/FormComponents/DayInput";
 import SubmitButton from "../../components/FormComponents/SubmitButton";
+import ErrorMessage from "@/app/components/MessageHandling/ErrorMessagePage";
+import ChangeEmailModal from "../components/ChangeEmailModal";
+import ChangePasswordModal from "../components/ChangePasswordModal";
 
 export default function Profile() {
   const [user, loading, error] = useAuthState(auth);
   const router = useRouter();
 
   const [profileDisplay, setProfileDisplay] = useState<Partial<UserData>>({});
+  const [notification, setNotification] = useState<{
+    message: string;
+    type: "success" | "info" | "warning" | "error";
+  } | null>(null);
 
-  // Инициализация формы
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+
   const {
     register,
     handleSubmit,
@@ -80,6 +90,10 @@ export default function Profile() {
           }
         } catch (err) {
           console.error("Error fetching profile data:", err);
+          setNotification({
+            message: "Failed to load profile data.",
+            type: "error",
+          });
         }
       }
     };
@@ -104,10 +118,16 @@ export default function Profile() {
         lastName: formData.lastName,
       });
 
-      alert("Profile updated successfully!");
+      setNotification({
+        message: "Profile updated successfully!",
+        type: "success",
+      });
     } catch (err) {
       console.error("Error updating profile:", err);
-      alert("Failed to update profile. Check console for details.");
+      setNotification({
+        message: "Failed to update profile. Check console for details.",
+        type: "error",
+      });
     }
   };
 
@@ -116,16 +136,21 @@ export default function Profile() {
   }
 
   if (error) {
-    return (
-      <div className="p-4 text-center text-red-500">
-        Error: {error.message}
-      </div>
-    );
+    return <ErrorMessage message={error.message} />;
   }
 
   return (
     <>
       <Navbar isScrolled={true} isLoggedIn={!!user} />
+
+      {notification && (
+        <Notification
+          message={notification.message}
+          type={notification.type}
+          duration={3000} // 3 секунды
+          onClose={() => setNotification(null)} // Скрыть после закрытия
+        />
+      )}
 
       <AccountLayout pathname="/Account/Profile">
         <WelcomeBlock
@@ -133,12 +158,42 @@ export default function Profile() {
           lastName={profileDisplay.lastName}
         />
 
+        <div className="mt-4 mb-4  space-y-2 text-sm text-gray-700">
+          <p>
+            With your specified email address and password you can manage your
+            personal data.
+          </p>
+          <button
+            onClick={() => setShowEmailModal(true)}
+            className="underline block"
+          >
+            Change Email &rarr;
+          </button>
+          <button
+            onClick={() => setShowPasswordModal(true)}
+            className="underline block"
+          >
+            Change Password &rarr;
+          </button>
+        </div>
+
+        {showEmailModal && (
+          <ChangeEmailModal
+            currentEmail={user?.email || ""}
+            onClose={() => setShowEmailModal(false)}
+          />
+        )}
+
+        {showPasswordModal && (
+          <ChangePasswordModal onClose={() => setShowPasswordModal(false)} />
+        )}
+
         <form onSubmit={handleSubmit(onSubmit)} className="mx-auto space-y-6">
           <h2 className="text-xl font-semibold mb-4">Profile Information</h2>
 
           <div className="flex flex-col md:flex-row gap-4">
             <TextField
-              label="First Name *"
+              label="First Name"
               id="firstName"
               register={register("firstName")}
               error={errors.firstName}
@@ -146,7 +201,7 @@ export default function Profile() {
             />
 
             <TextField
-              label="Last Name *"
+              label="Last Name"
               id="lastName"
               register={register("lastName")}
               error={errors.lastName}
@@ -155,7 +210,7 @@ export default function Profile() {
           </div>
 
           <PhoneNumberField
-            label="Phone Number *"
+            label="Phone Number"
             name="phoneNumber"
             control={control}
             error={errors.phoneNumber}

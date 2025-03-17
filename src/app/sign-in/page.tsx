@@ -17,10 +17,11 @@ import { auth } from "../../firebase/firebaseConfig";
 import Loading from "../components/Loading/Loading";
 
 import TextField from "../components/FormComponents/TextField";
-import PasswordField from "../components/FormComponents/Passwordfield";
+import PasswordField from "../components/FormComponents/PasswordField";
 import SubmitButton from "../components/FormComponents/SubmitButton";
 
 import { signInValidationSchema } from "../utils/signInValidationSchema";
+import ErrorMessage from "../components/MessageHandling/ErrorMessagePage";
 
 interface SignInFormData {
   email: string;
@@ -60,13 +61,21 @@ export default function SignInPage() {
   if (loadingGoogle || loadingEmail) {
     return <Loading />;
   }
-// TODO: Add styling for error messages
   if (errorGoogle || errorEmail) {
     return (
-      <div className="flex flex-col justify-center items-center w-full h-full mt-20">
-        <p className="text-red-500 text-lg">
-          Error: {errorGoogle?.message || errorEmail?.message}
-        </p>
+      <div className="flex flex-col justify-center items-center w-full h-full mt-20 space-y-4">
+        {errorGoogle && (
+          <ErrorMessage
+            message={errorGoogle.message}
+            retry={() => window.location.reload()}
+          />
+        )}
+        {errorEmail && (
+          <ErrorMessage
+            message={errorEmail.message}
+            retry={() => window.location.reload()}
+          />
+        )}
       </div>
     );
   }
@@ -230,6 +239,7 @@ export default function SignInPage() {
           </ul>
         </div>
       </div>
+
     </div>
   );
 }
