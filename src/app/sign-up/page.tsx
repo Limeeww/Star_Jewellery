@@ -28,14 +28,24 @@ import DayInput from "../components/FormComponents/DayInput";
 
 import Loading from "../components/Loading/Loading";
 import SubmitButton from "../components/FormComponents/SubmitButton";
-import ErrorMessage from "../components/MessageHandling/ErrorMessagePage";
+
+import Notification from "../components/MessageHandling/Notification";
 
 export default function SignUpPage() {
   const router = useRouter();
 
   const [user, loading, error] = useAuthState(auth);
-  const [createUserWithEmailAndPassword, userEmail, loadingEmail, errorEmail] =
-    useCreateUserWithEmailAndPassword(auth);
+  const [
+    createUserWithEmailAndPassword,
+    userEmail,
+    loadingEmail,
+    errorEmail,
+  ] = useCreateUserWithEmailAndPassword(auth);
+
+  const [notification, setNotification] = useState<{
+    message: string;
+    type: "success" | "error" | "info" | "warning";
+  } | null>(null);
 
   const {
     register,
@@ -53,6 +63,24 @@ export default function SignUpPage() {
     }
   }, [user, userEmail, router]);
 
+  useEffect(() => {
+    if (error) {
+      setNotification({
+        message: error.message || "Unknown error",
+        type: "error",
+      });
+    } else if (errorEmail) {
+      let msg = errorEmail.message;
+      if (errorEmail.code === "auth/weak-password") {
+        msg = "Your password is too weak. Please choose a stronger one.";
+      }
+      setNotification({
+        message: msg,
+        type: "error",
+      });
+    }
+  }, [error, errorEmail]);
+
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
   const passwordValue = watch("password") || "";
   const hasMinLength = passwordValue.length >= 8;
@@ -62,23 +90,30 @@ export default function SignUpPage() {
   const hasSpecialChar = /[^a-zA-Z0-9]/.test(passwordValue);
 
   const onSubmit = async (data: UserData) => {
-    const userCredential = await createUserWithEmailAndPassword(
-      data.email,
-      data.password
-    );
+    try {
+      const userCredential = await createUserWithEmailAndPassword(
+        data.email,
+        data.password
+      );
 
-    if (userCredential && userCredential.user) {
-      const userData = {
-        ...data,
-        createdAt: new Date(),
-        wishList: data.wishList || [],
-        orders: data.orders || [],
-        addresses: data.addresses || [],
-        bonuses: data.bonuses || "0",
-      };
+      if (userCredential && userCredential.user) {
+        const userData = {
+          ...data,
+          createdAt: new Date(),
+          wishList: data.wishList || [],
+          orders: data.orders || [],
+          addresses: data.addresses || [],
+          bonuses: data.bonuses || "0",
+        };
 
-      await setDoc(doc(db, "users", userCredential.user.uid), userData);
-      router.push("/Account/Overview");
+        await setDoc(doc(db, "users", userCredential.user.uid), userData);
+        router.push("/Account/Overview");
+      }
+    } catch (err: any) {
+      setNotification({
+        message: err.message || "Failed to create account.",
+        type: "error",
+      });
     }
   };
 
@@ -86,30 +121,19 @@ export default function SignUpPage() {
     return <Loading />;
   }
 
-  if (error || errorEmail) {
-    return (
-      <div className="flex flex-col justify-center items-center w-full h-full mt-20 space-y-4">
-        {error && (
-          <ErrorMessage
-            message={error.message}
-            retry={() => window.location.reload()}
-          />
-        )}
-        {errorEmail && (
-          <ErrorMessage
-            message={errorEmail.message}
-            retry={() => window.location.reload()}
-          />
-        )}
-      </div>
-    );
-  }
-
   return (
     <div
       className="flex flex-col lg:flex-row min-h-screen"
       style={{ fontFamily: "var(--font-poppins)" }}
     >
+      {notification && (
+        <Notification
+          message={notification.message}
+          type={notification.type}
+          onClose={() => setNotification(null)}
+        />
+      )}
+
       <div className="hidden lg:block lg:w-1/2 bg-[#E6F7F8] relative">
         <div className="sticky top-0 h-screen flex items-center justify-center p-8">
           <Image
@@ -211,12 +235,16 @@ export default function SignUpPage() {
                     ✔ At least one number
                   </li>
                   <li
-                    className={hasUppercase ? "text-green-600" : "text-red-600"}
+                    className={
+                      hasUppercase ? "text-green-600" : "text-red-600"
+                    }
                   >
                     ✔ At least one uppercase letter
                   </li>
                   <li
-                    className={hasLowercase ? "text-green-600" : "text-red-600"}
+                    className={
+                      hasLowercase ? "text-green-600" : "text-red-600"
+                    }
                   >
                     ✔ At least one lowercase letter
                   </li>
@@ -293,7 +321,7 @@ export default function SignUpPage() {
           </div>
 
           <CheckboxField
-            label="I agree to receive newsletters, emails, text messages, and social media updates about new collections, exclusive jewellery pieces, watches, fragrances, and other premium products from Star Jewellery."
+            label="I agree to receive newsletters, emails, text messages, and social media updates..."
             id="marketingConsent"
             register={register("marketingConsent")}
             error={errors.marketingConsent}

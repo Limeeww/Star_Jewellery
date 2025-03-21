@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { FieldError, UseFormRegisterReturn } from "react-hook-form";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 
-
 interface PasswordFieldProps {
   label: string;
   id: string;
@@ -10,6 +9,7 @@ interface PasswordFieldProps {
   error?: FieldError;
   className?: string;
   onFocus?: () => void;
+  onBlur?: () => void;
 }
 
 function PasswordField({

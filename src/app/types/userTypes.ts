@@ -1,3 +1,5 @@
+import { Timestamp } from "firebase/firestore";
+
 export interface Address {
   street: string;
   city: string;
@@ -34,4 +36,7 @@ export interface UserData {
   orders?: Order[];
   addresses?: Address[];
   bonuses?: string; 
+  lastBirthdayChange?: Timestamp;
+  lastAnniversaryChange?: Timestamp;
+  lastRelationshipStatusChange?: Timestamp;
 }
