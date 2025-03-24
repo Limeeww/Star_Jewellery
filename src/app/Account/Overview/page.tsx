@@ -1,44 +1,28 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../../../firebase/firebaseConfig";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer/Footer";
 import Loading from "../../components/Loading/Loading";
 
-import { fetchUserData } from "@/app/utils/auth";
+import { useProfileData, useRequireAuth } from "@/app/utils/auth";
 import WelcomeBlock from "@/app/Account/components/WelcomeBlock";
 import AccountLayout from "../components/AccountLayout";
 
-import { UserData } from "@/app/types/userTypes";
 import ProfileCard from "../components/ProfileCard";
 
 export default function Overview() {
   const [user, loading] = useAuthState(auth);
-  const router = useRouter();
   const pathname = usePathname();
-
-  const [profileData, setProfileData] = useState<UserData | null>(null);
 
   const isLoggedIn = !loading && !!user;
 
-  useEffect(() => {
-    if (!loading && !user) {
-      router.push("/");
-    }
-  }, [user, loading, router]);
+  useRequireAuth(user, loading);
 
-  useEffect(() => {
-    const getProfileData = async () => {
-      if (user) {
-        const data = await fetchUserData(user.uid);
-        if (data !== null) setProfileData(data as UserData);
-      }
-    };
-    getProfileData();
-  }, [user]);
+  const [profileData] = useProfileData(user);
 
   if (loading) {
     return <Loading />;
@@ -123,7 +107,7 @@ export default function Overview() {
           />
         </div>
       </AccountLayout>
-      ;
+      
       <Footer />
     </>
   );

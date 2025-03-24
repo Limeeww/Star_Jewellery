@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -9,18 +9,20 @@ import {
   useSignInWithGoogle,
   useSignInWithEmailAndPassword,
 } from "react-firebase-hooks/auth";
-
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 import { auth } from "../../firebase/firebaseConfig";
 import Loading from "../components/Loading/Loading";
-
 import TextField from "../components/FormComponents/TextField";
-import PasswordField from "../components/FormComponents/Passwordfield";
+import PasswordField from "../components/FormComponents/PasswordField";
 import SubmitButton from "../components/FormComponents/SubmitButton";
 
 import { signInValidationSchema } from "../utils/signInValidationSchema";
+
+// Импортируем Notification (пример)
+// Если у вас другой компонент, например ErrorMessage, адаптируйте под него
+import Notification from "../components/MessageHandling/Notification";
 
 interface SignInFormData {
   email: string;
@@ -34,6 +36,11 @@ export default function SignInPage() {
     useSignInWithGoogle(auth);
   const [signInWithEmailAndPassword, userEmail, loadingEmail, errorEmail] =
     useSignInWithEmailAndPassword(auth);
+
+  const [notification, setNotification] = useState<{
+    message: string;
+    type: "error" | "info" | "success" | "warning";
+  } | null>(null);
 
   const {
     register,
@@ -49,26 +56,39 @@ export default function SignInPage() {
     }
   }, [userGoogle, userEmail, router]);
 
+  useEffect(() => {
+    if (errorGoogle) {
+      setNotification({
+        message: errorGoogle.message || "Google sign-in error",
+        type: "error",
+      });
+    }
+    if (errorEmail) {
+      setNotification({
+        message: errorEmail.message || "Email/Password sign-in error",
+        type: "error",
+      });
+    }
+  }, [errorGoogle, errorEmail]);
+
   const handleGoogleSignIn = async () => {
     await signInWithGoogle();
   };
 
   const onSubmit = async (data: SignInFormData) => {
-    await signInWithEmailAndPassword(data.email, data.password);
+    try {
+      await signInWithEmailAndPassword(data.email, data.password);
+    } catch (err: any) {
+      setNotification({
+        message: err.message || "Failed to sign in with email/password.",
+        type: "error",
+      });
+    }
   };
 
+  // Если идёт загрузка
   if (loadingGoogle || loadingEmail) {
     return <Loading />;
-  }
-// TODO: Add styling for error messages
-  if (errorGoogle || errorEmail) {
-    return (
-      <div className="flex flex-col justify-center items-center w-full h-full mt-20">
-        <p className="text-red-500 text-lg">
-          Error: {errorGoogle?.message || errorEmail?.message}
-        </p>
-      </div>
-    );
   }
 
   return (
@@ -76,6 +96,14 @@ export default function SignInPage() {
       className="flex flex-col lg:flex-row min-h-screen"
       style={{ fontFamily: "var(--font-poppins)" }}
     >
+      {notification && (
+        <Notification
+          message={notification.message}
+          type={notification.type}
+          onClose={() => setNotification(null)}
+        />
+      )}
+
       <div className="hidden lg:block lg:w-1/2 bg-[#E6F7F8] relative">
         <div className="sticky top-0 h-screen flex items-center justify-center p-8">
           <Image
@@ -98,6 +126,7 @@ export default function SignInPage() {
         />
       </div>
 
+      {/* Правая часть (форма) */}
       <div className="w-full lg:w-1/2 overflow-y-auto p-8 bg-white">
         <form
           onSubmit={handleSubmit(onSubmit)}
@@ -126,6 +155,7 @@ export default function SignInPage() {
             error={errors.email}
           />
 
+          {/* Password */}
           <PasswordField
             label="Password *"
             id="password"
@@ -133,10 +163,8 @@ export default function SignInPage() {
             error={errors.password}
           />
 
-          <SubmitButton
-            label="SIGN IN"
-            isLoading={false}
-          />
+          {/* Кнопка отправки */}
+          <SubmitButton label="SIGN IN" isLoading={false} />
 
           <p className="text-sm text-gray-600 font-light pt-2">
             *Required fields
@@ -151,16 +179,16 @@ export default function SignInPage() {
             </p>
           </div>
 
+          {/* Google Sign-In */}
           <div className="flex items-center justify-center">
             <button
               type="button"
               onClick={handleGoogleSignIn}
-              className="flex items-center bg-white border border-gray-300 rounded-lg shadow-md px-6 py-2 text-sm font-medium  hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+              className="flex items-center bg-white border border-gray-300 rounded-lg shadow-md px-6 py-2 text-sm font-medium hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
             >
               <svg
                 className="h-6 w-6 mr-2"
                 xmlns="http://www.w3.org/2000/svg"
-                xmlnsXlink="http://www.w3.org/1999/xlink"
                 width="800px"
                 height="800px"
                 viewBox="-0.5 0 48 48"
@@ -168,40 +196,23 @@ export default function SignInPage() {
               >
                 <title>Google-color</title>
                 <desc>Created with Sketch.</desc>
-                <defs> </defs>
-                <g
-                  id="Icons"
-                  stroke="none"
-                  strokeWidth="1"
-                  fill="none"
-                  fillRule="evenodd"
-                >
-                  <g
-                    id="Color-"
-                    transform="translate(-401.000000, -860.000000)"
-                  >
-                    <g
-                      id="Google"
-                      transform="translate(401.000000, 860.000000)"
-                    >
+                <g fill="none" fillRule="evenodd">
+                  <g transform="translate(-401.000000, -860.000000)">
+                    <g transform="translate(401.000000, 860.000000)">
                       <path
                         d="M9.82727273,24 C9.82727273,22.4757333 10.0804318,21.0144 10.5322727,19.6437333 L2.62345455,13.6042667 C1.08206818,16.7338667 0.213636364,20.2602667 0.213636364,24 C0.213636364,27.7365333 1.081,31.2608 2.62025,34.3882667 L10.5247955,28.3370667 C10.0772273,26.9728 9.82727273,25.5168 9.82727273,24"
-                        id="Fill-1"
                         fill="#FBBC05"
                       />
                       <path
                         d="M23.7136364,10.1333333 C27.025,10.1333333 30.0159091,11.3066667 32.3659091,13.2266667 L39.2022727,6.4 C35.0363636,2.77333333 29.6954545,0.533333333 23.7136364,0.533333333 C14.4268636,0.533333333 6.44540909,5.84426667 2.62345455,13.6042667 L10.5322727,19.6437333 C12.3545909,14.112 17.5491591,10.1333333 23.7136364,10.1333333"
-                        id="Fill-2"
                         fill="#EB4335"
                       />
                       <path
                         d="M23.7136364,37.8666667 C17.5491591,37.8666667 12.3545909,33.888 10.5322727,28.3562667 L2.62345455,34.3946667 C6.44540909,42.1557333 14.4268636,47.4666667 23.7136364,47.4666667 C29.4455,47.4666667 34.9177955,45.4314667 39.0249545,41.6181333 L31.5177727,35.8144 C29.3995682,37.1488 26.7323182,37.8666667 23.7136364,37.8666667"
-                        id="Fill-3"
                         fill="#34A853"
                       />
                       <path
                         d="M46.1454545,24 C46.1454545,22.6133333 45.9318182,21.12 45.6113636,19.7333333 L23.7136364,19.7333333 L23.7136364,28.8 L36.3181818,28.8 C35.6879545,31.8912 33.9724545,34.2677333 31.5177727,35.8144 L39.0249545,41.6181333 C43.3393409,37.6138667 46.1454545,31.6490667 46.1454545,24"
-                        id="Fill-4"
                         fill="#4285F4"
                       />
                     </g>
@@ -211,8 +222,8 @@ export default function SignInPage() {
               <span>Continue with Google</span>
             </button>
           </div>
-
         </form>
+
         <div className="w-full h-px bg-gray-200 my-8" />
 
         <div className="max-w-md mx-auto">

@@ -53,7 +53,7 @@ export default function Navbar({ isScrolled, isLoggedIn, navLinks=NAV_LINKS }: N
         isLoggedIn={isLoggedIn}
       />
 
-      <nav className="flex items-center justify-between px-4 py-4 xl:px-6">
+      <nav className="flex items-center justify-between px-4 py-4 xl:px-8">
         <button
           onClick={() => setOpenMenu(true)}
           className={`

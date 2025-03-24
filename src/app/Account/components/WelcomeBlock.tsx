@@ -25,7 +25,7 @@ function WelcomeBlock({ firstName, lastName }: WelcomeBlockProps): JSX.Element {
         <p className="text-sm text-gray-700 mb-4">
           In your My Star account, you can manage your personal details and view
           your orders in one place. Feel free to explore your profile, update
-          your addresses, manage your payment methods, and more.
+          your addresses, bonuses, manage your wish list, and more.
         </p>
         <button
           onClick={() => signOutUser(router)}
