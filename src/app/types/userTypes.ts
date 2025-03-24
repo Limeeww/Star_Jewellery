@@ -1,11 +1,20 @@
 import { Timestamp } from "firebase/firestore";
 
 export interface Address {
+  title?: "Mr" | "Mrs";
+  addressLabel?: string;
+  firstName?: string;
+  lastName?: string;
   street: string;
+  houseNumber?: string;
+  additionalInfo?: string;
   city: string;
   state?: string;
   zipCode: string;
   country: string;
+  mobile?: string;
+  preferredShippingAddress?: boolean;
+  preferredBillingAddress?: boolean;
 }
 
 export interface Order {

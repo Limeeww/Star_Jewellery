@@ -19,7 +19,7 @@ interface NotificationProps {
 const Notification: React.FC<NotificationProps> = ({
   message,
   type = "info",
-  duration = 3000,
+  duration,
   onClose,
 }) => {
   const [visible, setVisible] = useState(true);

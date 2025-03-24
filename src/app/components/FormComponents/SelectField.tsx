@@ -27,7 +27,7 @@ function SelectField({
       </label>
       <select
         id={id}
-        className={`w-full border-b border-gray-300 p-2 focus:outline-none focus:border-black bg-transparent ${
+        className={`w-full border-b border-gray-300 py-2 focus:outline-none focus:border-black bg-transparent ${
           error ? "border-red-500" : ""
         }`}
         {...register}

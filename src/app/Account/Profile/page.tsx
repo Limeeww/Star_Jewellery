@@ -2,12 +2,10 @@
 
 import React, { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { useRouter } from "next/navigation";
-import { doc, getDoc, setDoc, Timestamp } from "firebase/firestore";
 
 import { useForm } from "react-hook-form";
 
-import { auth, db } from "@/firebase/firebaseConfig";
+import { auth } from "@/firebase/firebaseConfig";
 import Navbar from "@/app/components/Navbar/Navbar";
 import Footer from "@/app/components/Footer/Footer";
 import Loading from "@/app/components/Loading/Loading";
@@ -29,19 +27,25 @@ import PhoneNumberField from "@/app/components/FormComponents/PhoneNumberField";
 import CheckboxField from "@/app/components/FormComponents/CheckboxField";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { validationSchemaProfile } from "@/app/utils/validationSchemaProfile";
+import LinkButton from "../components/LinkButton";
+
+
+import {
+  useRequireAuth,
+  useProfileData,
+  updateUserProfileWithChecks,
+} from "../../utils/auth";
+import { useNotification } from "@/app/utils/useNotification";
 
 export default function Profile() {
   const [user, loading, error] = useAuthState(auth);
-  const router = useRouter();
-
-  const [notification, setNotification] = useState<{
-    message: string;
-    type: "success" | "info" | "warning" | "error";
-  } | null>(null);
-  const [profileDisplay, setProfileDisplay] = useState<Partial<UserData>>({});
+  const { notification, notify, clearNotification } = useNotification();
+  const [profileData, setProfileData] = useProfileData(user);
 
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
+
+  useRequireAuth(user, loading);
 
   const {
     register,
@@ -71,165 +75,55 @@ export default function Profile() {
   const relationshipStatus = watch("relationshipStatus");
 
   useEffect(() => {
-    if (!loading && !user) {
-      router.push("/");
+    if (profileData) {
+      reset(profileData);
     }
-  }, [user, loading, router]);
-
-  useEffect(() => {
-    if (!loading && !user) {
-      router.push("/");
-    }
-  }, [user, loading, router]);
-
-  useEffect(() => {
-    const fetchProfileData = async () => {
-      if (user) {
-        try {
-          const docRef = doc(db, "users", user.uid);
-          const docSnap = await getDoc(docRef);
-
-          if (docSnap.exists()) {
-            const data = docSnap.data() as UserData;
-            reset(data);
-            setProfileDisplay({
-              firstName: data.firstName,
-              lastName: data.lastName,
-            });
-          }
-        } catch (err) {
-          console.error("Error fetching profile data:", err);
-          setNotification({
-            message: "Failed to load profile data.",
-            type: "error",
-          });
-        }
-      }
-    };
-    fetchProfileData();
-  }, [user, reset]);
+  }, [profileData, reset]);
 
   if (loading) return <Loading />;
-  if (error) {
-    return <ErrorMessage message={error.message} />;
-  }
+  if (error) return <ErrorMessage message={error.message} />;
 
   const onSubmit = async (formData: UserData) => {
     if (!user) return;
-
-    try {
-      const docRef = doc(db, "users", user.uid);
-      const snapshot = await getDoc(docRef);
-      if (!snapshot.exists()) {
-        setNotification({
-          message: "User document not found.",
-          type: "error",
-        });
-        return;
-      }
-
-      const existingData = snapshot.data() as UserData;
-      const now = new Date();
-
-      const updates: Partial<UserData> = { ...formData };
-
-      const changingBirthday =
-        formData.birthDay !== existingData.birthDay ||
-        formData.birthMonth !== existingData.birthMonth ||
-        formData.birthYear !== existingData.birthYear;
-
-      if (changingBirthday) {
-        if (existingData.lastBirthdayChange) {
-          const diffMs =
-            now.getTime() - existingData.lastBirthdayChange.toMillis();
-          const diffDays = diffMs / (1000 * 60 * 60 * 24);
-          if (diffDays < 30) {
-            setNotification({
-              message:
-                "You cannot change your Birthday more than once in 30 days.",
-              type: "error",
-            });
-            return;
-          }
-        }
-        updates.lastBirthdayChange = Timestamp.fromDate(now);
-      }
-
-      const changingAnniversary =
-        formData.anniversaryDay !== existingData.anniversaryDay ||
-        formData.anniversaryMonth !== existingData.anniversaryMonth ||
-        formData.anniversaryYear !== existingData.anniversaryYear;
-
-      if (changingAnniversary) {
-        if (existingData.lastAnniversaryChange) {
-          const diffMs =
-            now.getTime() - existingData.lastAnniversaryChange.toMillis();
-          const diffDays = diffMs / (1000 * 60 * 60 * 24);
-          if (diffDays < 30) {
-            setNotification({
-              message:
-                "You cannot change your Birthday more than once in 30 days.",
-              type: "error",
-            });
-            return;
-          }
-        }
-        updates.lastAnniversaryChange = Timestamp.fromDate(now);
-      }
-
-      await setDoc(docRef, updates, { merge: true });
-
-      setProfileDisplay({ ...existingData, ...updates });
-      setNotification({
+    const updatedData = await updateUserProfileWithChecks(user.uid, formData);
+    if (updatedData) {
+      setProfileData(updatedData);
+      notify({
         message: "Profile updated successfully!",
         type: "success",
       });
-    } catch (err: any) {
-      setNotification({
-        message: `${err.message || "Failed to update profile."}`,
-        type: "error",
-      });
     }
   };
-
   return (
     <>
       <Navbar isScrolled={true} isLoggedIn={!!user} />
       {notification && (
-        <Notification
-          message={notification.message}
-          type={notification.type}
-          duration={3000}
-          onClose={() => setNotification(null)}
-        />
+        <Notification {...notification} onClose={clearNotification} />
       )}
 
       <AccountLayout pathname="/Account/Profile">
         <WelcomeBlock
-          firstName={profileDisplay.firstName}
-          lastName={profileDisplay.lastName}
+          firstName={profileData?.firstName || ""}
+          lastName={profileData?.lastName || ""}
         />
 
-        {/* Кнопки с underline и стрелкой справа */}
         <div className="mt-4 space-y-2 text-sm text-gray-800">
           <p>
             With your specified email address and password you can manage your
             personal data.
           </p>
-          <button
+          <LinkButton
+            text="Change Email"
+            className="underline text-sm cursor-pointer text-gray-700 hover:text-black transition-colors flex items-center"
             onClick={() => setShowEmailModal(true)}
-            className="underline flex items-center"
-          >
-            Change Email
-            <span className="ml-1">&rarr;</span>
-          </button>
-          <button
+            showArrow={true}
+          />
+          <LinkButton
+            text="Change Password"
+            className="underline text-sm cursor-pointer text-gray-700 hover:text-black transition-colors flex items-center"
             onClick={() => setShowPasswordModal(true)}
-            className="underline flex items-center"
-          >
-            Change Password
-            <span className="ml-1">&rarr;</span>
-          </button>
+            showArrow={true}
+          />
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="mt-6  space-y-4">
