@@ -8,7 +8,7 @@ type Product = {
   id: number;
   name: string;
   description: string;
-  image: string;
+  imageUrl: string;
   slug: string;
   variantID: string;
   price?: number;
@@ -24,7 +24,7 @@ export default function CollectionPage() {
       id: 1,
       name: "Ariana Grande Bracelet",
       description: "Crystals, handcrafted",
-      image: "/images/products/silver-ring-test/main.jpg",
+      imageUrl: "/images/products/silver-ring-test/main.jpg",
       slug: "Ariana-Grande-Bracelet",
       variantID: "5720857",
     },
@@ -32,7 +32,7 @@ export default function CollectionPage() {
       id: 2,
       name: "One Bracelet",
       description: "Timeless elegance",
-      image: "/images/product2.jpg",
+      imageUrl: "/images/product2.jpg",
       slug: "One-Bracelet",
       variantID: "123456",
     },
@@ -40,7 +40,7 @@ export default function CollectionPage() {
       id: 3,
       name: "Swarovski Remix",
       description: "Crystals, handcrafted",
-      image: "/images/product3.jpg",
+      imageUrl: "/images/product3.jpg",
       slug: "Swarovski-Remix",
       variantID: "234567",
     },
@@ -48,7 +48,7 @@ export default function CollectionPage() {
       id: 4,
       name: "Inter-Belly Bracelet",
       description: "Modern style",
-      image: "/images/product4.jpg",
+      imageUrl: "/images/product4.jpg",
       slug: "Inter-Belly-Bracelet",
       variantID: "345678",
     },
@@ -56,7 +56,7 @@ export default function CollectionPage() {
       id: 5,
       name: "Men's Vinto Ring",
       description: "Classic design",
-      image: "/images/product5.jpg",
+      imageUrl: "/images/product5.jpg",
       slug: "Mens-Vinto-Ring",
       variantID: "456789",
     },
