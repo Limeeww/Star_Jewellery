@@ -1,4 +1,5 @@
 import { Timestamp } from "firebase/firestore";
+import { CartItem } from "./cartItem";
 
 export interface Address {
   title?: "Mr" | "Mrs";
@@ -44,8 +45,9 @@ export interface UserData {
   wishList?: string[];
   orders?: Order[];
   addresses?: Address[];
-  bonuses?: string; 
+  bonuses?: string;
   lastBirthdayChange?: Timestamp;
   lastAnniversaryChange?: Timestamp;
   lastRelationshipStatusChange?: Timestamp;
+  cartItems?: CartItem[];
 }

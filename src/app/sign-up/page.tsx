@@ -104,6 +104,7 @@ export default function SignUpPage() {
           orders: data.orders || [],
           addresses: data.addresses || [],
           bonuses: data.bonuses || "0",
+          cartItems: data.cartItems || [],
         };
 
         await setDoc(doc(db, "users", userCredential.user.uid), userData);

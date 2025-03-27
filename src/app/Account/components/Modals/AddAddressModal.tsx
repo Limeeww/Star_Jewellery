@@ -152,7 +152,6 @@ export default function AddAddressModal({
             </h2>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              {/* Title */}
               <SelectField
                 label="Title"
                 id="title"

@@ -5,17 +5,17 @@ import Image from "next/image";
 import Link from "next/link";
 import { Product } from "../../types/product";
 
-
 type ItemProps = {
   product: Product;
 };
 
 export default function Item({ product }: ItemProps) {
+  
   return (
     <Link
       key={product.id}
       href={
-        product.slug ? `/${product.slug}/?variantID=${product.variantID}` : "#"
+        product.slug ? `/${product.slug}/?variantID=${product.variants}` : "#"
       }
       className="
       border 
@@ -32,7 +32,7 @@ export default function Item({ product }: ItemProps) {
     >
       <div className="overflow-hidden">
         <Image
-          src={product.image}
+          src={product.imageUrl}
           alt={product.name}
           width={300}
           height={300}

@@ -1,7 +1,7 @@
 "use client";
 
 import Navbar from "@/app/components/Navbar/Navbar";
-import type { Address } from "../../types/userTypes"; // adjust the path as needed to import the Address type definition
+import type { Address } from "../../types/userTypes";
 import React, { useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../../../firebase/firebaseConfig";
@@ -107,7 +107,6 @@ export default function Addresses() {
             address, and it will automatically appear during checkout.
           </p>
 
-          {/* Проверяем, есть ли сохранённые адреса */}
           {!profileData?.addresses || profileData.addresses.length === 0 ? (
             <div className="flex items-center justify-between mt-4 py-2">
               <p className="text-sm text-gray-800">
@@ -126,13 +125,11 @@ export default function Addresses() {
             </div>
           ) : (
             <div className="mt-4">
-              {/* Заголовок: сколько адресов сохранено */}
               <div className="flex flex items-center justify-between mt-4 py-2">
                 <h3 className="text-sm font-medium mb-2">
                   You have {profileData.addresses.length} saved{" "}
                   {profileData.addresses.length > 1 ? "addresses" : "address"}
                 </h3>
-                {/* Кнопка "Add new address" */}
                 <div className="flex justify-end">
                   <LinkButton
                     text="Add new address"
@@ -146,7 +143,6 @@ export default function Addresses() {
                   />
                 </div>
               </div>
-              {/* Сетка карточек адресов */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {profileData.addresses.map((address, index) => (
                   <AddressCard
