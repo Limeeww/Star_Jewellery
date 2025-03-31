@@ -3,51 +3,15 @@
 import * as admin from "firebase-admin";
 import { getFirestore } from "firebase-admin/firestore";
 import { ServiceAccount } from "firebase-admin";
-import serviceAccountKey from "../serviceAccountKey.json"; // Replace with the path to your service account key file
+import serviceAccountKey from "../serviceAccountKey.json"; 
+import { Product } from "../src/app/types/product"; 
 
-// Initialize Firebase Admin with your service account credentials
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccountKey as ServiceAccount),
 });
 
 const db = getFirestore();
 
-// Sample data interfaces
-interface Discount {
-  id: number;
-  name: string;
-  value: number;
-  type: "percentage" | "fixed";
-  applicableTo: number[]; // Array of Product IDs or Category IDs
-  validFrom: Date;
-  validUntil: Date;
-}
-
-interface ProductVariant {
-  id: number;
-  price: number;
-  materialColor: string;
-  insert: string;
-  insertColor: string;
-  weight: number;
-  quantity: number;
-}
-
-interface Product {
-  id: number;
-  name: string;
-  description: string;
-  slug: string;
-  imageUrl: string;
-  categoryId: number;
-  variants: ProductVariant[];
-  discounts?: Discount[]; // Optional array of applicable discounts
-  createdAt: Date;
-  updatedAt: Date;
-  price: number;
-}
-
-// Improved sample data in English
 const products: Product[] = [
   {
     id: 1,
@@ -56,7 +20,7 @@ const products: Product[] = [
       "Elegant bracelet with crystals, handcrafted and inspired by Ariana Grande's style.",
     slug: "ariana-grande-bracelet",
     imageUrl: "/images/products/ariana-bracelet/main.jpg",
-    categoryId: 1, // For example, 1 could be the bracelets category
+    categoryId: 1, 
     variants: [
       {
         id: 101,
@@ -91,6 +55,13 @@ const products: Product[] = [
     createdAt: new Date("2023-01-01T12:00:00Z"),
     updatedAt: new Date("2023-01-15T12:00:00Z"),
     price: 99.99,
+    isHideen: false,
+    additionalDescription:
+      "This bracelet features a stunning design with premium materials and exceptional craftsmanship.",
+    quantitySize: [
+      { size: 6, quantity: 10 },
+      { size: 7, quantity: 15 },
+    ],
   },
   {
     id: 2,
@@ -113,6 +84,13 @@ const products: Product[] = [
     createdAt: new Date("2023-02-10T09:00:00Z"),
     updatedAt: new Date("2023-02-15T09:00:00Z"),
     price: 79.99,
+    isHideen: false,
+    additionalDescription:
+      "One Bracelet is crafted with a focus on timeless style and enduring quality.",
+    quantitySize: [
+      { size: 5, quantity: 5 },
+      { size: 6, quantity: 8 },
+    ],
   },
   {
     id: 3,
@@ -146,6 +124,13 @@ const products: Product[] = [
     createdAt: new Date("2023-03-01T10:00:00Z"),
     updatedAt: new Date("2023-03-05T10:00:00Z"),
     price: 120.0,
+    isHideen: false,
+    additionalDescription:
+      "Swarovski Remix blends modern aesthetics with the sparkle of genuine Swarovski crystals.",
+    quantitySize: [
+      { size: 7, quantity: 12 },
+      { size: 8, quantity: 10 },
+    ],
   },
   {
     id: 4,
@@ -169,6 +154,13 @@ const products: Product[] = [
     createdAt: new Date("2023-04-01T11:00:00Z"),
     updatedAt: new Date("2023-04-02T11:00:00Z"),
     price: 110.0,
+    isHideen: false,
+    additionalDescription:
+      "Inter-Belly Bracelet stands out with its unique design and contemporary flair.",
+    quantitySize: [
+      { size: 6, quantity: 7 },
+      { size: 7, quantity: 10 },
+    ],
   },
   {
     id: 5,
@@ -177,7 +169,7 @@ const products: Product[] = [
       "Classic ring for the modern man, focusing on style and quality.",
     slug: "mens-vinto-ring",
     imageUrl: "/images/products/mens-vinto-ring/main.jpg",
-    categoryId: 2, // For example, 2 could be the rings category
+    categoryId: 2,
     variants: [
       {
         id: 501,
@@ -212,14 +204,19 @@ const products: Product[] = [
     createdAt: new Date("2023-01-20T14:00:00Z"),
     updatedAt: new Date("2023-01-25T14:00:00Z"),
     price: 150.0,
+    isHideen: false,
+    additionalDescription:
+      "Men's Vinto Ring offers a refined blend of modern design and timeless elegance.",
+    quantitySize: [
+      { size: 10, quantity: 5 },
+      { size: 11, quantity: 3 },
+    ],
   },
 ];
 
-// Function to upload products data to Firestore
 async function uploadProducts() {
   const batch = db.batch();
   products.forEach((product) => {
-    // Using product.id as the document ID
     const productRef = db.collection("products").doc(product.id.toString());
     batch.set(productRef, product);
   });

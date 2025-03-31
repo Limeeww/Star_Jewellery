@@ -4,5 +4,7 @@ export interface CartItem {
   imageUrl: string;
   price: number;
   quantity: number;
-  variantId?: number;
+  size: number; 
+  insert:string;
+  materialColor:string;
 }

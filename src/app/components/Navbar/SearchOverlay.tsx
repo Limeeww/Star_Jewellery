@@ -9,83 +9,32 @@ import { useRouter } from "next/navigation";
 
 import Item from "../Item/Item";
 import { Product } from "../../types/product";
-
+import { fetchProducts } from "@/app/utils/product";
 
 type SearchOverlayProps = {
   open: boolean;
   onClose: () => void;
 };
 
-
-
 export default function SearchOverlay({ open, onClose }: SearchOverlayProps) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [lastSearches, setLastSearches] = useState<string[]>([]);
+  const [lastSearches, setLastSearches] = useState(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("lastSearches");
+      return stored ? JSON.parse(stored) : [];
+    }
+    return [];
+  });
   const router = useRouter();
+  const [items, setItems] = useState<Product[]>([]);
 
-  //   Get Products from DB
-  const items: Product[] = [
-    {
-      id: 1,
-      name: "Ariana Grande Bracelet",
-      description: "Crystals, handcrafted",
-      imageUrl: "/images/products/silver-ring-test/main.jpg",
-      slug: "Ariana-Grande-Bracelet",
-      variants: [],
-      categoryId: 0,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      price: 0
-    },
-    {
-      id: 2,
-      name: "One Bracelet",
-      description: "Timeless elegance",
-      imageUrl: "/images/product2.jpg",
-      slug: "One-Bracelet",
-      variants: [],
-      categoryId: 0,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      price: 0
-    },
-    {
-      id: 3,
-      name: "Swarovski Remix",
-      description: "Crystals, handcrafted",
-      imageUrl: "/images/product3.jpg",
-      slug: "Swarovski-Remix",
-      variants: [],
-      categoryId: 0,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      price: 0
-    },
-    {
-      id: 4,
-      name: "Inter-Belly Bracelet",
-      description: "Modern style",
-      imageUrl: "/images/product4.jpg",
-      slug: "Inter-Belly-Bracelet",
-      variants: [],
-      categoryId: 0,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      price: 0
-    },
-    {
-      id: 5,
-      name: "Men's Vinto Ring",
-      description: "Classic design",
-      imageUrl: "/images/product5.jpg",
-      slug: "Mens-Vinto-Ring",
-      variants: [],
-      categoryId: 0,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      price: 0
-    },
-  ];
+  useEffect(() => {
+    async function loadProducts() {
+      const products = await fetchProducts(4);
+      setItems(products);
+    }
+    loadProducts();
+  }, []);
 
   const filteredItems = items.filter((item) =>
     item.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -138,6 +87,8 @@ export default function SearchOverlay({ open, onClose }: SearchOverlayProps) {
   const removeSearchTerm = (term: string) => {
     setLastSearches((prev) => prev.filter((t) => t !== term));
   };
+
+  const itemsToDisplay = searchTerm ? filteredItems : items;
 
   if (!open) return null;
   return (
@@ -247,9 +198,9 @@ export default function SearchOverlay({ open, onClose }: SearchOverlayProps) {
           </h2>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {items.map((item) => {
-              return <Item key={item.id} product={item} />;
-            })}
+            {itemsToDisplay.map((item) => (
+              <Item key={item.id} product={item} />
+            ))}
           </div>
 
           {filteredItems.length > 0 && searchTerm.length > 0 && (

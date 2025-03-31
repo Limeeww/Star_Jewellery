@@ -15,7 +15,7 @@ export default function Item({ product }: ItemProps) {
     <Link
       key={product.id}
       href={
-        product.slug ? `/${product.slug}/?variantID=${product.variants}` : "#"
+        product.slug ? `/${product.slug}/?variantID=${product.variants[0].id}` : "#" // TODO: get konkret id from product that 
       }
       className="
       border 
