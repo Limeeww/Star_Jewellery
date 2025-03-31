@@ -1,42 +1,18 @@
 import Image from "next/image";
 import Item from "../components/Item/Item";
 import { Product } from "../types/product";
-import { collection, getDocs, query, limit } from "firebase/firestore";
-import { db } from "../../firebase/firebaseConfig"; // Make sure your Firebase client is configure
 import { useEffect, useState } from "react";
+import { fetchProducts } from "../utils/product";
 
 export default function CollectionsSection() {
   const [items, setItems] = useState<Product[]>([]);
 
   useEffect(() => {
-    async function fetchProducts() {
-      try {
-        // Reference to the "products" collection
-        const productsRef = collection(db, "products");
-        // Query to get only 5 products
-        const q = query(productsRef, limit(5));
-        const querySnapshot = await getDocs(q);
-        const products: Product[] = querySnapshot.docs.map((doc) => {
-          const data = doc.data();
-          return {
-            id: data.id,
-            name: data.name,
-            description: data.description,
-            image: data.imageUrl,
-            slug: data.slug,
-            // If there are variants, take the first one's id; otherwise, use an empty string
-            variantID: data.variants && data.variants.length > 0
-              ? data.variants[0].id.toString()
-              : "",
-            price: data.price,
-          } as unknown as Product;
-        });
-        setItems(products);
-      } catch (error) {
-        console.error("Error fetching products: ", error);
-      }
+    async function loadProducts() {
+      const products = await fetchProducts(4);
+      setItems(products);
     }
-    fetchProducts();
+    loadProducts();
   }, []);
 
   return (

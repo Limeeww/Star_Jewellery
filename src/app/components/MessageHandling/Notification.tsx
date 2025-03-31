@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   AiOutlineCheckCircle,
@@ -7,32 +7,35 @@ import {
 } from "react-icons/ai";
 import { BiError } from "react-icons/bi";
 
-type NotificationType = "success" | "info" | "warning" | "error";
+export type NotificationType = "success" | "info" | "warning" | "error";
 
-interface NotificationProps {
+export interface NotificationProps {
   message: string;
   type?: NotificationType;
-  duration?: number; 
-  onClose?: () => void; 
+  duration?: number;
+  onClose?: () => void;
 }
 
 const Notification: React.FC<NotificationProps> = ({
   message,
   type = "info",
-  duration,
+  duration = 5000,
   onClose,
 }) => {
   const [visible, setVisible] = useState(true);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
+    timerRef.current = setTimeout(() => {
       setVisible(false);
-      setTimeout(() => {
-        onClose?.(); 
-      }, 300); 
+      onClose?.();
     }, duration);
 
-    return () => clearTimeout(timer);
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+    };
   }, [duration, onClose]);
 
   const typeStyles = {

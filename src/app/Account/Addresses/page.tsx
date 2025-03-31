@@ -94,7 +94,7 @@ export default function Addresses() {
           lastName={profileData?.lastName}
         />
 
-        <div className="mt-6 space-y-4 text-sm text-gray-800">
+        <div className="mt-6 space-y-4 text-sm text-gray-800" style={{ fontFamily: "var(--font-poppins)" }}>
           <h2
             className="text-2xl font-semibold"
             style={{ fontFamily: "var(--font-playfair)" }}

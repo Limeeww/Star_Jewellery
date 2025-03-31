@@ -1,66 +1,27 @@
-import React from "react";
+// pages/CollectionPage.tsx
+
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Item from "../components/Item/Item";
 import EmblaCarousel from "../components/EmblaCarousel/EmblaCarousel";
 import { EmblaOptionsType } from "embla-carousel";
-
-type Product = {
-  id: number;
-  name: string;
-  description: string;
-  imageUrl: string;
-  slug: string;
-  variantID: string;
-  price?: number;
-};
+import { Product } from "../types/product";
+import { fetchProducts } from "../utils/product";
 
 const OPTIONS: EmblaOptionsType = { dragFree: true };
 const SLIDE_COUNT = 10;
 const SLIDES = Array.from(Array(SLIDE_COUNT).keys());
 
 export default function CollectionPage() {
-  const items: Product[] = [
-    {
-      id: 1,
-      name: "Ariana Grande Bracelet",
-      description: "Crystals, handcrafted",
-      imageUrl: "/images/products/silver-ring-test/main.jpg",
-      slug: "Ariana-Grande-Bracelet",
-      variantID: "5720857",
-    },
-    {
-      id: 2,
-      name: "One Bracelet",
-      description: "Timeless elegance",
-      imageUrl: "/images/product2.jpg",
-      slug: "One-Bracelet",
-      variantID: "123456",
-    },
-    {
-      id: 3,
-      name: "Swarovski Remix",
-      description: "Crystals, handcrafted",
-      imageUrl: "/images/product3.jpg",
-      slug: "Swarovski-Remix",
-      variantID: "234567",
-    },
-    {
-      id: 4,
-      name: "Inter-Belly Bracelet",
-      description: "Modern style",
-      imageUrl: "/images/product4.jpg",
-      slug: "Inter-Belly-Bracelet",
-      variantID: "345678",
-    },
-    {
-      id: 5,
-      name: "Men's Vinto Ring",
-      description: "Classic design",
-      imageUrl: "/images/product5.jpg",
-      slug: "Mens-Vinto-Ring",
-      variantID: "456789",
-    },
-  ];
+  const [items, setItems] = useState<Product[]>([]);
+
+  useEffect(() => {
+    async function loadProducts() {
+      const products = await fetchProducts(4);
+      setItems(products);
+    }
+    loadProducts();
+  }, []);
 
   return (
     <div

@@ -17,6 +17,12 @@ export interface ProductVariant {
   insertColor: string;
   weight: number;
   quantity: number;
+
+}
+
+export interface quantitySize {
+  size:number;
+  quantity:number;
 }
 
 export interface Product {
@@ -27,8 +33,11 @@ export interface Product {
   imageUrl: string;
   categoryId: number;
   variants: ProductVariant[];
-  discounts?: Discount[]; // Optional array of applicable discounts
+  discounts?: Discount[]; 
   createdAt: Date;
   updatedAt: Date;
   price: number;
+  isHideen: boolean; 
+  additionalDescription: string; 
+  quantitySize: quantitySize[];
 }
