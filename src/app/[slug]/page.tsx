@@ -27,6 +27,9 @@ import SubmitButton from "../components/FormComponents/SubmitButton";
 import { Product } from "../types/product";
 import { useRequireAuth } from "../utils/auth";
 import { useNotification } from "../utils/useNotification";
+import InfoBlocks from "./components/InfoItem";
+import { AiOutlineSearch } from "react-icons/ai";
+import ProductImageBlock from "./components/ProductImageBlock";
 
 export default function ProductPage() {
   const [user, loading] = useAuthState(auth);
@@ -58,10 +61,16 @@ export default function ProductPage() {
   }));
 
   useRequireAuth(user, loading);
-  const { notify, notification={type: 'success', message: 'Product added to cart!', duration: 3000}, clearNotification } = useNotification();
+  const {
+    notify,
+    notification = {
+      type: "success",
+      message: "Product added to cart!",
+      duration: 3000,
+    },
+    clearNotification,
+  } = useNotification();
 
-
-  const something = {type: 'success', message: 'Product added to cart!', duration: 3000};
   useEffect(() => {
     if (!slug) return;
 
@@ -119,12 +128,16 @@ export default function ProductPage() {
       await updateDoc(userRef, {
         cartItems: arrayUnion(cartItem),
       });
-      notify({ type: "success", message: "Product added to cart!", duration: 3000 });
+      notify({
+        type: "success",
+        message: "Product added to cart!",
+        duration: 3000,
+      });
     } catch (error) {
       notify({
         type: "error",
         message: `Error adding product to cart: ${String(error)}`,
-        duration: 3000 
+        duration: 3000,
       });
     }
   };
@@ -148,17 +161,9 @@ export default function ProductPage() {
             onClose={clearNotification}
           />
         )}
-       
+
         <div className="grid grid-cols-1 2xl:grid-cols-2 gap-8 items-center">
-          <div className="overflow-hidden shadow-lg mt-6">
-            <Image
-              src={product.imageUrl}
-              alt={product.name}
-              width={600}
-              height={600}
-              className="w-full h-[90vh] object-cover"
-            />
-          </div>
+          <ProductImageBlock product={product} />
 
           <div>
             <h1
@@ -224,6 +229,9 @@ export default function ProductPage() {
                 className="w-full"
               />
             </form>
+            <div className="mt-8">
+              <InfoBlocks />
+            </div>
           </div>
         </div>
       </section>
