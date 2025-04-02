@@ -30,6 +30,7 @@ import { useNotification } from "../utils/useNotification";
 import InfoBlocks from "./components/InfoItem";
 import { AiOutlineSearch } from "react-icons/ai";
 import ProductImageBlock from "./components/ProductImageBlock";
+import SideModal from "../components/SideModal/SideModal";
 
 export default function ProductPage() {
   const [user, loading] = useAuthState(auth);
@@ -142,7 +143,6 @@ export default function ProductPage() {
     }
   };
 
-  console.log(notification);
 
   return (
     <>
