@@ -1,7 +1,6 @@
 "use client";
 
 import { useParams, useSearchParams } from "next/navigation";
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -27,6 +26,11 @@ import SubmitButton from "../components/FormComponents/SubmitButton";
 import { Product } from "../types/product";
 import { useRequireAuth } from "../utils/auth";
 import { useNotification } from "../utils/useNotification";
+import InfoBlocks from "./components/InfoItem";
+import { AiOutlineShoppingCart } from "react-icons/ai";
+import ProductImageBlock from "./components/ProductImageBlock";
+import MainFeaturesList from "./components/MainFeatureList";
+
 
 export default function ProductPage() {
   const [user, loading] = useAuthState(auth);
@@ -58,10 +62,16 @@ export default function ProductPage() {
   }));
 
   useRequireAuth(user, loading);
-  const { notify, notification={type: 'success', message: 'Product added to cart!', duration: 3000}, clearNotification } = useNotification();
+  const {
+    notify,
+    notification = {
+      type: "success",
+      message: "Product added to cart!",
+      duration: 3000,
+    },
+    clearNotification,
+  } = useNotification();
 
-
-  const something = {type: 'success', message: 'Product added to cart!', duration: 3000};
   useEffect(() => {
     if (!slug) return;
 
@@ -119,17 +129,19 @@ export default function ProductPage() {
       await updateDoc(userRef, {
         cartItems: arrayUnion(cartItem),
       });
-      notify({ type: "success", message: "Product added to cart!", duration: 3000 });
+      notify({
+        type: "success",
+        message: "Product added to cart!",
+        duration: 3000,
+      });
     } catch (error) {
       notify({
         type: "error",
         message: `Error adding product to cart: ${String(error)}`,
-        duration: 3000 
+        duration: 3000,
       });
     }
   };
-
-  console.log(notification);
 
   return (
     <>
@@ -148,17 +160,9 @@ export default function ProductPage() {
             onClose={clearNotification}
           />
         )}
-       
+
         <div className="grid grid-cols-1 2xl:grid-cols-2 gap-8 items-center">
-          <div className="overflow-hidden shadow-lg mt-6">
-            <Image
-              src={product.imageUrl}
-              alt={product.name}
-              width={600}
-              height={600}
-              className="w-full h-[90vh] object-cover"
-            />
-          </div>
+          <ProductImageBlock product={product} />
 
           <div>
             <h1
@@ -219,11 +223,22 @@ export default function ProductPage() {
               />
 
               <SubmitButton
-                label="Record for a personal order"
+                label={
+                  <>
+                    <AiOutlineShoppingCart className="inline mr-2 text-lg" />
+                    Add to the basket
+                  </>
+                }
                 isLoading={false}
                 className="w-full"
               />
             </form>
+            <div className="mt-8">
+              <MainFeaturesList product={product} />
+            </div>
+            <div className="mt-6">
+              <InfoBlocks />
+            </div>
           </div>
         </div>
       </section>
