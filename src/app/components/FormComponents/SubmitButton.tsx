@@ -1,7 +1,7 @@
 import React from "react";
 
 interface SubmitButtonProps {
-  label: string;
+  label: React.ReactNode;
   isLoading?: boolean;
   className?: string;
 }

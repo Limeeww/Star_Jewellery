@@ -1,7 +1,6 @@
 "use client";
 
 import { useParams, useSearchParams } from "next/navigation";
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -28,9 +27,10 @@ import { Product } from "../types/product";
 import { useRequireAuth } from "../utils/auth";
 import { useNotification } from "../utils/useNotification";
 import InfoBlocks from "./components/InfoItem";
-import { AiOutlineSearch } from "react-icons/ai";
+import { AiOutlineShoppingCart } from "react-icons/ai";
 import ProductImageBlock from "./components/ProductImageBlock";
-import SideModal from "../components/SideModal/SideModal";
+import MainFeaturesList from "./components/MainFeatureList";
+
 
 export default function ProductPage() {
   const [user, loading] = useAuthState(auth);
@@ -143,7 +143,6 @@ export default function ProductPage() {
     }
   };
 
-
   return (
     <>
       <Navbar isScrolled={true} isLoggedIn={isLoggedIn} />
@@ -224,12 +223,20 @@ export default function ProductPage() {
               />
 
               <SubmitButton
-                label="Record for a personal order"
+                label={
+                  <>
+                    <AiOutlineShoppingCart className="inline mr-2 text-lg" />
+                    Add to the basket
+                  </>
+                }
                 isLoading={false}
                 className="w-full"
               />
             </form>
             <div className="mt-8">
+              <MainFeaturesList product={product} />
+            </div>
+            <div className="mt-6">
               <InfoBlocks />
             </div>
           </div>

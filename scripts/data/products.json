@@ -32,7 +32,7 @@
       "createdAt": "2025-04-01T00:00:00.000Z",
       "updatedAt": "2025-04-01T00:00:00.000Z",
       "price": 15000,
-      "isHideen": false,
+      "isHidden": false,
       "additionalDescription": "This elegant gold ring is crafted with meticulous attention to detail, featuring intricate filigree work and shimmering small diamonds that catch the light beautifully. Ideal for both everyday wear and special occasions, it serves as a timeless piece that complements any style.",
       "quantitySize": [
         { "size": 6, "quantity": 3 },
@@ -73,7 +73,7 @@
       "createdAt": "2025-04-01T00:00:00.000Z",
       "updatedAt": "2025-04-01T00:00:00.000Z",
       "price": 5000,
-      "isHideen": false,
+      "isHidden": false,
       "additionalDescription": "These delicate silver earrings are expertly crafted to combine classic elegance with a modern touch. Featuring vibrant semi-precious stones and refined detailing, they add a subtle yet sophisticated sparkle to any ensemble.",
       "quantitySize": [{ "size": 1, "quantity": 30 }]
     },
@@ -98,7 +98,7 @@
       "createdAt": "2025-04-01T00:00:00.000Z",
       "updatedAt": "2025-04-01T00:00:00.000Z",
       "price": 35000,
-      "isHideen": false,
+      "isHidden": false,
       "additionalDescription": "This luxurious diamond necklace exudes opulence and elegance with its dazzling array of brilliant-cut diamonds. Each stone is meticulously set to create a harmonious display of light and sparkle, making it an exquisite statement piece for evening events and celebrations.",
       "quantitySize": [{ "size": 16, "quantity": 2 }]
     },
@@ -123,7 +123,7 @@
       "createdAt": "2025-04-01T00:00:00.000Z",
       "updatedAt": "2025-04-01T00:00:00.000Z",
       "price": 25000,
-      "isHideen": false,
+      "isHidden": false,
       "additionalDescription": "Crafted with precision, this unique platinum bracelet features intricate, elaborate patterns that highlight its luxurious appeal. Its timeless design and exceptional finish make it a must-have accessory for those with refined taste.",
       "quantitySize": [{ "size": 7, "quantity": 4 }]
     },
@@ -159,7 +159,7 @@
       "createdAt": "2025-04-01T00:00:00.000Z",
       "updatedAt": "2025-04-01T00:00:00.000Z",
       "price": 12000,
-      "isHideen": false,
+      "isHidden": false,
       "additionalDescription": "This contemporary minimalist necklace embodies modern elegance with its clean, smooth lines and polished finish. Ideal for both casual and formal settings, its understated design adds a touch of sophistication to any outfit.",
       "quantitySize": [{ "size": 18, "quantity": 6 }]
     },
@@ -184,7 +184,7 @@
       "createdAt": "2025-04-01T00:00:00.000Z",
       "updatedAt": "2025-04-01T00:00:00.000Z",
       "price": 8000,
-      "isHideen": false,
+      "isHidden": false,
       "additionalDescription": "Expertly crafted for the discerning gentleman, these exclusive men's cufflinks boast intricate engraving and a sleek silver finish. They are designed to elevate formal attire with a subtle yet unmistakable touch of sophistication.",
       "quantitySize": [{ "size": 1, "quantity": 20 }]
     },
@@ -209,7 +209,7 @@
       "createdAt": "2025-04-01T00:00:00.000Z",
       "updatedAt": "2025-04-01T00:00:00.000Z",
       "price": 50000,
-      "isHideen": false,
+      "isHidden": false,
       "additionalDescription": "This comprehensive jewelry set includes an exquisitely designed ring, a sophisticated necklace, and elegantly crafted earrings. Each piece is a testament to fine artistry and superior craftsmanship, making this set a perfect choice for those seeking an all-in-one luxury accessory collection.",
       "quantitySize": [
         { "size": 7, "quantity": 1 },
@@ -238,7 +238,7 @@
       "createdAt": "2025-04-01T00:00:00.000Z",
       "updatedAt": "2025-04-01T00:00:00.000Z",
       "price": 6000,
-      "isHideen": false,
+      "isHidden": false,
       "additionalDescription": "This decorative enamel brooch is a striking accessory that merges traditional craftsmanship with vibrant contemporary design. Its detailed enamel work in blue and green hues adds a pop of color, making it a perfect accent piece for both formal and casual ensembles.",
       "quantitySize": [{ "size": 2, "quantity": 12 }]
     },
@@ -263,7 +263,7 @@
       "createdAt": "2025-04-01T00:00:00.000Z",
       "updatedAt": "2025-04-01T00:00:00.000Z",
       "price": 9000,
-      "isHideen": false,
+      "isHidden": false,
       "additionalDescription": "This geometric pendant represents a fusion of modern design and classic elegance. With its bold lines, sleek finish, and sparkling diamond accents, it makes a striking accessory that elevates any look, whether casual or formal.",
       "quantitySize": [{ "size": 1, "quantity": 10 }]
     }
