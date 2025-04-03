@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Product } from "../../types/product";
 import {
-  IoIosInformationCircleOutline,
+  
   IoIosArrowDown,
   IoIosArrowUp,
 } from "react-icons/io";

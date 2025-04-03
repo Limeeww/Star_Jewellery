@@ -30,8 +30,48 @@ import InfoBlocks from "./components/InfoItem";
 import { AiOutlineShoppingCart } from "react-icons/ai";
 import ProductImageBlock from "./components/ProductImageBlock";
 import MainFeaturesList from "./components/MainFeatureList";
+import SimilarProducts from "../components/SimilarProducts/SimilarProducts";
+import AboutCollection from "./components/AboutCollection";
+import ShareButton from "../components/ShareButton/ShareButton";
+import { Timestamp } from "firebase/firestore";
 
 
+function isTimestamp(value: unknown): value is Timestamp {
+  return (
+    !!value &&
+    typeof value === "object" &&
+    typeof (value as Timestamp).toDate === "function"
+  );
+}
+
+function getActiveDiscount(product: Product) {
+  if (!product.discounts || product.discounts.length === 0) return null;
+  const now = new Date();
+
+  for (const discount of product.discounts) {
+    let from: Date;
+    let until: Date;
+
+    if (isTimestamp(discount.validFrom)) {
+      from = discount.validFrom.toDate();
+    } else {
+      from = new Date(discount.validFrom);
+    }
+
+    if (isTimestamp(discount.validUntil)) {
+      until = discount.validUntil.toDate();
+    } else {
+      until = new Date(discount.validUntil);
+    }
+
+    // console.log("Try this", now >= from && now <= until)
+
+    if (now >= from && now <= until) {
+      return discount;
+    }
+  }
+  return null;
+}
 export default function ProductPage() {
   const [user, loading] = useAuthState(auth);
   const { slug } = useParams();
@@ -46,31 +86,8 @@ export default function ProductPage() {
     formState: { errors },
   } = useForm();
 
-  const sizeOptions = (product?.quantitySize || []).map((item) => ({
-    value: item.size.toString(),
-    label: `Size ${item.size} (${item.quantity} available)`,
-  }));
-
-  const insertOptions = (product?.variants || []).map((variant) => ({
-    value: `${variant.insert}-${variant.insertColor}`,
-    label: `${variant.insert} (${variant.insertColor})`,
-  }));
-
-  const specOptions = (product?.variants || []).map((obj) => ({
-    value: obj.materialColor,
-    label: obj.materialColor,
-  }));
-
   useRequireAuth(user, loading);
-  const {
-    notify,
-    notification = {
-      type: "success",
-      message: "Product added to cart!",
-      duration: 3000,
-    },
-    clearNotification,
-  } = useNotification();
+  const { notify, notification, clearNotification } = useNotification();
 
   useEffect(() => {
     if (!slug) return;
@@ -91,6 +108,7 @@ export default function ProductPage() {
               id: Number(variantID),
             }));
           }
+
           setProduct(fetchedProduct);
         } else {
           notify({
@@ -111,13 +129,31 @@ export default function ProductPage() {
 
   if (!product) return <Loading />;
 
+  const activeDiscount = getActiveDiscount(product);
+  let discountedPrice: number | null;
+
+  console.log("Active discount:", activeDiscount);
+  console.log("Product price:", product.price);
+  console.log("activeDiscount value:", activeDiscount?.value);
+
+  if (activeDiscount) {
+    if (activeDiscount.type === "percentage") {
+      discountedPrice = product.price * (1 - activeDiscount.value / 100);
+    } else if (activeDiscount.type === "fixed") {
+      discountedPrice = product.price - activeDiscount.value;
+    }
+  }
+
   const onSubmit = async (data: any) => {
     if (!user) return;
+
+    const finalPrice = discountedPrice ?? product.price;
+
     const cartItem = {
       productId: product.id,
       name: product.name,
       imageUrl: product.imageUrl,
-      price: product.price,
+      price: finalPrice,
       quantity: 1,
       size: Number(data.size),
       insert: data.inserts,
@@ -142,6 +178,23 @@ export default function ProductPage() {
       });
     }
   };
+
+  const formatPrice = (price: number) => price.toFixed(2);
+
+  const sizeOptions = (product?.quantitySize || []).map((item) => ({
+    value: item.size.toString(),
+    label: `Size ${item.size} (${item.quantity} available)`,
+  }));
+
+  const insertOptions = (product?.variants || []).map((variant) => ({
+    value: `${variant.insert}-${variant.insertColor}`,
+    label: `${variant.insert} (${variant.insertColor})`,
+  }));
+
+  const specOptions = (product?.variants || []).map((obj) => ({
+    value: obj.materialColor,
+    label: obj.materialColor,
+  }));
 
   return (
     <>
@@ -171,6 +224,7 @@ export default function ProductPage() {
             >
               {product.name}
             </h1>
+
             <p className="text-base md:text-lg text-gray-600 leading-relaxed mb-6">
               {product.description}
             </p>
@@ -178,6 +232,24 @@ export default function ProductPage() {
             {product.additionalDescription && (
               <p className="text-sm md:text-base text-gray-700 leading-relaxed mb-6">
                 {product.additionalDescription}
+              </p>
+            )}
+
+            {discountedPrice ? (
+              <div className="mb-6">
+                <p className="text-xl text-gray-500 line-through">
+                  {formatPrice(product.price)} ₴
+                </p>
+                <p className="text-2xl font-bold text-red-600">
+                  {formatPrice(discountedPrice)} ₴
+                </p>
+                <p className="text-sm text-red-500 mt-1">
+                  {activeDiscount?.name || "Discount"}
+                </p>
+              </div>
+            ) : (
+              <p className="text-2xl font-bold text-gray-800 mb-6">
+                {product.price} ₴
               </p>
             )}
 
@@ -206,10 +278,6 @@ export default function ProductPage() {
                 />
               </div>
 
-              <p className="text-2xl font-bold text-gray-800 mb-6">
-                {product.price ?? "unknown"} ₴
-              </p>
-
               <SelectField
                 label="Material Color"
                 id="materialColor"
@@ -233,15 +301,35 @@ export default function ProductPage() {
                 className="w-full"
               />
             </form>
+
             <div className="mt-8">
               <MainFeaturesList product={product} />
             </div>
+
             <div className="mt-6">
               <InfoBlocks />
+              <div className="mt-4 items-end flex">
+                <ShareButton
+                  title="Share this product"
+                  text="Check out this amazing product!"
+                  url={
+                    typeof window !== "undefined" ? window.location.href : ""
+                  }
+                />
+              </div>
             </div>
           </div>
         </div>
+
+        <div className="mt-12">
+          <AboutCollection />
+        </div>
+
+        <div className="mt-2">
+          <SimilarProducts />
+        </div>
       </section>
+
       <Footer />
     </>
   );
