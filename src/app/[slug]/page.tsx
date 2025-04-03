@@ -161,10 +161,10 @@ export default function ProductPage() {
           />
         )}
 
-        <div className="grid grid-cols-1 2xl:grid-cols-2 gap-8 items-center">
+        <div className="grid grid-cols-1 2xl:grid-cols-2 gap-8 items-start">
           <ProductImageBlock product={product} />
 
-          <div>
+          <div className="mt-6">
             <h1
               className="text-3xl md:text-4xl font-bold text-gray-800 mb-4"
               style={{ fontFamily: "var(--font-playfair)" }}
