@@ -42,7 +42,7 @@ const infoItems: InfoItem[] = [
       <>
         <p>
           Every piece of our{" "}
-          <span className="text-blue-500 font-bold">SOVA jewelry</span> comes
+          <span className="text-blue-500 font-bold">STAR jewelry</span> comes
           with an 18-month warranty, ensuring top quality and authenticity.
         </p>
         <p>

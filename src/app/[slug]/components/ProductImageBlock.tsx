@@ -52,7 +52,7 @@ const ProductImageBlock = ({ product }: { product: ProductProps }) => {
             <AiOutlineClose size={24} className="text-white" />
           </button>
           <div
-            className="w-[90vh] h-[90vh] max-w-[90vw] max-h-[90vh] w-full h-auto"
+            className="w-[60vh] h-[60vh] max-w-[90vw] max-h-[90vh] w-full h-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <Image

@@ -3,10 +3,11 @@
 import { useState } from "react";
 import { Product } from "../../types/product";
 import {
-  IoIosInformationCircleOutline,
+  
   IoIosArrowDown,
   IoIosArrowUp,
 } from "react-icons/io";
+import InfoItem from "@/app/components/InfoItem/InfoItem";
 
 interface Props {
   product: Product;
@@ -28,7 +29,8 @@ const MainFeaturesList = ({ product }: Props) => {
         <div className="flex items-center">
           Gold{" "}
           <span className="ml-1 text-gray-400 text-xs">
-            <IoIosInformationCircleOutline size={18} />
+            <InfoItem
+              text="The information about the metal is provided by the manufacturer. It is not a guarantee of the quality of the product."/>
           </span>
         </div>
       ),
@@ -65,7 +67,7 @@ const MainFeaturesList = ({ product }: Props) => {
         Main features
       </h3>
 
-      <div className="relative max-h-[200px] overflow-hidden">
+      <div className="relative max-h-[200px] overflow-visible">
         <ul className="text-sm text-gray-900 space-y-2 transition-all duration-500">
           {features.map((item, index) => (
             <li
@@ -85,11 +87,10 @@ const MainFeaturesList = ({ product }: Props) => {
         )}
       </div>
 
-      {/* Кнопка */}
       {features.length > previewCount && (
         <button
           onClick={() => setExpanded(!expanded)}
-          className="mt-2 text-sm text-amber-700 font-medium hover:underline flex items-center justify-center space-x-1"
+          className="mt-5 text-sm text-slate-700 font-medium hover:underline flex items-center justify-center space-x-1"
         >
           {expanded ? (
             <>

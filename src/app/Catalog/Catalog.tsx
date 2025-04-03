@@ -1,5 +1,3 @@
-// pages/CollectionPage.tsx
-
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Item from "../components/Item/Item";

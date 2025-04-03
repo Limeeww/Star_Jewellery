@@ -9,9 +9,8 @@ import Link from "next/link";
 
 import Navbar from "@/app/components/Navbar/Navbar";
 import Footer from "@/app/components/Footer/Footer";
-import CartItemComponent from "@/app/components/CartItem/CartItemComponent";
-import GiftOptions from "@/app/components/GiftOptions/GiftOptions";
-import OrderSummary from "@/app/components/OrderSummary/OrderSummary";
+import CartItemComponent from "@/app/cart/components/CartItemComponent";
+import OrderSummary from "@/app/cart/components/OrderSummary";
 import RecentlyViewed from "@/app/components/RecentlyViewed/RecentlyViewed";
 
 import { CartItem } from "@/app/types/cartItem";
@@ -24,6 +23,7 @@ import {
   getGiftOptionsTotal,
   getTotal,
 } from "@/app/utils/cartUtils";
+import GiftOptions from "./components/GiftOptions";
 
 export default function CartPage() {
   const [user, loading] = useAuthState(auth);
