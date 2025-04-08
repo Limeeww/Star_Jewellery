@@ -6,6 +6,8 @@ import { db } from "../../../firebase/firebaseConfig";
 import { collection, query, getDocs } from "firebase/firestore";
 import { Product } from "../../types/product"; 
 
+
+// DO NOT USE THIS COMPONENT IN THE APP, IT IS FOR TESTING PURPOSES ONLY
 const ProductItem = ({ product }: { product: Product }) => {
   const [collapsed, setCollapsed] = useState(true);
 

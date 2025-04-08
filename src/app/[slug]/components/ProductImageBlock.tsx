@@ -52,7 +52,7 @@ const ProductImageBlock = ({ product }: { product: ProductProps }) => {
             <AiOutlineClose size={24} className="text-white" />
           </button>
           <div
-            className="w-[60vh] h-[60vh] max-w-[90vw] max-h-[90vh] w-full h-auto"
+            className="w-[60vh] h-[60vh] max-w-[90vw] max-h-[90vh]  w-full h-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <Image
@@ -60,7 +60,7 @@ const ProductImageBlock = ({ product }: { product: ProductProps }) => {
               alt={product.name}
               width={800}
               height={800}
-              className="object-contain w-full h-auto"
+              className="object-contain  h-auto"
             />
           </div>
         </div>

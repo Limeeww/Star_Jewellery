@@ -8,6 +8,8 @@ export default function AboutCollection() {
     "collection"
   );
 
+
+  // GET TEXT FROM FIREBASE
   const collectionText = `
     Smart & Beautiful is a jewelry collection inspired by intellectual beauty.
     Its distinguishing feature is ceramics as the main material. 
@@ -27,7 +29,7 @@ export default function AboutCollection() {
 
   return (
     <section
-      className="w-full px-4 md:px-8 py-8 md:py-12 bg-white"
+      className="w-full px-4 md:px-6 py-8 md:py-12 bg-white"
       style={{ fontFamily: "var(--font-poppins)" }}
     >
       <h2

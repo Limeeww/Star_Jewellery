@@ -1,11 +1,18 @@
+import { Timestamp } from "firebase/firestore";
+
+
+// GET TEXT && IMAGE FROM FIREBASE ABOUT COLLECTION for AboutCollection.tsx
+// GET FEATURES FROM FIREBASE
+
+
 export interface Discount {
   id: number;
   name: string;
   value: number;
   type: "percentage" | "fixed";
   applicableTo: number[]; // Array of Product IDs or Category IDs
-  validFrom: Date;
-  validUntil: Date;
+  validFrom: Timestamp;
+  validUntil: Timestamp;
 }
 
 export interface ProductVariant {
