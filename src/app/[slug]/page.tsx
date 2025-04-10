@@ -13,6 +13,7 @@ import {
   updateDoc,
   arrayUnion,
   doc,
+  getDoc,
 } from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 
@@ -34,7 +35,17 @@ import SimilarProducts from "../components/SimilarProducts/SimilarProducts";
 import AboutCollection from "./components/AboutCollection";
 import ShareButton from "../components/ShareButton/ShareButton";
 import { Timestamp } from "firebase/firestore";
-
+import SideModal from "../components/SideModal/SideModal";
+import CartItemComponent from "../components/CartItem/CartItemComponent";
+import { useCartItems } from "../utils/cartUtils";
+import {
+  decrementQuantity,
+  incrementQuantity,
+  removeItem,
+} from "../utils/cartActions";
+import LinkButtonForm from "../components/FormComponents/LinkButtonForm";
+import { Collection } from "../types/collection";
+import CollectionPage from "../Catalog/Catalog";
 
 function isTimestamp(value: unknown): value is Timestamp {
   return (
@@ -78,7 +89,12 @@ export default function ProductPage() {
   const searchParams = useSearchParams();
   const variantID = searchParams.get("variantID");
   const [product, setProduct] = useState<Product | null>(null);
+  const [collectionData, setCollectionData] = useState<Collection[]>([]);
   const isLoggedIn = !loading && !!user;
+
+  const [sideModalOpen, setSideModalOpen] = useState(false);
+
+  const cartItems = useCartItems(user ? user.uid : null);
 
   const {
     register,
@@ -91,50 +107,87 @@ export default function ProductPage() {
 
   useEffect(() => {
     if (!slug) return;
-
-    async function fetchProduct() {
+  
+    const fetchData = async () => {
       try {
         const productsRef = collection(db, "products");
-        const q = query(productsRef, where("slug", "==", slug));
-        const querySnap = await getDocs(q);
-
-        if (!querySnap.empty) {
-          const docSnap = querySnap.docs[0];
-          const fetchedProduct = docSnap.data() as Product;
-
-          if (variantID && fetchedProduct.variants) {
-            fetchedProduct.variants = fetchedProduct.variants.map((v) => ({
-              ...v,
-              id: Number(variantID),
-            }));
-          }
-
-          setProduct(fetchedProduct);
-        } else {
+        const productQuery = query(productsRef, where("slug", "==", slug));
+        const productSnap = await getDocs(productQuery);
+  
+        if (productSnap.empty) {
           notify({
             type: "warning",
-            message: `No product found for slug: ${slug}`,
+            message: `Не найден продукт по slug: ${slug}`,
           });
+          return;
         }
+  
+        const productDoc = productSnap.docs[0];
+        const fetchedProduct = productDoc.data() as Product;
+  
+        if (variantID && fetchedProduct.variants) {
+          fetchedProduct.variants = fetchedProduct.variants.map((variant) => ({
+            ...variant,
+            id: Number(variantID),
+          }));
+        }
+  
+        setProduct(fetchedProduct);
+  
+        if (!fetchedProduct.categoryId) {
+          setCollectionData([]);
+          console.log("У продукта нет collectionId");
+          return;
+        }
+  
+        const collectionDocRef = doc(
+          db,
+          "collections",
+          fetchedProduct.categoryId.toString()
+        );
+        const collectionDocSnap = await getDoc(collectionDocRef);
+  
+        if (!collectionDocSnap.exists()) {
+          setCollectionData([]);
+          console.log("Коллекция с таким ID не найдена");
+          return;
+        }
+  
+        const data = collectionDocSnap.data();
+        const singleCollection = {
+          id: Number(collectionDocSnap.id),
+          name: data.name || "",
+          description: data.description || "",
+          images: data.images || [],
+          parentCategory: Number(data.parentCategory) || 0,
+          isActive: data.isActive ?? true,
+          createdAt: data.createdAt,
+        };
+  
+        // Обновляем стейт с данными коллекции
+        setCollectionData([singleCollection]);
+        console.log("Collection data:", [singleCollection]);
+  
       } catch (error) {
         notify({
           type: "error",
-          message: `Error fetching product: ${String(error)}`,
+          message: `Ошибка при получении данных: ${String(error)}`,
         });
       }
-    }
-
-    fetchProduct();
+    };
+  
+    fetchData();
   }, [slug, variantID, notify]);
+  
 
   if (!product) return <Loading />;
 
   const activeDiscount = getActiveDiscount(product);
   let discountedPrice: number | null;
 
-  console.log("Active discount:", activeDiscount);
-  console.log("Product price:", product.price);
-  console.log("activeDiscount value:", activeDiscount?.value);
+  // console.log("Active discount:", activeDiscount);
+  // console.log("Product price:", product.price);
+  // console.log("activeDiscount value:", activeDiscount?.value);
 
   if (activeDiscount) {
     if (activeDiscount.type === "percentage") {
@@ -165,11 +218,7 @@ export default function ProductPage() {
       await updateDoc(userRef, {
         cartItems: arrayUnion(cartItem),
       });
-      notify({
-        type: "success",
-        message: "Product added to cart!",
-        duration: 3000,
-      });
+      setSideModalOpen(true);
     } catch (error) {
       notify({
         type: "error",
@@ -198,7 +247,11 @@ export default function ProductPage() {
 
   return (
     <>
-      <Navbar isScrolled={true} isLoggedIn={isLoggedIn} />
+      <Navbar
+        isScrolled={true}
+        isLoggedIn={isLoggedIn}
+        navLinks={[{ label: "Home", href: "/" }]}
+      />
 
       <section
         className="px-4 py-16 sm:px-6 lg:px-8"
@@ -322,7 +375,7 @@ export default function ProductPage() {
         </div>
 
         <div className="mt-12">
-          <AboutCollection />
+          <AboutCollection firebaseProduct={product} collection={collectionData[0]} />
         </div>
 
         <div className="mt-2">
@@ -331,6 +384,48 @@ export default function ProductPage() {
       </section>
 
       <Footer />
+
+      <SideModal isOpen={sideModalOpen} onClose={() => setSideModalOpen(false)}>
+        <div className="p-4">
+          <h2 className="text-xl font-semibold mb-2">
+            Product successfully added to cart!
+          </h2>
+          <p className="mb-4">
+            You can continue shopping or view your cart items below.
+          </p>
+
+          {cartItems && cartItems.length > 0 ? (
+            cartItems.map((item) => (
+              <div key={item.productId} className="mb-4">
+                <CartItemComponent
+                  item={item}
+                  onIncrement={(productId: number) => {
+                    if (user?.uid) {
+                      incrementQuantity(user.uid, productId);
+                    }
+                  }}
+                  onDecrement={(productId: number) => {
+                    if (user?.uid) {
+                      decrementQuantity(user.uid, productId);
+                    }
+                  }}
+                  onRemove={(productId: number) => {
+                    if (user?.uid) {
+                      removeItem(user.uid, productId);
+                    }
+                  }}
+                />
+              </div>
+            ))
+          ) : (
+            <p>Your cart is currently empty.</p>
+          )}
+
+          <div className="mt-4">
+            <LinkButtonForm href="/cart" label="View Cart" showArrow />
+          </div>
+        </div>
+      </SideModal>
     </>
   );
 }

@@ -17,6 +17,8 @@ const MainFeaturesList = ({ product }: Props) => {
   const [expanded, setExpanded] = useState(false);
   const variant = product.variants?.[0];
 
+
+  // GET FEATURES FROM FIREBASE
   const features = [
     {
       label: "Vendor code",
