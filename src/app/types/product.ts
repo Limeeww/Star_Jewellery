@@ -1,24 +1,23 @@
 import { Timestamp } from "firebase/firestore";
 
-
-// GET TEXT && IMAGE FROM FIREBASE ABOUT COLLECTION for AboutCollection.tsx
-// GET FEATURES FROM FIREBASE
-
-
 export interface Discount {
   id: number;
   name: string;
   value: number;
   type: "percentage" | "fixed";
-  applicableTo: number[]; // Array of Product IDs or Category IDs
+  targetType: "product" | "category" | "collection";
+  applicableTo: number[];
   validFrom: Timestamp;
   validUntil: Timestamp;
+  priority?: number;
 }
+
 
 export interface ProductVariant {
   id: number;
   // sku: string;
   price: number;
+  material: string;
   materialColor: string;
   insert: string;
   insertColor: string;
@@ -40,11 +39,10 @@ export interface Product {
   imageUrl: string;
   categoryId: number;
   variants: ProductVariant[];
-  discounts?: Discount[]; 
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
   price: number;
-  isHideen: boolean; 
+  isHidden: boolean; 
   additionalDescription: string; 
   quantitySize: quantitySize[];
 }
