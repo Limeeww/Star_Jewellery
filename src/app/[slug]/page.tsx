@@ -24,7 +24,7 @@ import Notification from "../components/MessageHandling/Notification";
 import SelectField from "../components/FormComponents/SelectField";
 import SubmitButton from "../components/FormComponents/SubmitButton";
 
-import { Product } from "../types/product";
+import { Discount, Product } from "../types/product";
 import { useRequireAuth } from "../utils/auth";
 import { useNotification } from "../utils/useNotification";
 import InfoBlocks from "./components/InfoItem";
@@ -34,7 +34,6 @@ import MainFeaturesList from "./components/MainFeatureList";
 import SimilarProducts from "../components/SimilarProducts/SimilarProducts";
 import AboutCollection from "./components/AboutCollection";
 import ShareButton from "../components/ShareButton/ShareButton";
-import { Timestamp } from "firebase/firestore";
 import SideModal from "../components/SideModal/SideModal";
 import CartItemComponent from "../components/CartItem/CartItemComponent";
 import { useCartItems } from "../utils/cartUtils";
@@ -45,44 +44,7 @@ import {
 } from "../utils/cartActions";
 import LinkButtonForm from "../components/FormComponents/LinkButtonForm";
 import { Collection } from "../types/collection";
-import CollectionPage from "../Catalog/Catalog";
 
-function isTimestamp(value: unknown): value is Timestamp {
-  return (
-    !!value &&
-    typeof value === "object" &&
-    typeof (value as Timestamp).toDate === "function"
-  );
-}
-
-function getActiveDiscount(product: Product) {
-  if (!product.discounts || product.discounts.length === 0) return null;
-  const now = new Date();
-
-  for (const discount of product.discounts) {
-    let from: Date;
-    let until: Date;
-
-    if (isTimestamp(discount.validFrom)) {
-      from = discount.validFrom.toDate();
-    } else {
-      from = new Date(discount.validFrom);
-    }
-
-    if (isTimestamp(discount.validUntil)) {
-      until = discount.validUntil.toDate();
-    } else {
-      until = new Date(discount.validUntil);
-    }
-
-    // console.log("Try this", now >= from && now <= until)
-
-    if (now >= from && now <= until) {
-      return discount;
-    }
-  }
-  return null;
-}
 export default function ProductPage() {
   const [user, loading] = useAuthState(auth);
   const { slug } = useParams();
@@ -96,6 +58,17 @@ export default function ProductPage() {
 
   const cartItems = useCartItems(user ? user.uid : null);
 
+  const [activeDiscount, setActiveDiscount] = useState<Discount | null>(null);
+
+  let discountedPrice: number | null = null;
+  if (product && activeDiscount) {
+    if (activeDiscount.type === "percentage") {
+      discountedPrice = product.price * (1 - activeDiscount.value / 100);
+    } else if (activeDiscount.type === "fixed") {
+      discountedPrice = product.price - activeDiscount.value;
+    }
+  }
+
   const {
     register,
     handleSubmit,
@@ -107,52 +80,56 @@ export default function ProductPage() {
 
   useEffect(() => {
     if (!slug) return;
-  
+
     const fetchData = async () => {
       try {
         const productsRef = collection(db, "products");
         const productQuery = query(productsRef, where("slug", "==", slug));
         const productSnap = await getDocs(productQuery);
-  
+
         if (productSnap.empty) {
           notify({
             type: "warning",
-            message: `Не найден продукт по slug: ${slug}`,
+            message: `Product with slug ${slug} not found`,
           });
           return;
         }
-  
+
         const productDoc = productSnap.docs[0];
         const fetchedProduct = productDoc.data() as Product;
-  
+
+        // Если есть variantID и логика работы с вариантами – добавляем необходимую обработку
         if (variantID && fetchedProduct.variants) {
-          fetchedProduct.variants = fetchedProduct.variants.map((variant) => ({
-            ...variant,
-            id: Number(variantID),
-          }));
+          // ваша логика для variants здесь
         }
-  
+
         setProduct(fetchedProduct);
-  
+
         if (!fetchedProduct.categoryId) {
           setCollectionData([]);
-          console.log("У продукта нет collectionId");
+          notify({
+            type: "error",
+            message: `Product with ID ${fetchedProduct.id} has no collectionId`,
+          });
           return;
         }
-  
+
         const collectionDocRef = doc(
           db,
           "collections",
           fetchedProduct.categoryId.toString()
         );
         const collectionDocSnap = await getDoc(collectionDocRef);
-  
+
         if (!collectionDocSnap.exists()) {
           setCollectionData([]);
-          console.log("Коллекция с таким ID не найдена");
+          notify({
+            type: "error",
+            message: `Collection with ID ${fetchedProduct.categoryId} not found`,
+          });
           return;
         }
-  
+
         const data = collectionDocSnap.data();
         const singleCollection = {
           id: Number(collectionDocSnap.id),
@@ -163,41 +140,61 @@ export default function ProductPage() {
           isActive: data.isActive ?? true,
           createdAt: data.createdAt,
         };
-  
-        // Обновляем стейт с данными коллекции
+
         setCollectionData([singleCollection]);
-        console.log("Collection data:", [singleCollection]);
-  
+
+        const discountsRef = collection(db, "discounts");
+        // Ищем скидки, у которых поле `applicableTo` содержит ID продукта
+        const discountsQuery = query(
+          discountsRef,
+          where("applicableTo", "array-contains", fetchedProduct.id)
+        );
+        const discountsSnap = await getDocs(discountsQuery);
+
+        if (!discountsSnap.empty) {
+          const now = new Date();
+          const allDiscounts: Discount[] = discountsSnap.docs.map((docSnap) => {
+            return {
+              ...docSnap.data(),
+              id: Number(docSnap.id), 
+            } as Discount;
+          });
+
+          const validDiscounts = allDiscounts.filter((discount) => {
+            const start = discount.validFrom?.toDate
+              ? discount.validFrom.toDate()
+              : discount.validFrom.toDate();
+            const end = discount.validUntil?.toDate
+              ? discount.validUntil.toDate()
+              : discount.validUntil.toDate();
+            return now >= start && now <= end;
+          });
+
+          if (validDiscounts.length > 0) {
+            validDiscounts.sort(
+              (a, b) => (b.priority ?? 0) - (a.priority ?? 0)
+            );
+            setActiveDiscount(validDiscounts[0]);
+          } else {
+            setActiveDiscount(null);
+          }
+        } else {
+          setActiveDiscount(null);
+        }
       } catch (error) {
         notify({
           type: "error",
-          message: `Ошибка при получении данных: ${String(error)}`,
+          message: `Error fetching data: ${String(error)}`,
         });
       }
     };
-  
+
     fetchData();
   }, [slug, variantID, notify]);
-  
 
   if (!product) return <Loading />;
 
-  const activeDiscount = getActiveDiscount(product);
-  let discountedPrice: number | null;
-
-  // console.log("Active discount:", activeDiscount);
-  // console.log("Product price:", product.price);
-  // console.log("activeDiscount value:", activeDiscount?.value);
-
-  if (activeDiscount) {
-    if (activeDiscount.type === "percentage") {
-      discountedPrice = product.price * (1 - activeDiscount.value / 100);
-    } else if (activeDiscount.type === "fixed") {
-      discountedPrice = product.price - activeDiscount.value;
-    }
-  }
-
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: Product) => {
     if (!user) return;
 
     const finalPrice = discountedPrice ?? product.price;
@@ -208,9 +205,9 @@ export default function ProductPage() {
       imageUrl: product.imageUrl,
       price: finalPrice,
       quantity: 1,
-      size: Number(data.size),
-      insert: data.inserts,
-      materialColor: data.materialColor,
+      size: Number(data.quantitySize[0].size),
+      insert: data.variants[0].insert,
+      materialColor: data.variants[0].materialColor,
     };
 
     try {
@@ -247,11 +244,7 @@ export default function ProductPage() {
 
   return (
     <>
-      <Navbar
-        isScrolled={true}
-        isLoggedIn={isLoggedIn}
-        navLinks={[{ label: "Home", href: "/" }]}
-      />
+      <Navbar isScrolled={true} isLoggedIn={isLoggedIn} />
 
       <section
         className="px-4 py-16 sm:px-6 lg:px-8"
@@ -375,7 +368,10 @@ export default function ProductPage() {
         </div>
 
         <div className="mt-12">
-          <AboutCollection firebaseProduct={product} collection={collectionData[0]} />
+          <AboutCollection
+            firebaseProduct={product}
+            collection={collectionData[0]}
+          />
         </div>
 
         <div className="mt-2">
