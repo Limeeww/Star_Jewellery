@@ -7,9 +7,9 @@ import { Product } from "../../types/product";
 interface CartItemComponentProps {
   item: CartItem;
   product?: Product; // additional info 
-  onIncrement: (productId: number) => void;
-  onDecrement: (productId: number) => void;
-  onRemove: (productId: number) => void;
+  onIncrement: (item: number) => void;
+  onDecrement: (item: number) => void;
+  onRemove: (item: number) => void;
 }
 
 function CartItemComponent({

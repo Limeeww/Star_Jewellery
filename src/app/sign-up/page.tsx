@@ -30,6 +30,7 @@ import Loading from "../components/Loading/Loading";
 import SubmitButton from "../components/FormComponents/SubmitButton";
 
 import Notification from "../components/MessageHandling/Notification";
+import { useNotification } from "../utils/useNotification";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -37,11 +38,10 @@ export default function SignUpPage() {
   const [user, loading, error] = useAuthState(auth);
   const [createUserWithEmailAndPassword, userEmail, loadingEmail, errorEmail] =
     useCreateUserWithEmailAndPassword(auth);
+  const [createUserWithEmailAndPassword, userEmail, loadingEmail, errorEmail] =
+    useCreateUserWithEmailAndPassword(auth);
 
-  const [notification, setNotification] = useState<{
-    message: string;
-    type: "success" | "error" | "info" | "warning";
-  } | null>(null);
+  const { notify, notification, clearNotification } = useNotification();
 
   const {
     register,
@@ -61,21 +61,21 @@ export default function SignUpPage() {
 
   useEffect(() => {
     if (error) {
-      setNotification({
-        message: error.message || "Unknown error",
+      notify({
         type: "error",
+        message: error.message || "Unknown error",
       });
     } else if (errorEmail) {
       let msg = errorEmail.message;
       if (errorEmail.code === "auth/weak-password") {
         msg = "Your password is too weak. Please choose a stronger one.";
       }
-      setNotification({
-        message: msg,
+      notify({
         type: "error",
+        message: msg,
       });
     }
-  }, [error, errorEmail]);
+  }, [error, errorEmail, notify]);
 
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
   const passwordValue = watch("password") || "";
@@ -122,6 +122,27 @@ export default function SignUpPage() {
         data.password
       );
 
+      if (userCredential && userCredential.user) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { password, confirmPassword, ...userData } = data;
+
+        const finalUserData = {
+          ...userData,
+          createdAt: new Date(),
+          wishList: userData.wishList || [],
+          orders: userData.orders || [],
+          addresses: userData.addresses || [],
+          bonuses: userData.bonuses || "0",
+          cartItems: userData.cartItems || [],
+        };
+        await setDoc(doc(db, "users", userCredential.user.uid), finalUserData);
+        router.push("/Account/Overview");
+      }
+    } catch (err: any) {
+      notify({
+        type: "error",
+        message: err.message || "Failed to create account.",
+      });
       if (!userCredential?.user) {
         throw new Error("Registration failed");
       }
@@ -164,7 +185,8 @@ export default function SignUpPage() {
         <Notification
           message={notification.message}
           type={notification.type}
-          onClose={() => setNotification(null)}
+          duration={notification.duration}
+          onClose={clearNotification}
         />
       )}
 
@@ -270,10 +292,12 @@ export default function SignUpPage() {
                   </li>
                   <li
                     className={hasUppercase ? "text-green-600" : "text-red-600"}
+                    className={hasUppercase ? "text-green-600" : "text-red-600"}
                   >
                     ✔ At least one uppercase letter
                   </li>
                   <li
+                    className={hasLowercase ? "text-green-600" : "text-red-600"}
                     className={hasLowercase ? "text-green-600" : "text-red-600"}
                   >
                     ✔ At least one lowercase letter

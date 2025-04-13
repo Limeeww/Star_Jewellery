@@ -10,9 +10,8 @@ import {
   query,
   where,
   getDocs,
-  updateDoc,
-  arrayUnion,
   doc,
+  getDoc,
 } from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 
@@ -23,7 +22,7 @@ import Notification from "../components/MessageHandling/Notification";
 import SelectField from "../components/FormComponents/SelectField";
 import SubmitButton from "../components/FormComponents/SubmitButton";
 
-import { Product } from "../types/product";
+import { Discount, Product, ProductVariant } from "../types/product";
 import { useRequireAuth } from "../utils/auth";
 import { useNotification } from "../utils/useNotification";
 import InfoBlocks from "./components/InfoItem";
@@ -33,110 +32,50 @@ import MainFeaturesList from "./components/MainFeatureList";
 import SimilarProducts from "../components/SimilarProducts/SimilarProducts";
 import AboutCollection from "./components/AboutCollection";
 import ShareButton from "../components/ShareButton/ShareButton";
-import { Timestamp } from "firebase/firestore";
+import SideModal from "../components/SideModal/SideModal";
+import CartItemComponent from "../components/CartItem/CartItemComponent";
+import { useCartItems } from "../utils/cartUtils";
+import {
+  addOrIncrementCartItem,
+  decrementQuantity,
+  incrementQuantity,
+  removeItem,
+} from "../utils/cartActions";
+import LinkButtonForm from "../components/FormComponents/LinkButtonForm";
+import { Collection } from "../types/collection";
 
-
-function isTimestamp(value: unknown): value is Timestamp {
-  return (
-    !!value &&
-    typeof value === "object" &&
-    typeof (value as Timestamp).toDate === "function"
-  );
+interface FormValues {
+  size: string;
+  inserts: string;
+  materialColor: string;
 }
 
-function getActiveDiscount(product: Product) {
-  if (!product.discounts || product.discounts.length === 0) return null;
-  const now = new Date();
-
-  for (const discount of product.discounts) {
-    let from: Date;
-    let until: Date;
-
-    if (isTimestamp(discount.validFrom)) {
-      from = discount.validFrom.toDate();
-    } else {
-      from = new Date(discount.validFrom);
-    }
-
-    if (isTimestamp(discount.validUntil)) {
-      until = discount.validUntil.toDate();
-    } else {
-      until = new Date(discount.validUntil);
-    }
-
-    // console.log("Try this", now >= from && now <= until)
-
-    if (now >= from && now <= until) {
-      return discount;
-    }
-  }
-  return null;
-}
 export default function ProductPage() {
   const [user, loading] = useAuthState(auth);
   const { slug } = useParams();
   const searchParams = useSearchParams();
   const variantID = searchParams.get("variantID");
   const [product, setProduct] = useState<Product | null>(null);
+  const [collectionData, setCollectionData] = useState<Collection[]>([]);
   const isLoggedIn = !loading && !!user;
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
+  const [sideModalOpen, setSideModalOpen] = useState(false);
 
-  useRequireAuth(user, loading);
-  const { notify, notification, clearNotification } = useNotification();
+  const cartItems = useCartItems(user ? user.uid : null);
+  const [selectedInsert, setSelectedInsert] = useState<string>("");
+  const [selectedMaterialColor, setSelectedMaterialColor] =
+    useState<string>("");
+  const [activeDiscount, setActiveDiscount] = useState<Discount | null>(null);
 
-  useEffect(() => {
-    if (!slug) return;
+  const activeVariant: ProductVariant | undefined = product?.variants.find(
+    (variant) =>
+      variant.insert === selectedInsert &&
+      variant.materialColor === selectedMaterialColor
+  );
+  const displayedVariant = activeVariant || product?.variants[0];
 
-    async function fetchProduct() {
-      try {
-        const productsRef = collection(db, "products");
-        const q = query(productsRef, where("slug", "==", slug));
-        const querySnap = await getDocs(q);
-
-        if (!querySnap.empty) {
-          const docSnap = querySnap.docs[0];
-          const fetchedProduct = docSnap.data() as Product;
-
-          if (variantID && fetchedProduct.variants) {
-            fetchedProduct.variants = fetchedProduct.variants.map((v) => ({
-              ...v,
-              id: Number(variantID),
-            }));
-          }
-
-          setProduct(fetchedProduct);
-        } else {
-          notify({
-            type: "warning",
-            message: `No product found for slug: ${slug}`,
-          });
-        }
-      } catch (error) {
-        notify({
-          type: "error",
-          message: `Error fetching product: ${String(error)}`,
-        });
-      }
-    }
-
-    fetchProduct();
-  }, [slug, variantID, notify]);
-
-  if (!product) return <Loading />;
-
-  const activeDiscount = getActiveDiscount(product);
-  let discountedPrice: number | null;
-
-  console.log("Active discount:", activeDiscount);
-  console.log("Product price:", product.price);
-  console.log("activeDiscount value:", activeDiscount?.value);
-
-  if (activeDiscount) {
+  let discountedPrice: number | null = null;
+  if (product && activeDiscount) {
     if (activeDiscount.type === "percentage") {
       discountedPrice = product.price * (1 - activeDiscount.value / 100);
     } else if (activeDiscount.type === "fixed") {
@@ -144,15 +83,158 @@ export default function ProductPage() {
     }
   }
 
-  const onSubmit = async (data: any) => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+  } = useForm<FormValues>({
+    defaultValues: {
+      size: "",
+      inserts: "",
+      materialColor: "",
+    },
+  });
+
+  useRequireAuth(user, loading);
+  const { notify, notification, clearNotification } = useNotification();
+
+  useEffect(() => {
+    if (!slug) return;
+
+    const fetchData = async () => {
+      try {
+        const productsRef = collection(db, "products");
+        const productQuery = query(productsRef, where("slug", "==", slug));
+        const productSnap = await getDocs(productQuery);
+
+        if (productSnap.empty) {
+          notify({
+            type: "warning",
+            message: `Product with slug ${slug} not found`,
+          });
+          return;
+        }
+
+        const productDoc = productSnap.docs[0];
+        const fetchedProduct = productDoc.data() as Product;
+
+        if (variantID && fetchedProduct.variants) {
+          const variantFromQuery = fetchedProduct.variants.find(
+            (variant) => variant.id === Number(variantID)
+          );
+          if (variantFromQuery) {
+            setSelectedInsert(variantFromQuery.insert);
+            setSelectedMaterialColor(variantFromQuery.materialColor);
+            setValue("inserts", variantFromQuery.insert);
+            setValue("materialColor", variantFromQuery.materialColor);
+          }
+        }
+
+        setProduct(fetchedProduct);
+
+        if (!fetchedProduct.categoryId) {
+          setCollectionData([]);
+          notify({
+            type: "error",
+            message: `Product with ID ${fetchedProduct.id} has no collectionId`,
+          });
+          return;
+        }
+
+        const collectionDocRef = doc(
+          db,
+          "collections",
+          fetchedProduct.categoryId.toString()
+        );
+        const collectionDocSnap = await getDoc(collectionDocRef);
+
+        if (!collectionDocSnap.exists()) {
+          setCollectionData([]);
+          notify({
+            type: "error",
+            message: `Collection with ID ${fetchedProduct.categoryId} not found`,
+          });
+          return;
+        }
+
+        const data = collectionDocSnap.data();
+        const singleCollection = {
+          id: Number(collectionDocSnap.id),
+          name: data.name || "",
+          description: data.description || "",
+          images: data.images || [],
+          parentCategory: Number(data.parentCategory) || 0,
+          isActive: data.isActive ?? true,
+          createdAt: data.createdAt,
+        };
+
+        setCollectionData([singleCollection]);
+
+        const discountsRef = collection(db, "discounts");
+        const discountsQuery = query(
+          discountsRef,
+          where("applicableTo", "array-contains", fetchedProduct.id)
+        );
+        const discountsSnap = await getDocs(discountsQuery);
+
+        if (!discountsSnap.empty) {
+          const now = new Date();
+          const allDiscounts: Discount[] = discountsSnap.docs.map((docSnap) => {
+            return {
+              ...docSnap.data(),
+              id: Number(docSnap.id),
+            } as Discount;
+          });
+
+          const validDiscounts = allDiscounts.filter((discount) => {
+            const start = discount.validFrom?.toDate
+              ? discount.validFrom.toDate()
+              : discount.validFrom.toDate();
+            const end = discount.validUntil?.toDate
+              ? discount.validUntil.toDate()
+              : discount.validUntil.toDate();
+            return now >= start && now <= end;
+          });
+
+          if (validDiscounts.length > 0) {
+            validDiscounts.sort(
+              (a, b) => (b.priority ?? 0) - (a.priority ?? 0)
+            );
+            setActiveDiscount(validDiscounts[0]);
+          } else {
+            setActiveDiscount(null);
+          }
+        } else {
+          setActiveDiscount(null);
+        }
+      } catch (error) {
+        notify({
+          type: "error",
+          message: `Error fetching data: ${String(error)}`,
+        });
+      }
+    };
+
+    fetchData();
+  }, [slug, variantID, notify, setValue]);
+
+  if (!product) return <Loading />;
+
+  const onSubmit = async (data: FormValues) => {
     if (!user) return;
 
     const finalPrice = discountedPrice ?? product.price;
+    const variantForCart =
+      product.variants.find(
+        (v) =>
+          v.insert === data.inserts && v.materialColor === data.materialColor
+      ) || product.variants[0];
 
     const cartItem = {
       productId: product.id,
       name: product.name,
-      imageUrl: product.imageUrl,
+      imageUrl: variantForCart.images?.[0] || "",
       price: finalPrice,
       quantity: 1,
       size: Number(data.size),
@@ -161,15 +243,8 @@ export default function ProductPage() {
     };
 
     try {
-      const userRef = doc(db, "users", user.uid);
-      await updateDoc(userRef, {
-        cartItems: arrayUnion(cartItem),
-      });
-      notify({
-        type: "success",
-        message: "Product added to cart!",
-        duration: 3000,
-      });
+      await addOrIncrementCartItem(user.uid, cartItem);
+      setSideModalOpen(true);
     } catch (error) {
       notify({
         type: "error",
@@ -181,19 +256,21 @@ export default function ProductPage() {
 
   const formatPrice = (price: number) => price.toFixed(2);
 
-  const sizeOptions = (product?.quantitySize || []).map((item) => ({
+  const sizeOptions = (product.quantitySize || []).map((item) => ({
     value: item.size.toString(),
     label: `Size ${item.size} (${item.quantity} available)`,
   }));
-
-  const insertOptions = (product?.variants || []).map((variant) => ({
-    value: `${variant.insert}-${variant.insertColor}`,
-    label: `${variant.insert} (${variant.insertColor})`,
+  const uniqueInserts = [...new Set(product.variants.map((v) => v.insert))];
+  const insertOptions = uniqueInserts.map((insert) => ({
+    value: insert,
+    label: insert,
   }));
-
-  const specOptions = (product?.variants || []).map((obj) => ({
-    value: obj.materialColor,
-    label: obj.materialColor,
+  const uniqueMaterialColors = [
+    ...new Set(product.variants.map((v) => v.materialColor)),
+  ];
+  const materialColorOptions = uniqueMaterialColors.map((color) => ({
+    value: color,
+    label: color,
   }));
 
   return (
@@ -215,7 +292,7 @@ export default function ProductPage() {
         )}
 
         <div className="grid grid-cols-1 2xl:grid-cols-2 gap-8 items-start">
-          <ProductImageBlock product={product} />
+          <ProductImageBlock variant={displayedVariant!} />
 
           <div className="mt-6">
             <h1
@@ -249,7 +326,7 @@ export default function ProductPage() {
               </div>
             ) : (
               <p className="text-2xl font-bold text-gray-800 mb-6">
-                {product.price} ₴
+                {formatPrice(product.price)} ₴
               </p>
             )}
 
@@ -266,10 +343,15 @@ export default function ProductPage() {
                 />
 
                 <SelectField
-                  label="Inserts, Carat"
+                  label="Inserts"
                   id="inserts"
                   register={register("inserts", {
                     required: "Insert is required",
+                    onChange: (e) => {
+                      const newInsert = e.target.value;
+                      setSelectedInsert(newInsert);
+                      setValue("inserts", newInsert);
+                    },
                   })}
                   error={errors.inserts}
                   options={insertOptions}
@@ -283,9 +365,14 @@ export default function ProductPage() {
                 id="materialColor"
                 register={register("materialColor", {
                   required: "Material color is required",
+                  onChange: (e) => {
+                    const newColor = e.target.value;
+                    setSelectedMaterialColor(newColor);
+                    setValue("materialColor", newColor);
+                  },
                 })}
                 error={errors.materialColor}
-                options={specOptions}
+                options={materialColorOptions}
                 placeholder="Select Material Color"
                 className="w-full mb-6"
               />
@@ -322,7 +409,10 @@ export default function ProductPage() {
         </div>
 
         <div className="mt-12">
-          <AboutCollection />
+          <AboutCollection
+            firebaseProduct={product}
+            collection={collectionData[0]}
+          />
         </div>
 
         <div className="mt-2">
@@ -331,6 +421,68 @@ export default function ProductPage() {
       </section>
 
       <Footer />
+
+      <SideModal isOpen={sideModalOpen} onClose={() => setSideModalOpen(false)}>
+        <div className="p-4">
+          <h2 className="text-xl font-semibold mb-2">
+            Product successfully added to cart!
+          </h2>
+          <p className="mb-4">
+            You can continue shopping or view your cart items below.
+          </p>
+
+          {cartItems && cartItems.length > 0 ? (
+            cartItems.map((item) => (
+              <div
+                key={`${item.productId}-${item.size}-${item.insert}-${item.materialColor}`}
+              >
+                <CartItemComponent
+                  item={item}
+                  onIncrement={() => {
+                    if (user?.uid) {
+                      incrementQuantity(
+                        user.uid,
+                        item.productId,
+                        item.size,
+                        item.insert,
+                        item.materialColor
+                      );
+                    }
+                  }}
+                  onDecrement={() => {
+                    if (user?.uid) {
+                      decrementQuantity(
+                        user.uid,
+                        item.productId,
+                        item.size,
+                        item.insert,
+                        item.materialColor
+                      );
+                    }
+                  }}
+                  onRemove={() => {
+                    if (user?.uid) {
+                      removeItem(
+                        user.uid,
+                        item.productId,
+                        item.size,
+                        item.insert,
+                        item.materialColor
+                      );
+                    }
+                  }}
+                />
+              </div>
+            ))
+          ) : (
+            <p>Your cart is currently empty.</p>
+          )}
+
+          <div className="mt-4">
+            <LinkButtonForm href="/cart" label="View Cart" showArrow />
+          </div>
+        </div>
+      </SideModal>
     </>
   );
 }

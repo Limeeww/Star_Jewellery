@@ -28,7 +28,7 @@ export default function InfoItem({ text }: InfoItemProps) {
       if (
         modalRef.current &&
         !modalRef.current.contains(event.target as Node) &&
-        !refs.setReference.current?.contains(event.target as Node)
+        !(refs.reference.current instanceof Node && refs.reference.current.contains(event.target as Node))
       ) {
         setIsOpen(false);
       }
@@ -39,7 +39,7 @@ export default function InfoItem({ text }: InfoItemProps) {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isOpen, refs]);
+  }, [isOpen, refs.reference]);
 
   return (
     <div className="inline-block">
