@@ -10,8 +10,6 @@ import {
   query,
   where,
   getDocs,
-  updateDoc,
-  arrayUnion,
   doc,
   getDoc,
 } from "firebase/firestore";
@@ -38,6 +36,7 @@ import SideModal from "../components/SideModal/SideModal";
 import CartItemComponent from "../components/CartItem/CartItemComponent";
 import { useCartItems } from "../utils/cartUtils";
 import {
+  addOrIncrementCartItem,
   decrementQuantity,
   incrementQuantity,
   removeItem,
@@ -64,16 +63,15 @@ export default function ProductPage() {
 
   const cartItems = useCartItems(user ? user.uid : null);
   const [selectedInsert, setSelectedInsert] = useState<string>("");
-  const [selectedMaterialColor, setSelectedMaterialColor] = useState<string>("");
+  const [selectedMaterialColor, setSelectedMaterialColor] =
+    useState<string>("");
   const [activeDiscount, setActiveDiscount] = useState<Discount | null>(null);
 
-  // Вычисление активного варианта по выбранным значениям
   const activeVariant: ProductVariant | undefined = product?.variants.find(
     (variant) =>
       variant.insert === selectedInsert &&
       variant.materialColor === selectedMaterialColor
   );
-  // Если нужного варианта не найдено, используем fallback – первый вариант
   const displayedVariant = activeVariant || product?.variants[0];
 
   let discountedPrice: number | null = null;
@@ -121,7 +119,6 @@ export default function ProductPage() {
         const productDoc = productSnap.docs[0];
         const fetchedProduct = productDoc.data() as Product;
 
-        // Если передан variantID, устанавливаем выбранные значения
         if (variantID && fetchedProduct.variants) {
           const variantFromQuery = fetchedProduct.variants.find(
             (variant) => variant.id === Number(variantID)
@@ -129,7 +126,6 @@ export default function ProductPage() {
           if (variantFromQuery) {
             setSelectedInsert(variantFromQuery.insert);
             setSelectedMaterialColor(variantFromQuery.materialColor);
-            // Синхронизируем значения с формой:
             setValue("inserts", variantFromQuery.insert);
             setValue("materialColor", variantFromQuery.materialColor);
           }
@@ -229,7 +225,6 @@ export default function ProductPage() {
     if (!user) return;
 
     const finalPrice = discountedPrice ?? product.price;
-    // Ищем вариант для добавления в корзину по значениям из формы
     const variantForCart =
       product.variants.find(
         (v) =>
@@ -239,7 +234,6 @@ export default function ProductPage() {
     const cartItem = {
       productId: product.id,
       name: product.name,
-      // Берём первую фотографию из массива вариантов
       imageUrl: variantForCart.images?.[0] || "",
       price: finalPrice,
       quantity: 1,
@@ -249,10 +243,7 @@ export default function ProductPage() {
     };
 
     try {
-      const userRef = doc(db, "users", user.uid);
-      await updateDoc(userRef, {
-        cartItems: arrayUnion(cartItem),
-      });
+      await addOrIncrementCartItem(user.uid, cartItem);
       setSideModalOpen(true);
     } catch (error) {
       notify({
@@ -408,7 +399,9 @@ export default function ProductPage() {
                 <ShareButton
                   title="Share this product"
                   text="Check out this amazing product!"
-                  url={typeof window !== "undefined" ? window.location.href : ""}
+                  url={
+                    typeof window !== "undefined" ? window.location.href : ""
+                  }
                 />
               </div>
             </div>
@@ -440,22 +433,42 @@ export default function ProductPage() {
 
           {cartItems && cartItems.length > 0 ? (
             cartItems.map((item) => (
-              <div key={item.productId} className="mb-4">
+              <div
+                key={`${item.productId}-${item.size}-${item.insert}-${item.materialColor}`}
+              >
                 <CartItemComponent
                   item={item}
-                  onIncrement={(productId: number) => {
+                  onIncrement={() => {
                     if (user?.uid) {
-                      incrementQuantity(user.uid, productId);
+                      incrementQuantity(
+                        user.uid,
+                        item.productId,
+                        item.size,
+                        item.insert,
+                        item.materialColor
+                      );
                     }
                   }}
-                  onDecrement={(productId: number) => {
+                  onDecrement={() => {
                     if (user?.uid) {
-                      decrementQuantity(user.uid, productId);
+                      decrementQuantity(
+                        user.uid,
+                        item.productId,
+                        item.size,
+                        item.insert,
+                        item.materialColor
+                      );
                     }
                   }}
-                  onRemove={(productId: number) => {
+                  onRemove={() => {
                     if (user?.uid) {
-                      removeItem(user.uid, productId);
+                      removeItem(
+                        user.uid,
+                        item.productId,
+                        item.size,
+                        item.insert,
+                        item.materialColor
+                      );
                     }
                   }}
                 />
