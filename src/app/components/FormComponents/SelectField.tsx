@@ -27,6 +27,8 @@ function SelectField({
   const [selected, setSelected] = useState<string>("");
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const { onChange, name, ref } = register;
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -43,8 +45,10 @@ function SelectField({
   const handleSelect = (value: string) => {
     setSelected(value);
     setIsOpen(false);
-    if (register.onChange) {
-      register.onChange({ target: { value } } as React.ChangeEvent<HTMLInputElement>);
+    if (onChange && name) {
+      onChange({
+        target: { name, value },
+      } as React.ChangeEvent<HTMLInputElement>);
     }
   };
 
@@ -77,7 +81,11 @@ function SelectField({
             stroke="currentColor"
             strokeWidth={2}
           >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M5 15l7-7 7 7"
+            />
           </svg>
         </button>
 
@@ -104,8 +112,7 @@ function SelectField({
         </AnimatePresence>
       </div>
       {error && <p className="text-red-500 text-sm mt-1">{error.message}</p>}
-      {/* Скрытое поле для передачи выбранного значения в форму */}
-      <input type="hidden" {...register} value={selected} />
+      <input type="hidden" name={name} value={selected} ref={ref} />
     </div>
   );
 }

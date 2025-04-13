@@ -79,7 +79,6 @@ const products = [
     name: "Gold Ring",
     description: "Elegant gold ring with a timeless design.",
     slug: "gold-ring",
-    imageUrl: "/images/gold-ring.jpg",
     categoryId: 1,
     variants: [
       {
@@ -91,6 +90,11 @@ const products = [
         insertColor: "clear",
         weight: 5,
         quantity: 10,
+        images: [
+          "/images/products/gold-ring-diamond-yellow/front.jpg",
+          "/images/products/gold-ring-diamond-yellow/side.jpg",
+          "/images/products/gold-ring-diamond-yellow/back.jpg"
+        ]
       },
       {
         id: 102,
@@ -101,7 +105,12 @@ const products = [
         insertColor: "blue",
         weight: 6,
         quantity: 5,
-      },
+        images: [
+          "/images/products/gold-ring-diamond-white/front.jpg",
+          "/images/products/gold-ring-diamond-white/side.jpg",
+          "/images/products/gold-ring-diamond-white/back.jpg"
+        ]
+      }
     ],
     createdAt: now,
     updatedAt: now,
@@ -111,15 +120,14 @@ const products = [
       "High-quality gold ring available in two elegant variants, perfect for special occasions.",
     quantitySize: [
       { size: 6, quantity: 5 },
-      { size: 7, quantity: 5 },
-    ],
+      { size: 7, quantity: 5 }
+    ]
   },
   {
     id: 2,
     name: "Silver Earrings",
     description: "Shiny silver earrings with crystal accents.",
     slug: "silver-earrings",
-    imageUrl: "/images/silver-earrings.jpg",
     categoryId: 2,
     variants: [
       {
@@ -131,6 +139,10 @@ const products = [
         insertColor: "blue",
         weight: 3,
         quantity: 12,
+        images: [
+          "/images/products/silver-earrings-crystal-white/front.jpg",
+          "/images/products/silver-earrings-crystal-white/side.jpg"
+        ]
       },
       {
         id: 202,
@@ -141,7 +153,11 @@ const products = [
         insertColor: "green",
         weight: 3.5,
         quantity: 6,
-      },
+        images: [
+          "/images/products/silver-earrings-crystal-rose/front.jpg",
+          "/images/products/silver-earrings-crystal-rose/side.jpg"
+        ]
+      }
     ],
     createdAt: now,
     updatedAt: now,
@@ -149,14 +165,13 @@ const products = [
     isHidden: false,
     additionalDescription:
       "Shiny silver earrings crafted with attention to detail, ideal for both casual and formal styles.",
-    quantitySize: [{ size: 1, quantity: 18 }],
+    quantitySize: [{ size: 1, quantity: 18 }]
   },
   {
     id: 3,
     name: "Minimalist Pendant",
     description: "Simple and elegant pendant design.",
     slug: "minimalist-pendant",
-    imageUrl: "/images/pendant.jpg",
     categoryId: 3,
     variants: [
       {
@@ -168,6 +183,10 @@ const products = [
         insertColor: "",
         weight: 2,
         quantity: 8,
+        images: [
+          "/images/products/pendant-minimalist-rose/front.jpg",
+          "/images/products/pendant-minimalist-rose/side.jpg"
+        ]
       },
       {
         id: 302,
@@ -178,7 +197,11 @@ const products = [
         insertColor: "",
         weight: 2.2,
         quantity: 4,
-      },
+        images: [
+          "/images/products/pendant-minimalist-yellow/front.jpg",
+          "/images/products/pendant-minimalist-yellow/side.jpg"
+        ]
+      }
     ],
     createdAt: now,
     updatedAt: now,
@@ -186,14 +209,13 @@ const products = [
     isHidden: false,
     additionalDescription:
       "A minimalist pendant available in two finishes, emphasizing simplicity and elegance.",
-    quantitySize: [{ size: 1, quantity: 12 }],
+    quantitySize: [{ size: 1, quantity: 12 }]
   },
   {
     id: 4,
     name: "Men’s Ring",
     description: "Bold and strong ring designed for men.",
     slug: "mens-ring",
-    imageUrl: "/images/mens-ring.jpg",
     categoryId: 4,
     variants: [
       {
@@ -205,6 +227,10 @@ const products = [
         insertColor: "black",
         weight: 6,
         quantity: 7,
+        images: [
+          "/images/products/mens-ring-steel-black/front.jpg",
+          "/images/products/mens-ring-steel-black/side.jpg"
+        ]
       },
       {
         id: 402,
@@ -215,7 +241,11 @@ const products = [
         insertColor: "grey",
         weight: 7,
         quantity: 4,
-      },
+        images: [
+          "/images/products/mens-ring-steel-gunmetal/front.jpg",
+          "/images/products/mens-ring-steel-gunmetal/side.jpg"
+        ]
+      }
     ],
     createdAt: now,
     updatedAt: now,
@@ -225,15 +255,14 @@ const products = [
       "A powerful design in two variants – choose between a matte black finish or a sleek gunmetal look.",
     quantitySize: [
       { size: 10, quantity: 7 },
-      { size: 11, quantity: 4 },
-    ],
+      { size: 11, quantity: 4 }
+    ]
   },
   {
     id: 5,
     name: "Pearl Bracelet",
     description: "Delicate bracelet featuring pearls.",
     slug: "pearl-bracelet",
-    imageUrl: "/images/bracelet.jpg",
     categoryId: 5,
     variants: [
       {
@@ -245,6 +274,10 @@ const products = [
         insertColor: "white",
         weight: 4,
         quantity: 15,
+        images: [
+          "/images/products/pearl-bracelet-silver-white/front.jpg",
+          "/images/products/pearl-bracelet-silver-white/side.jpg"
+        ]
       },
       {
         id: 502,
@@ -255,7 +288,11 @@ const products = [
         insertColor: "cream",
         weight: 4.2,
         quantity: 6,
-      },
+        images: [
+          "/images/products/pearl-bracelet-silver-pink/front.jpg",
+          "/images/products/pearl-bracelet-silver-pink/side.jpg"
+        ]
+      }
     ],
     createdAt: now,
     updatedAt: now,
@@ -265,10 +302,12 @@ const products = [
       "An elegant pearl bracelet available in two variants, offering a refined touch for any ensemble.",
     quantitySize: [
       { size: 6, quantity: 10 },
-      { size: 7, quantity: 11 },
-    ],
-  },
+      { size: 7, quantity: 11 }
+    ]
+  }
 ];
+
+
 
 // ==================== COLLECTIONS ====================
 // Помимо стандартных коллекций, добавляем базовую коллекцию "Rings Collection" и подколлекцию "Wedding Rings"
@@ -360,13 +399,11 @@ async function uploadAll() {
     productBatch.set(ref, product);
   });
   
-  // Загрузка коллекций
   collections.forEach((collection) => {
     const ref = db.collection("collections").doc(collection.id.toString());
     collectionBatch.set(ref, collection);
   });
   
-  // Загрузка скидок
   discounts.forEach((discount) => {
     const ref = db.collection("discounts").doc(discount.id.toString());
     discountBatch.set(ref, discount);

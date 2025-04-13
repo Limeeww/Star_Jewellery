@@ -24,7 +24,7 @@ import Notification from "../components/MessageHandling/Notification";
 import SelectField from "../components/FormComponents/SelectField";
 import SubmitButton from "../components/FormComponents/SubmitButton";
 
-import { Discount, Product } from "../types/product";
+import { Discount, Product, ProductVariant } from "../types/product";
 import { useRequireAuth } from "../utils/auth";
 import { useNotification } from "../utils/useNotification";
 import InfoBlocks from "./components/InfoItem";
@@ -45,6 +45,12 @@ import {
 import LinkButtonForm from "../components/FormComponents/LinkButtonForm";
 import { Collection } from "../types/collection";
 
+interface FormValues {
+  size: string;
+  inserts: string;
+  materialColor: string;
+}
+
 export default function ProductPage() {
   const [user, loading] = useAuthState(auth);
   const { slug } = useParams();
@@ -57,8 +63,18 @@ export default function ProductPage() {
   const [sideModalOpen, setSideModalOpen] = useState(false);
 
   const cartItems = useCartItems(user ? user.uid : null);
-
+  const [selectedInsert, setSelectedInsert] = useState<string>("");
+  const [selectedMaterialColor, setSelectedMaterialColor] = useState<string>("");
   const [activeDiscount, setActiveDiscount] = useState<Discount | null>(null);
+
+  // Вычисление активного варианта по выбранным значениям
+  const activeVariant: ProductVariant | undefined = product?.variants.find(
+    (variant) =>
+      variant.insert === selectedInsert &&
+      variant.materialColor === selectedMaterialColor
+  );
+  // Если нужного варианта не найдено, используем fallback – первый вариант
+  const displayedVariant = activeVariant || product?.variants[0];
 
   let discountedPrice: number | null = null;
   if (product && activeDiscount) {
@@ -73,7 +89,14 @@ export default function ProductPage() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm();
+    setValue,
+  } = useForm<FormValues>({
+    defaultValues: {
+      size: "",
+      inserts: "",
+      materialColor: "",
+    },
+  });
 
   useRequireAuth(user, loading);
   const { notify, notification, clearNotification } = useNotification();
@@ -98,9 +121,18 @@ export default function ProductPage() {
         const productDoc = productSnap.docs[0];
         const fetchedProduct = productDoc.data() as Product;
 
-        // Если есть variantID и логика работы с вариантами – добавляем необходимую обработку
+        // Если передан variantID, устанавливаем выбранные значения
         if (variantID && fetchedProduct.variants) {
-          // ваша логика для variants здесь
+          const variantFromQuery = fetchedProduct.variants.find(
+            (variant) => variant.id === Number(variantID)
+          );
+          if (variantFromQuery) {
+            setSelectedInsert(variantFromQuery.insert);
+            setSelectedMaterialColor(variantFromQuery.materialColor);
+            // Синхронизируем значения с формой:
+            setValue("inserts", variantFromQuery.insert);
+            setValue("materialColor", variantFromQuery.materialColor);
+          }
         }
 
         setProduct(fetchedProduct);
@@ -144,7 +176,6 @@ export default function ProductPage() {
         setCollectionData([singleCollection]);
 
         const discountsRef = collection(db, "discounts");
-        // Ищем скидки, у которых поле `applicableTo` содержит ID продукта
         const discountsQuery = query(
           discountsRef,
           where("applicableTo", "array-contains", fetchedProduct.id)
@@ -156,7 +187,7 @@ export default function ProductPage() {
           const allDiscounts: Discount[] = discountsSnap.docs.map((docSnap) => {
             return {
               ...docSnap.data(),
-              id: Number(docSnap.id), 
+              id: Number(docSnap.id),
             } as Discount;
           });
 
@@ -190,24 +221,31 @@ export default function ProductPage() {
     };
 
     fetchData();
-  }, [slug, variantID, notify]);
+  }, [slug, variantID, notify, setValue]);
 
   if (!product) return <Loading />;
 
-  const onSubmit = async (data: Product) => {
+  const onSubmit = async (data: FormValues) => {
     if (!user) return;
 
     const finalPrice = discountedPrice ?? product.price;
+    // Ищем вариант для добавления в корзину по значениям из формы
+    const variantForCart =
+      product.variants.find(
+        (v) =>
+          v.insert === data.inserts && v.materialColor === data.materialColor
+      ) || product.variants[0];
 
     const cartItem = {
       productId: product.id,
       name: product.name,
-      imageUrl: product.imageUrl,
+      // Берём первую фотографию из массива вариантов
+      imageUrl: variantForCart.images?.[0] || "",
       price: finalPrice,
       quantity: 1,
-      size: Number(data.quantitySize[0].size),
-      insert: data.variants[0].insert,
-      materialColor: data.variants[0].materialColor,
+      size: Number(data.size),
+      insert: data.inserts,
+      materialColor: data.materialColor,
     };
 
     try {
@@ -227,19 +265,21 @@ export default function ProductPage() {
 
   const formatPrice = (price: number) => price.toFixed(2);
 
-  const sizeOptions = (product?.quantitySize || []).map((item) => ({
+  const sizeOptions = (product.quantitySize || []).map((item) => ({
     value: item.size.toString(),
     label: `Size ${item.size} (${item.quantity} available)`,
   }));
-
-  const insertOptions = (product?.variants || []).map((variant) => ({
-    value: `${variant.insert}-${variant.insertColor}`,
-    label: `${variant.insert} (${variant.insertColor})`,
+  const uniqueInserts = [...new Set(product.variants.map((v) => v.insert))];
+  const insertOptions = uniqueInserts.map((insert) => ({
+    value: insert,
+    label: insert,
   }));
-
-  const specOptions = (product?.variants || []).map((obj) => ({
-    value: obj.materialColor,
-    label: obj.materialColor,
+  const uniqueMaterialColors = [
+    ...new Set(product.variants.map((v) => v.materialColor)),
+  ];
+  const materialColorOptions = uniqueMaterialColors.map((color) => ({
+    value: color,
+    label: color,
   }));
 
   return (
@@ -261,7 +301,7 @@ export default function ProductPage() {
         )}
 
         <div className="grid grid-cols-1 2xl:grid-cols-2 gap-8 items-start">
-          <ProductImageBlock product={product} />
+          <ProductImageBlock variant={displayedVariant!} />
 
           <div className="mt-6">
             <h1
@@ -295,7 +335,7 @@ export default function ProductPage() {
               </div>
             ) : (
               <p className="text-2xl font-bold text-gray-800 mb-6">
-                {product.price} ₴
+                {formatPrice(product.price)} ₴
               </p>
             )}
 
@@ -312,10 +352,15 @@ export default function ProductPage() {
                 />
 
                 <SelectField
-                  label="Inserts, Carat"
+                  label="Inserts"
                   id="inserts"
                   register={register("inserts", {
                     required: "Insert is required",
+                    onChange: (e) => {
+                      const newInsert = e.target.value;
+                      setSelectedInsert(newInsert);
+                      setValue("inserts", newInsert);
+                    },
                   })}
                   error={errors.inserts}
                   options={insertOptions}
@@ -329,9 +374,14 @@ export default function ProductPage() {
                 id="materialColor"
                 register={register("materialColor", {
                   required: "Material color is required",
+                  onChange: (e) => {
+                    const newColor = e.target.value;
+                    setSelectedMaterialColor(newColor);
+                    setValue("materialColor", newColor);
+                  },
                 })}
                 error={errors.materialColor}
-                options={specOptions}
+                options={materialColorOptions}
                 placeholder="Select Material Color"
                 className="w-full mb-6"
               />
@@ -358,9 +408,7 @@ export default function ProductPage() {
                 <ShareButton
                   title="Share this product"
                   text="Check out this amazing product!"
-                  url={
-                    typeof window !== "undefined" ? window.location.href : ""
-                  }
+                  url={typeof window !== "undefined" ? window.location.href : ""}
                 />
               </div>
             </div>

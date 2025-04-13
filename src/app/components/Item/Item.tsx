@@ -33,7 +33,7 @@ export default function Item({ product }: ItemProps) {
     >
       <div className="overflow-hidden">
         <Image
-          src={product.imageUrl}
+          src={product.variants[0].images[0]}
           alt={product.name}
           width={300}
           height={300}

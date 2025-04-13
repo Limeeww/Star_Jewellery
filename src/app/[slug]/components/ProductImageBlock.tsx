@@ -4,14 +4,20 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { AiOutlineSearch, AiOutlineClose } from "react-icons/ai";
 import { motion, AnimatePresence } from "framer-motion";
+import { ProductVariant } from "@/app/types/product";
 
-interface ProductProps {
-  imageUrl: string;
-  name: string;
+interface ProductVariantProps {
+  variant: ProductVariant;
 }
 
-const ProductImageBlock = ({ product }: { product: ProductProps }) => {
+const ProductImageBlock = ({ variant }: ProductVariantProps) => {
   const [isModalOpen, setModalOpen] = useState(false);
+
+  const mainImage =
+    variant.images && variant.images.length > 0
+      ? variant.images[0]
+      : "/images/placeholder.png";
+  const altText = `${variant.insert} - ${variant.materialColor}`;
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -27,8 +33,8 @@ const ProductImageBlock = ({ product }: { product: ProductProps }) => {
     <>
       <div className="relative overflow-hidden shadow-lg mt-6">
         <Image
-          src={product.imageUrl}
-          alt={product.name}
+          src={mainImage}
+          alt={altText}
           width={600}
           height={600}
           className="w-full max-h-[90vh] object-cover"
@@ -66,8 +72,8 @@ const ProductImageBlock = ({ product }: { product: ProductProps }) => {
               onClick={(e) => e.stopPropagation()}
             >
               <Image
-                src={product.imageUrl}
-                alt={product.name}
+                src={mainImage}
+                alt={altText}
                 width={800}
                 height={800}
                 className="object-contain w-full h-full"

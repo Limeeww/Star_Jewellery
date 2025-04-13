@@ -12,23 +12,21 @@ export interface Discount {
   priority?: number;
 }
 
-
 export interface ProductVariant {
   id: number;
-  // sku: string;
   price: number;
+  weight: number;
   material: string;
   materialColor: string;
   insert: string;
   insertColor: string;
-  weight: number;
   quantity: number;
-
+  images?: string[];
 }
 
-export interface quantitySize {
-  size:number;
-  quantity:number;
+export interface QuantitySize {
+  size: number;
+  quantity: number;
 }
 
 export interface Product {
@@ -36,7 +34,6 @@ export interface Product {
   name: string;
   description: string;
   slug: string;
-  imageUrl: string;
   categoryId: number;
   variants: ProductVariant[];
   createdAt: Timestamp;
@@ -44,5 +41,5 @@ export interface Product {
   price: number;
   isHidden: boolean; 
   additionalDescription: string; 
-  quantitySize: quantitySize[];
+  quantitySize: QuantitySize[];
 }
