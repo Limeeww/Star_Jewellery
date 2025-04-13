@@ -24,16 +24,14 @@ export default function Overview() {
 
   const [profileData] = useProfileData(user);
 
-  if (loading) {
+  if (loading || !profileData) {
     return <Loading />;
   }
-
-
-
 
   return (
     <>
       <Navbar isScrolled={true} isLoggedIn={isLoggedIn} />
+
       <AccountLayout pathname={pathname}>
         <WelcomeBlock
           firstName={profileData?.firstName}
@@ -105,9 +103,19 @@ export default function Overview() {
             }
             linkHref="/Account/Bonuses"
           />
+
+          {profileData.role === "admin" ? (
+            <ProfileCard
+              title="MANAGE SHOP DATA"
+              description={"Start managing the shop date via link."}
+              linkHref="/Account/Admin"
+            />
+          ) : (
+            <></>
+          )}
         </div>
       </AccountLayout>
-      
+
       <Footer />
     </>
   );
