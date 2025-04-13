@@ -50,4 +50,5 @@ export interface UserData {
   lastAnniversaryChange?: Timestamp;
   lastRelationshipStatusChange?: Timestamp;
   cartItems?: CartItem[];
+  role: "admin" | "user";
 }

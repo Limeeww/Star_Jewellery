@@ -94,6 +94,7 @@ export default function Profile() {
       });
     }
   };
+  
   return (
     <>
       <Navbar isScrolled={true} isLoggedIn={!!user} />
