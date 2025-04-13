@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, FC, ReactNode } from "react";
+import { useEffect, ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { AiOutlineClose } from "react-icons/ai";
 
@@ -20,7 +20,7 @@ const modalVariants = {
   visible: { x: 0 },
 };
 
-const SideModal: FC<SideModalProps> = ({ isOpen, onClose, children }) => {
+function SideModal({ isOpen, onClose, children } : SideModalProps) {
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -42,12 +42,11 @@ const SideModal: FC<SideModalProps> = ({ isOpen, onClose, children }) => {
         >
           <motion.div
             className="absolute inset-0 bg-black bg-opacity-50"
-            onClick={onClose} 
+            onClick={onClose}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-          />
+            transition={{ duration: 0.3 }} />
 
           <motion.div
             className="relative bg-white shadow-lg w-full max-w-md h-full"
@@ -59,17 +58,16 @@ const SideModal: FC<SideModalProps> = ({ isOpen, onClose, children }) => {
           >
             <button
               onClick={onClose}
-              className="absolute top-6 right-6 p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition"
+              className="absolute top-6 right-6 p-2 rounded-full hover:bg-gray-200 transition"
             >
-              <AiOutlineClose size={20} className="text-gray-700" />
+              <AiOutlineClose size={20} className="text-gray-800" />
             </button>
-            {/* Контент модального окна */}
             <div className="h-full overflow-y-auto p-6 pt-12">{children}</div>
           </motion.div>
         </motion.div>
       )}
     </AnimatePresence>
   );
-};
+}
 
 export default SideModal;
