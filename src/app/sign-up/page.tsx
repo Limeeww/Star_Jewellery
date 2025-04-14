@@ -36,8 +36,7 @@ export default function SignUpPage() {
   const router = useRouter();
 
   const [user, loading, error] = useAuthState(auth);
-  const [createUserWithEmailAndPassword, userEmail, loadingEmail, errorEmail] =
-    useCreateUserWithEmailAndPassword(auth);
+
   const [createUserWithEmailAndPassword, userEmail, loadingEmail, errorEmail] =
     useCreateUserWithEmailAndPassword(auth);
 
@@ -85,36 +84,6 @@ export default function SignUpPage() {
   const hasLowercase = /[a-z]/.test(passwordValue);
   const hasSpecialChar = /[^a-zA-Z0-9]/.test(passwordValue);
 
-  // const onSubmit = async (data: UserData) => {
-  //   try {
-  //     const userCredential = await createUserWithEmailAndPassword(
-  //       data.email,
-  //       data.password
-  //     );
-
-  //     if (userCredential && userCredential.user) {
-  //       const userData = {
-  //         ...data,
-  //         createdAt: new Date(),
-  //         wishList: data.wishList || [],
-  //         orders: data.orders || [],
-  //         addresses: data.addresses || [],
-  //         bonuses: data.bonuses || "0",
-  //         cartItems: data.cartItems || [],
-  //         role: "user",
-  //       };
-
-  //       await setDoc(doc(db, "users", userCredential.user.uid), userData);
-  //       router.push("/Account/Overview");
-  //     }
-  //   } catch (err: any) {
-  //     setNotification({
-  //       message: err.message || "Failed to create account.",
-  //       type: "error",
-  //     });
-  //   }
-  // };
-
   const onSubmit = async (data: UserData) => {
     try {
       const userCredential = await createUserWithEmailAndPassword(
@@ -134,6 +103,7 @@ export default function SignUpPage() {
           addresses: userData.addresses || [],
           bonuses: userData.bonuses || "0",
           cartItems: userData.cartItems || [],
+          role: "user",
         };
         await setDoc(doc(db, "users", userCredential.user.uid), finalUserData);
         router.push("/Account/Overview");
@@ -143,38 +113,12 @@ export default function SignUpPage() {
         type: "error",
         message: err.message || "Failed to create account.",
       });
-      if (!userCredential?.user) {
-        throw new Error("Registration failed");
-      }
-
-      const newUser = userCredential.user;
-
-      // Убираем пароль из сохраняемых данных
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password, confirmPassword, ...safeData } = data;
-
-      const userData = {
-        ...safeData,
-        createdAt: new Date(),
-        wishList: [],
-        orders: [],
-        addresses: [],
-        bonuses: "0",
-        cartItems: [],
-        role: "user",
-      };
-
-      await setDoc(doc(db, "users", newUser.uid), userData);
-
-      router.push("/Account/Overview");
-    } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Something went wrong";
-      setNotification({ message, type: "error" });
     }
   };
 
-  if (loading || loadingEmail) return <Loading />;
+  if (loading || loadingEmail) {
+    return <Loading />;
+  }
 
   return (
     <div
@@ -292,12 +236,10 @@ export default function SignUpPage() {
                   </li>
                   <li
                     className={hasUppercase ? "text-green-600" : "text-red-600"}
-                    className={hasUppercase ? "text-green-600" : "text-red-600"}
                   >
                     ✔ At least one uppercase letter
                   </li>
                   <li
-                    className={hasLowercase ? "text-green-600" : "text-red-600"}
                     className={hasLowercase ? "text-green-600" : "text-red-600"}
                   >
                     ✔ At least one lowercase letter

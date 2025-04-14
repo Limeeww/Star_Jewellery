@@ -14,6 +14,8 @@ import AccountLayout from "../components/AccountLayout";
 
 import ProfileCard from "../components/ProfileCard";
 
+import { useUserRole } from "../../../hooks/useUserRole";
+
 export default function Overview() {
   const [user, loading] = useAuthState(auth);
   const pathname = usePathname();
@@ -23,8 +25,10 @@ export default function Overview() {
   useRequireAuth(user, loading);
 
   const [profileData] = useProfileData(user);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { user: currentUser, role, loading: roleLoading } = useUserRole();
 
-  if (loading || !profileData) {
+  if (loading || roleLoading || !profileData) {
     return <Loading />;
   }
 
@@ -104,12 +108,19 @@ export default function Overview() {
             linkHref="/Account/Bonuses"
           />
 
-          {profileData.role === "admin" ? (
-            <ProfileCard
-              title="MANAGE SHOP DATA"
-              description={"Start managing the shop date via link."}
-              linkHref="/Account/Admin"
-            />
+          {role === "admin" ? (
+            <>
+              <ProfileCard
+                title="MANAGE USER ROLES"
+                description={"Start managing the user roles via link."}
+                linkHref="/Admin/Roles"
+              />
+              <ProfileCard
+                title="MANAGE PRODUCTS"
+                description={"Start managing the products via link."}
+                linkHref="/Admin/Products"
+              />
+            </>
           ) : (
             <></>
           )}

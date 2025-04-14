@@ -1,7 +1,5 @@
 import Link from "next/link";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "../../../firebase/firebaseConfig";
-import { useProfileData } from "@/app/utils/auth";
+import { useUserRole } from "../../../hooks/useUserRole";
 
 interface NavLink {
   label: string;
@@ -29,10 +27,11 @@ const ADMIN_LINKS = [
   { label: "My Addresses", href: "/Account/Addresses" },
   { label: "My Wish List", href: "/Account/Wishlist" },
   { label: "My Bonuses", href: "/Account/Bonuses" },
-  { label: "Manage", href: "/Account/AdminPage" },
+  { label: "Manage User Roles", href: "/Admin/Roles" },
+  { label: "Manage Products", href: "/Admin/Products" },
 ];
 
-const getLinks = (role?: string): NavLink[] => {
+const getLinks = (role?: string | null): NavLink[] => {
   if (role === "admin") return ADMIN_LINKS;
   return SIDE_LINKS;
 };
@@ -41,9 +40,9 @@ export default function AccountSidebar({
   navLinks,
   pathname,
 }: AccountSidebarProps) {
-  const [user] = useAuthState(auth);
-  const [profileData] = useProfileData(user);
-  const linksToRender = navLinks || getLinks(profileData?.role);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { user, role, loading } = useUserRole();
+  const linksToRender = navLinks || getLinks(role);
   return (
     <nav className="space-y-4 text-sm text-gray-700 flex flex-col">
       {linksToRender.map((link) => {

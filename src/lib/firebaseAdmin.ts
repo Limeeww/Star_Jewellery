@@ -2,6 +2,7 @@
 
 import { cert, getApps, initializeApp } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
+import { getFirestore } from "firebase-admin/firestore";
 
 // Инициализируем Admin SDK только один раз
 if (!getApps().length) {
@@ -14,4 +15,6 @@ if (!getApps().length) {
   });
 }
 
-export const adminAuth = getAuth();
+const adminAuth = getAuth();
+const adminDB = getFirestore();
+export { adminDB, adminAuth };
