@@ -1,10 +1,7 @@
-// lib/firebaseAdmin.ts
-
 import { cert, getApps, initializeApp } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 import { getFirestore } from "firebase-admin/firestore";
 
-// Инициализируем Admin SDK только один раз
 if (!getApps().length) {
   initializeApp({
     credential: cert({

@@ -42,15 +42,13 @@ export default function AdminProductsPage() {
     }
   };
 
-  const formatTimestamp = (timestamp: any) => {
+  const formatTimestamp = (timestamp: { toDate?: () => Date; _seconds?: number } | null | undefined) => {
     if (!timestamp) return "N/A";
 
-    // Firestore Timestamp
     if (typeof timestamp.toDate === "function") {
       return timestamp.toDate().toLocaleString();
     }
 
-    // Plain object with _seconds
     if (typeof timestamp._seconds === "number") {
       return new Date(timestamp._seconds * 1000).toLocaleString();
     }
@@ -58,15 +56,13 @@ export default function AdminProductsPage() {
     return "N/A";
   };
 
-  // for (let i = 0; i < products.length; i++) {
-  //   console.log(products[i].createdAt);
-  // }
+
   if (loading || role !== "admin" || isLoading) return <Loading />;
 
   return (
     <>
       <Navbar isScrolled={true} isLoggedIn={isLoggedIn} />
-      <AccountLayout pathname={pathname}>
+      <AccountLayout pathname={pathname || ""} sideLinks={[]}>
         <h3
           className="uppercase text-xl font-bold mb-6 text-center"
           style={{ fontFamily: "var(--font-playfair)" }}
@@ -178,7 +174,7 @@ export default function AdminProductsPage() {
               </div>
               <LinkButton
                 text="Edit"
-                className="bg-black hover:bg-gray-800 text-xl cursor-pointer text-white transition-colors"
+                className="w-full bg-black text-white text-md font-medium px-4 py-2 hover:bg-gray-800 transition-colors"
                 showArrow={false}
                 onClick={() =>
                   router.push(`/Admin/Products/Edit/${product.id}`)
