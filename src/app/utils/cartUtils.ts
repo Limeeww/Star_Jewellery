@@ -1,4 +1,3 @@
-// utilities/cartUtils.ts
 import { CartItem } from "../types/cartItem";
 import { GiftOptionsForm } from "../types/order";
 import { useState, useEffect } from "react";

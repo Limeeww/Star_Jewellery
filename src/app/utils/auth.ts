@@ -1,10 +1,18 @@
-// utils/auth.tsx
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { auth, db } from "../../firebase/firebaseConfig";
-import { collection, doc, getDoc, getDocs, query, setDoc, Timestamp, where } from "firebase/firestore";
-import Notification from "../components/MessageHandling/Notification"; 
-import { onAuthStateChanged } from "firebase/auth";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  setDoc,
+  Timestamp,
+  where,
+} from "firebase/firestore";
+import Notification from "../components/MessageHandling/Notification";
+import { onAuthStateChanged, User, UserProfile } from "firebase/auth";
 
 export type NotificationType = "success" | "info" | "warning" | "error";
 
@@ -14,13 +22,7 @@ export interface NotificationProps {
   duration?: number;
   onClose?: () => void;
 }
-
-/**
- * Helper для показа уведомлений.
- * Можно настроить логику отображения уведомлений здесь.
- */
 export const notify = (props: NotificationProps) => {
-  // Пример: рендерим компонент уведомления или вызываем метод контекста уведомлений
   Notification(props);
 };
 
@@ -55,7 +57,7 @@ export const updateUserProfile = async (userId: string, userData: object) => {
  */
 export const updateUserProfileWithChecks = async (
   userId: string,
-  formData: any
+  formData: Partial<UserProfile>
 ) => {
   const docRef = doc(db, "users", userId);
   const snapshot = await getDoc(docRef);
@@ -70,7 +72,7 @@ export const updateUserProfileWithChecks = async (
 
   const existingData = snapshot.data();
   const now = new Date();
-  const updates: any = { ...formData };
+  const updates: Record<string, unknown> = { ...formData };
 
   // Check for birthday change
   const birthdayChanged =
@@ -80,8 +82,7 @@ export const updateUserProfileWithChecks = async (
 
   if (birthdayChanged) {
     if (existingData.lastBirthdayChange) {
-      const diffMs =
-        now.getTime() - existingData.lastBirthdayChange.toMillis();
+      const diffMs = now.getTime() - existingData.lastBirthdayChange.toMillis();
       const diffDays = diffMs / (1000 * 60 * 60 * 24);
       if (diffDays < 30) {
         notify({
@@ -124,7 +125,7 @@ export const updateUserProfileWithChecks = async (
 /**
  * Hook to require authentication. Redirects to "/" if no user.
  */
-export function useRequireAuth(user: any, loading: boolean) {
+export function useRequireAuth(user: User | null | undefined, loading: boolean) {
   const router = useRouter();
   useEffect(() => {
     if (!loading && !user) {
@@ -132,12 +133,11 @@ export function useRequireAuth(user: any, loading: boolean) {
     }
   }, [user, loading, router]);
 }
-
 /**
  * Hook to fetch and manage profile data.
  */
-export function useProfileData(user: any) {
-  const [profileData, setProfileData] = useState<any | null>(null);
+export function useProfileData(user: { uid: string } | null) {
+  const [profileData, setProfileData] = useState<UserProfile | null>(null);
   useEffect(() => {
     async function getProfileData() {
       if (user) {
@@ -149,7 +149,6 @@ export function useProfileData(user: any) {
   }, [user]);
   return [profileData, setProfileData] as const;
 }
-
 
 /**
  * Check if the given email is already taken.

@@ -62,7 +62,7 @@ function SideModal({ isOpen, onClose, children } : SideModalProps) {
             >
               <AiOutlineClose size={20} className="text-gray-800" />
             </button>
-            <div className="h-full overflow-y-auto p-6 pt-12">{children}</div>
+            <div className="h-full overflow-y-auto p-4 pt-12">{children}</div>
           </motion.div>
         </motion.div>
       )}

@@ -43,6 +43,7 @@ import {
 } from "../utils/cartActions";
 import LinkButtonForm from "../components/FormComponents/LinkButtonForm";
 import { Collection } from "../types/collection";
+import ProductImageSlider from "./components/ProductImageBlock";
 
 interface FormValues {
   size: string;
@@ -292,8 +293,12 @@ export default function ProductPage() {
         )}
 
         <div className="grid grid-cols-1 2xl:grid-cols-2 gap-8 items-start">
-          <ProductImageBlock variant={displayedVariant!} />
-
+          <div>
+            <ProductImageSlider
+              images={displayedVariant?.images || []}
+              altText={`${displayedVariant?.insert} - ${displayedVariant?.materialColor}`}
+            />
+          </div>
           <div className="mt-6">
             <h1
               className="text-3xl md:text-4xl font-bold text-gray-800 mb-4"
@@ -423,62 +428,68 @@ export default function ProductPage() {
       <Footer />
 
       <SideModal isOpen={sideModalOpen} onClose={() => setSideModalOpen(false)}>
-        <div className="p-4">
-          <h2 className="text-xl font-semibold mb-2">
-            Product successfully added to cart!
-          </h2>
-          <p className="mb-4">
-            You can continue shopping or view your cart items below.
-          </p>
+        <div className="p-4 h-full flex flex-col max-h-screen overflow-y-auto">
+          <div className="flex-1">
+            <h2
+              className="text-2xl font-semibold mb-2"
+              style={{ fontFamily: "var(--font-playfair)" }}
+            >
+              Product successfully added to cart!
+            </h2>
+            <p className="mb-4">
+              You can continue shopping or view your cart items below.
+            </p>
 
-          {cartItems && cartItems.length > 0 ? (
-            cartItems.map((item) => (
-              <div
-                key={`${item.productId}-${item.size}-${item.insert}-${item.materialColor}`}
-              >
-                <CartItemComponent
-                  item={item}
-                  onIncrement={() => {
-                    if (user?.uid) {
-                      incrementQuantity(
-                        user.uid,
-                        item.productId,
-                        item.size,
-                        item.insert,
-                        item.materialColor
-                      );
-                    }
-                  }}
-                  onDecrement={() => {
-                    if (user?.uid) {
-                      decrementQuantity(
-                        user.uid,
-                        item.productId,
-                        item.size,
-                        item.insert,
-                        item.materialColor
-                      );
-                    }
-                  }}
-                  onRemove={() => {
-                    if (user?.uid) {
-                      removeItem(
-                        user.uid,
-                        item.productId,
-                        item.size,
-                        item.insert,
-                        item.materialColor
-                      );
-                    }
-                  }}
-                />
-              </div>
-            ))
-          ) : (
-            <p>Your cart is currently empty.</p>
-          )}
+            {cartItems && cartItems.length > 0 ? (
+              cartItems.map((item) => (
+                <div
+                  key={`${item.productId}-${item.size}-${item.insert}-${item.materialColor}`}
+                  className="mb-4"
+                >
+                  <CartItemComponent
+                    item={item}
+                    onIncrement={() => {
+                      if (user?.uid) {
+                        incrementQuantity(
+                          user.uid,
+                          item.productId,
+                          item.size,
+                          item.insert,
+                          item.materialColor
+                        );
+                      }
+                    }}
+                    onDecrement={() => {
+                      if (user?.uid) {
+                        decrementQuantity(
+                          user.uid,
+                          item.productId,
+                          item.size,
+                          item.insert,
+                          item.materialColor
+                        );
+                      }
+                    }}
+                    onRemove={() => {
+                      if (user?.uid) {
+                        removeItem(
+                          user.uid,
+                          item.productId,
+                          item.size,
+                          item.insert,
+                          item.materialColor
+                        );
+                      }
+                    }}
+                  />
+                </div>
+              ))
+            ) : (
+              <p>Your cart is currently empty.</p>
+            )}
+          </div>
 
-          <div className="mt-4">
+          <div className="mt-auto">
             <LinkButtonForm href="/cart" label="View Cart" showArrow />
           </div>
         </div>

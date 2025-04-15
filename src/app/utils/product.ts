@@ -1,4 +1,3 @@
-// utils/fetchProducts.ts
 
 import { collection, getDocs, query, limit } from "firebase/firestore";
 import { db } from "../../firebase/firebaseConfig"; 
@@ -26,7 +25,7 @@ export async function fetchProducts(limitNum:number): Promise<Product[]> {
         variants: data.variants || [],
         createdAt: data.createdAt,
         updatedAt: data.updatedAt,
-        isHideen: data.isHideen || false,
+        isHidden: data.isHidden || false,
         additionalDescription: data.additionalDescription || "",
         quantitySize: data.quantitySize || 0,
       };

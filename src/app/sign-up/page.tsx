@@ -36,6 +36,7 @@ export default function SignUpPage() {
   const router = useRouter();
 
   const [user, loading, error] = useAuthState(auth);
+  
   const [createUserWithEmailAndPassword, userEmail, loadingEmail, errorEmail] =
     useCreateUserWithEmailAndPassword(auth);
 
