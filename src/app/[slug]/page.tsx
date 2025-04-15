@@ -1,18 +1,11 @@
 "use client";
 
 import { useParams, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 
-import { auth, db } from "../../firebase/firebaseConfig";
-import {
-  collection,
-  query,
-  where,
-  getDocs,
-  doc,
-  getDoc,
-} from "firebase/firestore";
+import { auth } from "../../firebase/firebaseConfig";
+
 import { useAuthState } from "react-firebase-hooks/auth";
 
 import Navbar from "../components/Navbar/Navbar";
@@ -22,12 +15,11 @@ import Notification from "../components/MessageHandling/Notification";
 import SelectField from "../components/FormComponents/SelectField";
 import SubmitButton from "../components/FormComponents/SubmitButton";
 
-import { Discount, Product, ProductVariant } from "../types/product";
+import { ProductVariant } from "../types/product";
 import { useRequireAuth } from "../utils/auth";
 import { useNotification } from "../utils/useNotification";
 import InfoBlocks from "./components/InfoItem";
 import { AiOutlineShoppingCart } from "react-icons/ai";
-import ProductImageBlock from "./components/ProductImageBlock";
 import MainFeaturesList from "./components/MainFeatureList";
 import SimilarProducts from "../components/SimilarProducts/SimilarProducts";
 import AboutCollection from "./components/AboutCollection";
@@ -42,8 +34,10 @@ import {
   removeItem,
 } from "../utils/cartActions";
 import LinkButtonForm from "../components/FormComponents/LinkButtonForm";
-import { Collection } from "../types/collection";
+import { calculateDiscountedPrice } from "../utils/priceUtils";
 import ProductImageSlider from "./components/ProductImageBlock";
+import { useProductDetails } from "../utils/useProductDetails";
+import { formatPrice } from "../utils/priceUtils";
 
 interface FormValues {
   size: string;
@@ -52,37 +46,13 @@ interface FormValues {
 }
 
 export default function ProductPage() {
-  const [user, loading] = useAuthState(auth);
-  const { slug } = useParams();
+  const [user, loadingAuth] = useAuthState(auth);
+  const { slug } = useParams() as { slug: string };
   const searchParams = useSearchParams();
-  const variantID = searchParams.get("variantID");
-  const [product, setProduct] = useState<Product | null>(null);
-  const [collectionData, setCollectionData] = useState<Collection[]>([]);
-  const isLoggedIn = !loading && !!user;
+  const variantID = searchParams?.get("variantID");
 
-  const [sideModalOpen, setSideModalOpen] = useState(false);
-
-  const cartItems = useCartItems(user ? user.uid : null);
-  const [selectedInsert, setSelectedInsert] = useState<string>("");
-  const [selectedMaterialColor, setSelectedMaterialColor] =
-    useState<string>("");
-  const [activeDiscount, setActiveDiscount] = useState<Discount | null>(null);
-
-  const activeVariant: ProductVariant | undefined = product?.variants.find(
-    (variant) =>
-      variant.insert === selectedInsert &&
-      variant.materialColor === selectedMaterialColor
-  );
-  const displayedVariant = activeVariant || product?.variants[0];
-
-  let discountedPrice: number | null = null;
-  if (product && activeDiscount) {
-    if (activeDiscount.type === "percentage") {
-      discountedPrice = product.price * (1 - activeDiscount.value / 100);
-    } else if (activeDiscount.type === "fixed") {
-      discountedPrice = product.price - activeDiscount.value;
-    }
-  }
+  const [selectedInsert, setSelectedInsert] = useState("");
+  const [selectedMaterialColor, setSelectedMaterialColor] = useState("");
 
   const {
     register,
@@ -97,141 +67,34 @@ export default function ProductPage() {
     },
   });
 
-  useRequireAuth(user, loading);
+  const onVariantFound = (variant: ProductVariant) => {
+    setSelectedInsert(variant.insert);
+    setSelectedMaterialColor(variant.materialColor);
+    setValue("inserts", variant.insert);
+    setValue("materialColor", variant.materialColor);
+  };
+
+  const { product, collectionData, activeDiscount, loading } =
+    useProductDetails(slug, variantID ?? null, onVariantFound);
+
+  const [sideModalOpen, setSideModalOpen] = useState(false);
+  const cartItems = useCartItems(user ? user.uid : null);
+
+  useRequireAuth(user, loadingAuth);
   const { notify, notification, clearNotification } = useNotification();
 
-  useEffect(() => {
-    if (!slug) return;
-
-    const fetchData = async () => {
-      try {
-        const productsRef = collection(db, "products");
-        const productQuery = query(productsRef, where("slug", "==", slug));
-        const productSnap = await getDocs(productQuery);
-
-        if (productSnap.empty) {
-          notify({
-            type: "warning",
-            message: `Product with slug ${slug} not found`,
-          });
-          return;
-        }
-
-        const productDoc = productSnap.docs[0];
-        const fetchedProduct = productDoc.data() as Product;
-
-        if (variantID && fetchedProduct.variants) {
-          const variantFromQuery = fetchedProduct.variants.find(
-            (variant) => variant.id === Number(variantID)
-          );
-          if (variantFromQuery) {
-            setSelectedInsert(variantFromQuery.insert);
-            setSelectedMaterialColor(variantFromQuery.materialColor);
-            setValue("inserts", variantFromQuery.insert);
-            setValue("materialColor", variantFromQuery.materialColor);
-          }
-        }
-
-        setProduct(fetchedProduct);
-
-        if (!fetchedProduct.categoryId) {
-          setCollectionData([]);
-          notify({
-            type: "error",
-            message: `Product with ID ${fetchedProduct.id} has no collectionId`,
-          });
-          return;
-        }
-
-        const collectionDocRef = doc(
-          db,
-          "collections",
-          fetchedProduct.categoryId.toString()
-        );
-        const collectionDocSnap = await getDoc(collectionDocRef);
-
-        if (!collectionDocSnap.exists()) {
-          setCollectionData([]);
-          notify({
-            type: "error",
-            message: `Collection with ID ${fetchedProduct.categoryId} not found`,
-          });
-          return;
-        }
-
-        const data = collectionDocSnap.data();
-        const singleCollection = {
-          id: Number(collectionDocSnap.id),
-          name: data.name || "",
-          description: data.description || "",
-          images: data.images || [],
-          parentCategory: Number(data.parentCategory) || 0,
-          isActive: data.isActive ?? true,
-          createdAt: data.createdAt,
-        };
-
-        setCollectionData([singleCollection]);
-
-        const discountsRef = collection(db, "discounts");
-        const discountsQuery = query(
-          discountsRef,
-          where("applicableTo", "array-contains", fetchedProduct.id)
-        );
-        const discountsSnap = await getDocs(discountsQuery);
-
-        if (!discountsSnap.empty) {
-          const now = new Date();
-          const allDiscounts: Discount[] = discountsSnap.docs.map((docSnap) => {
-            return {
-              ...docSnap.data(),
-              id: Number(docSnap.id),
-            } as Discount;
-          });
-
-          const validDiscounts = allDiscounts.filter((discount) => {
-            const start = discount.validFrom?.toDate
-              ? discount.validFrom.toDate()
-              : discount.validFrom.toDate();
-            const end = discount.validUntil?.toDate
-              ? discount.validUntil.toDate()
-              : discount.validUntil.toDate();
-            return now >= start && now <= end;
-          });
-
-          if (validDiscounts.length > 0) {
-            validDiscounts.sort(
-              (a, b) => (b.priority ?? 0) - (a.priority ?? 0)
-            );
-            setActiveDiscount(validDiscounts[0]);
-          } else {
-            setActiveDiscount(null);
-          }
-        } else {
-          setActiveDiscount(null);
-        }
-      } catch (error) {
-        notify({
-          type: "error",
-          message: `Error fetching data: ${String(error)}`,
-        });
-      }
-    };
-
-    fetchData();
-  }, [slug, variantID, notify, setValue]);
-
-  if (!product) return <Loading />;
+  const discountedPrice = product
+    ? calculateDiscountedPrice(product, activeDiscount)
+    : null;
 
   const onSubmit = async (data: FormValues) => {
-    if (!user) return;
-
+    if (!user || !product) return;
     const finalPrice = discountedPrice ?? product.price;
     const variantForCart =
       product.variants.find(
         (v) =>
           v.insert === data.inserts && v.materialColor === data.materialColor
       ) || product.variants[0];
-
     const cartItem = {
       productId: product.id,
       name: product.name,
@@ -242,7 +105,6 @@ export default function ProductPage() {
       insert: data.inserts,
       materialColor: data.materialColor,
     };
-
     try {
       await addOrIncrementCartItem(user.uid, cartItem);
       setSideModalOpen(true);
@@ -255,9 +117,9 @@ export default function ProductPage() {
     }
   };
 
-  const formatPrice = (price: number) => price.toFixed(2);
+  if (loading || !product) return <Loading />;
 
-  const sizeOptions = (product.quantitySize || []).map((item) => ({
+  const sizeOptions = (product.variants || []).map((item) => ({
     value: item.size.toString(),
     label: `Size ${item.size} (${item.quantity} available)`,
   }));
@@ -276,7 +138,7 @@ export default function ProductPage() {
 
   return (
     <>
-      <Navbar isScrolled={true} isLoggedIn={isLoggedIn} />
+      <Navbar isScrolled={true} isLoggedIn={!!user} />
 
       <section
         className="px-4 py-16 sm:px-6 lg:px-8"
@@ -295,11 +157,13 @@ export default function ProductPage() {
         <div className="grid grid-cols-1 2xl:grid-cols-2 gap-8 items-start">
           <div>
             <ProductImageSlider
-              images={displayedVariant?.images || []}
-              altText={`${displayedVariant?.insert} - ${displayedVariant?.materialColor}`}
+              images={product.variants[0].images || []}
+              altText={`${selectedInsert || product.variants[0].insert} - ${
+                selectedMaterialColor || product.variants[0].materialColor
+              }`}
             />
           </div>
-          <div className="mt-6">
+          <div className="xl:mt-6 ">
             <h1
               className="text-3xl md:text-4xl font-bold text-gray-800 mb-4"
               style={{ fontFamily: "var(--font-playfair)" }}

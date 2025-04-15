@@ -11,7 +11,9 @@ admin.initializeApp({
 const db = getFirestore();
 
 const now = Timestamp.now();
-const oneWeekLater = Timestamp.fromDate(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000));
+const oneWeekLater = Timestamp.fromDate(
+  new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+);
 
 // ==================== DISCOUNTS ====================
 const discounts = [
@@ -89,12 +91,15 @@ const products = [
         insert: "diamond",
         insertColor: "clear",
         weight: 5,
-        quantity: 10,
+        quantitySize: [
+          { size: 16, quantity: 5 },
+          { size: 17, quantity: 5 },
+        ],
         images: [
           "/images/products/gold-ring-diamond-yellow/front.jpg",
           "/images/products/gold-ring-diamond-yellow/side.jpg",
-          "/images/products/gold-ring-diamond-yellow/back.jpg"
-        ]
+          "/images/products/gold-ring-diamond-yellow/back.jpg",
+        ],
       },
       {
         id: 102,
@@ -104,13 +109,16 @@ const products = [
         insert: "diamond",
         insertColor: "blue",
         weight: 6,
-        quantity: 5,
+        quantitySize: [
+          { size: 16, quantity: 2 },
+          { size: 17, quantity: 3 },
+        ],
         images: [
           "/images/products/gold-ring-diamond-white/front.jpg",
           "/images/products/gold-ring-diamond-white/side.jpg",
-          "/images/products/gold-ring-diamond-white/back.jpg"
-        ]
-      }
+          "/images/products/gold-ring-diamond-white/back.jpg",
+        ],
+      },
     ],
     createdAt: now,
     updatedAt: now,
@@ -118,10 +126,6 @@ const products = [
     isHidden: false,
     additionalDescription:
       "High-quality gold ring available in two elegant variants, perfect for special occasions.",
-    quantitySize: [
-      { size: 6, quantity: 5 },
-      { size: 7, quantity: 5 }
-    ]
   },
   {
     id: 2,
@@ -138,11 +142,11 @@ const products = [
         insert: "crystal",
         insertColor: "blue",
         weight: 3,
-        quantity: 12,
+        quantitySize: [{ size: 1, quantity: 12 }],
         images: [
           "/images/products/silver-earrings-crystal-white/front.jpg",
-          "/images/products/silver-earrings-crystal-white/side.jpg"
-        ]
+          "/images/products/silver-earrings-crystal-white/side.jpg",
+        ],
       },
       {
         id: 202,
@@ -152,12 +156,12 @@ const products = [
         insert: "crystal",
         insertColor: "green",
         weight: 3.5,
-        quantity: 6,
+        quantitySize: [{ size: 1, quantity: 6 }],
         images: [
           "/images/products/silver-earrings-crystal-rose/front.jpg",
-          "/images/products/silver-earrings-crystal-rose/side.jpg"
-        ]
-      }
+          "/images/products/silver-earrings-crystal-rose/side.jpg",
+        ],
+      },
     ],
     createdAt: now,
     updatedAt: now,
@@ -165,7 +169,6 @@ const products = [
     isHidden: false,
     additionalDescription:
       "Shiny silver earrings crafted with attention to detail, ideal for both casual and formal styles.",
-    quantitySize: [{ size: 1, quantity: 18 }]
   },
   {
     id: 3,
@@ -182,11 +185,11 @@ const products = [
         insert: "none",
         insertColor: "",
         weight: 2,
-        quantity: 8,
+        quantitySize: [{ size: 1, quantity: 8 }],
         images: [
           "/images/products/pendant-minimalist-rose/front.jpg",
-          "/images/products/pendant-minimalist-rose/side.jpg"
-        ]
+          "/images/products/pendant-minimalist-rose/side.jpg",
+        ],
       },
       {
         id: 302,
@@ -196,12 +199,12 @@ const products = [
         insert: "none",
         insertColor: "",
         weight: 2.2,
-        quantity: 4,
+        quantitySize: [{ size: 1, quantity: 4 }],
         images: [
           "/images/products/pendant-minimalist-yellow/front.jpg",
-          "/images/products/pendant-minimalist-yellow/side.jpg"
-        ]
-      }
+          "/images/products/pendant-minimalist-yellow/side.jpg",
+        ],
+      },
     ],
     createdAt: now,
     updatedAt: now,
@@ -209,7 +212,6 @@ const products = [
     isHidden: false,
     additionalDescription:
       "A minimalist pendant available in two finishes, emphasizing simplicity and elegance.",
-    quantitySize: [{ size: 1, quantity: 12 }]
   },
   {
     id: 4,
@@ -226,11 +228,14 @@ const products = [
         insert: "onyx",
         insertColor: "black",
         weight: 6,
-        quantity: 7,
+        quantitySize: [
+          { size: 19, quantity: 3 },
+          { size: 20, quantity: 4 },
+        ],
         images: [
           "/images/products/mens-ring-steel-black/front.jpg",
-          "/images/products/mens-ring-steel-black/side.jpg"
-        ]
+          "/images/products/mens-ring-steel-black/side.jpg",
+        ],
       },
       {
         id: 402,
@@ -240,12 +245,15 @@ const products = [
         insert: "onyx",
         insertColor: "grey",
         weight: 7,
-        quantity: 4,
+        quantitySize: [
+          { size: 19, quantity: 2 },
+          { size: 20, quantity: 2 },
+        ],
         images: [
           "/images/products/mens-ring-steel-gunmetal/front.jpg",
-          "/images/products/mens-ring-steel-gunmetal/side.jpg"
-        ]
-      }
+          "/images/products/mens-ring-steel-gunmetal/side.jpg",
+        ],
+      },
     ],
     createdAt: now,
     updatedAt: now,
@@ -253,10 +261,6 @@ const products = [
     isHidden: false,
     additionalDescription:
       "A powerful design in two variants – choose between a matte black finish or a sleek gunmetal look.",
-    quantitySize: [
-      { size: 10, quantity: 7 },
-      { size: 11, quantity: 4 }
-    ]
   },
   {
     id: 5,
@@ -273,11 +277,14 @@ const products = [
         insert: "pearl",
         insertColor: "white",
         weight: 4,
-        quantity: 15,
+        quantitySize: [
+          { size: 16, quantity: 10 },
+          { size: 18, quantity: 5 },
+        ],
         images: [
           "/images/products/pearl-bracelet-silver-white/front.jpg",
-          "/images/products/pearl-bracelet-silver-white/side.jpg"
-        ]
+          "/images/products/pearl-bracelet-silver-white/side.jpg",
+        ],
       },
       {
         id: 502,
@@ -287,12 +294,15 @@ const products = [
         insert: "pearl",
         insertColor: "cream",
         weight: 4.2,
-        quantity: 6,
+        quantitySize: [
+          { size: 16, quantity: 2 },
+          { size: 18, quantity: 4 },
+        ],
         images: [
           "/images/products/pearl-bracelet-silver-pink/front.jpg",
-          "/images/products/pearl-bracelet-silver-pink/side.jpg"
-        ]
-      }
+          "/images/products/pearl-bracelet-silver-pink/side.jpg",
+        ],
+      },
     ],
     createdAt: now,
     updatedAt: now,
@@ -300,14 +310,8 @@ const products = [
     isHidden: false,
     additionalDescription:
       "An elegant pearl bracelet available in two variants, offering a refined touch for any ensemble.",
-    quantitySize: [
-      { size: 6, quantity: 10 },
-      { size: 7, quantity: 11 }
-    ]
-  }
+  },
 ];
-
-
 
 // ==================== COLLECTIONS ====================
 // Помимо стандартных коллекций, добавляем базовую коллекцию "Rings Collection" и подколлекцию "Wedding Rings"
@@ -317,8 +321,8 @@ const collections = [
     id: 1,
     name: "Golden Classics",
     description: "Timeless gold designs",
-    images: ["/collections/gold.jpg"],
-    parentCategory: 1, // Предполагается, что эта коллекция привязана к категории 1
+    images: ["/images/collections/gold.jpg", "/images/collections/gold2.jpg"],
+    parentCategory: 1,
     isActive: true,
     createdAt: now,
     productIds: [1],
@@ -327,7 +331,10 @@ const collections = [
     id: 2,
     name: "Silver Dreams",
     description: "Modern silver jewelry",
-    images: ["/collections/silver.jpg"],
+    images: [
+      "/images/collections/silver.jpg",
+      "/images/collections/silver2.jpg",
+    ],
     parentCategory: 2,
     isActive: true,
     createdAt: now,
@@ -337,7 +344,10 @@ const collections = [
     id: 3,
     name: "Elegant Simplicity",
     description: "Minimalist beauty",
-    images: ["/collections/minimal.jpg"],
+    images: [
+      "/images/collections/minimal.jpg",
+      "/images/collections/minimal2.jpg",
+    ],
     parentCategory: 3,
     isActive: true,
     createdAt: now,
@@ -347,7 +357,7 @@ const collections = [
     id: 4,
     name: "Men’s Collection",
     description: "Rings and bracelets for men",
-    images: ["/collections/men.jpg"],
+    images: ["/images/collections/men.jpg", "/images/collections/men2.jpg"],
     parentCategory: 4,
     isActive: true,
     createdAt: now,
@@ -357,7 +367,7 @@ const collections = [
     id: 5,
     name: "Pearl Elegance",
     description: "Bracelets with pearls",
-    images: ["/collections/pearl.jpg"],
+    images: ["/images/collections/pearl.jpg", "/images/collections/pearl2.jpg"],
     parentCategory: 5,
     isActive: true,
     createdAt: now,
@@ -368,7 +378,7 @@ const collections = [
     id: 10,
     name: "Rings Collection",
     description: "Base collection for rings",
-    images: ["/collections/rings.jpg"],
+    images: ["/images/collections/rings.jpg", "/images/collections/rings2.jpg"],
     parentCategory: 0, // 0 или null можно использовать для обозначения базовой категории
     isActive: true,
     createdAt: now,
@@ -378,7 +388,10 @@ const collections = [
     id: 11,
     name: "Wedding Rings",
     description: "A curated subcollection of wedding rings.",
-    images: ["/collections/wedding-rings.jpg"],
+    images: [
+      "/images/collections/wedding-rings.jpg",
+      "/images/collections/wedding-rings2.jpg",
+    ],
     // Здесь parentCategory ссылается на базовую коллекцию "Rings Collection" (id: 10)
     parentCategory: 10,
     isActive: true,
@@ -398,17 +411,17 @@ async function uploadAll() {
     const ref = db.collection("products").doc(product.id.toString());
     productBatch.set(ref, product);
   });
-  
+
   collections.forEach((collection) => {
     const ref = db.collection("collections").doc(collection.id.toString());
     collectionBatch.set(ref, collection);
   });
-  
+
   discounts.forEach((discount) => {
     const ref = db.collection("discounts").doc(discount.id.toString());
     discountBatch.set(ref, discount);
   });
-  
+
   await productBatch.commit();
   await collectionBatch.commit();
   await discountBatch.commit();

@@ -142,12 +142,12 @@ export default function ProductImageSlider({
             key={i}
             onClick={() => setPage(i)}
             className={`cursor-pointer border-2 p-1 rounded ${
-              i === page ? "border-blue-500" : "border-transparent"
+              i === page ? "border-gray-800" : "border-transparent"
             }`}
           >
             <div className="relative w-[80px] h-[80px]">
               <Image
-                src={img}
+              src={img}
                 alt={`Thumbnail ${i + 1}`}
                 fill
                 className="object-cover"
