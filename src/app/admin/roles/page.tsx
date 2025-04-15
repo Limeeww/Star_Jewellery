@@ -8,6 +8,7 @@ import Loading from "@/app/components/Loading/Loading";
 import { UserItem } from "../../types/userTypes";
 import AccountLayout from "../../Account/components/AccountLayout";
 import Navbar from "../../components/Navbar/Navbar";
+import ActionButton from "@/app/components/FormComponents/ActionButton";
 
 export default function AdminRolesPage() {
   const pathname = usePathname();
@@ -101,22 +102,20 @@ export default function AdminRolesPage() {
 
               <div className="flex gap-2 flex-wrap mt-auto">
                 {user.role !== "admin" && (
-                  <button
-                    className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm"
+                  <ActionButton
+                    text="Make Admin"
                     disabled={updatingUid === user.uid}
+                    className="px-4 py-2 bg-green-600 text-white hover:bg-green-700 text-sm"
                     onClick={() => changeRole(user.uid, "admin")}
-                  >
-                    Make Admin
-                  </button>
+                  />
                 )}
                 {user.role !== "user" && (
-                  <button
-                    className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 text-sm"
+                  <ActionButton
+                    text="Make User"
                     disabled={updatingUid === user.uid}
+                    className="px-4 py-2 bg-black text-white hover:bg-gray-800 text-sm"
                     onClick={() => changeRole(user.uid, "user")}
-                  >
-                    Make User
-                  </button>
+                  />
                 )}
               </div>
             </li>

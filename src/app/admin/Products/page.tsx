@@ -7,6 +7,10 @@ import Navbar from "@/app/components/Navbar/Navbar";
 import AccountLayout from "@/app/Account/components/AccountLayout";
 import Loading from "@/app/components/Loading/Loading";
 import { Product } from "@/app/types/product";
+import Image from "next/image";
+import { Carousel } from "react-responsive-carousel";
+import "react-responsive-carousel/lib/styles/carousel.min.css";
+import LinkButton from "@/app/Account/components/LinkButton";
 
 export default function AdminProductsPage() {
   const pathname = usePathname();
@@ -38,6 +42,25 @@ export default function AdminProductsPage() {
     }
   };
 
+  const formatTimestamp = (timestamp: any) => {
+    if (!timestamp) return "N/A";
+
+    // Firestore Timestamp
+    if (typeof timestamp.toDate === "function") {
+      return timestamp.toDate().toLocaleString();
+    }
+
+    // Plain object with _seconds
+    if (typeof timestamp._seconds === "number") {
+      return new Date(timestamp._seconds * 1000).toLocaleString();
+    }
+
+    return "N/A";
+  };
+
+  // for (let i = 0; i < products.length; i++) {
+  //   console.log(products[i].createdAt);
+  // }
   if (loading || role !== "admin" || isLoading) return <Loading />;
 
   return (
@@ -58,30 +81,109 @@ export default function AdminProductsPage() {
             >
               <div className="mb-4 space-y-2 text-sm text-gray-800">
                 <p>
-                  <span className="font-semibold">Name:</span> {product.name}
+                  <strong>Name:</strong> {product.name}
                 </p>
                 <p>
-                  <span className="font-semibold">Price:</span> $
-                  {product.price.toFixed(2)}
+                  <strong>Slug:</strong> {product.slug}
                 </p>
                 <p>
-                  <span className="font-semibold">Slug:</span> {product.slug}
+                  <strong>Description:</strong> {product.description}
                 </p>
                 <p>
-                  <span className="font-semibold">Category:</span>{" "}
-                  {product.categoryId}
+                  <strong>Additional Info:</strong>{" "}
+                  {product.additionalDescription}
                 </p>
                 <p>
-                  <span className="font-semibold">Visibility:</span>{" "}
+                  <strong>Category ID:</strong> {product.categoryId}
+                </p>
+                <p>
+                  <strong>Created At:</strong>{" "}
+                  {formatTimestamp(product.createdAt)}
+                </p>
+                <p>
+                  <strong>Updated At:</strong>{" "}
+                  {formatTimestamp(product.updatedAt)}
+                </p>
+                <p>
+                  <strong>Visibility:</strong>{" "}
                   <span
-                    className={`font-semibold ${
-                      product.isHidden ? "text-red-500" : "text-green-600"
-                    }`}
+                    className={
+                      product.isHidden ? "text-red-600" : "text-green-600"
+                    }
                   >
                     {product.isHidden ? "Hidden" : "Visible"}
                   </span>
                 </p>
+
+                {product.variants.length > 0 && (
+                  <div className="pt-2">
+                    <p className="font-semibold underline">Variants:</p>
+                    <ul className="pl-4 list-disc">
+                      {product.variants.map((variant, i) => (
+                        <li key={i}>
+                          <span className="block">
+                            Material: {variant.material}
+                          </span>
+                          <span className="block">
+                            Color: {variant.materialColor}
+                          </span>
+                          <span className="block">
+                            Insert: {variant.insert}
+                          </span>
+                          <span className="block">
+                            Insert Color: {variant.insertColor}
+                          </span>
+                          <span className="block">
+                            Weight: {variant.weight}
+                          </span>
+                          <span className="block">Price: ${variant.price}</span>
+                          {variant.quantitySize.length > 0 && (
+                            <div className="pt-2">
+                              <p className="font-semibold underline">
+                                Quantity by Size:
+                              </p>
+                              <ul className="pl-4 list-disc">
+                                {variant.quantitySize.map((item, i) => (
+                                  <li key={i}>
+                                    Size {item.size}: {item.quantity} pcs
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                          {variant.images && variant.images.length > 0 && (
+                            <Carousel
+                              showThumbs={false}
+                              showStatus={false}
+                              infiniteLoop
+                              className="mt-2"
+                            >
+                              {variant.images.map((photo, idx) => (
+                                <div key={idx} className="w-full h-64 relative">
+                                  <Image
+                                    src={photo}
+                                    alt={`Variant Image ${idx + 1}`}
+                                    fill
+                                    className="object-contain"
+                                  />
+                                </div>
+                              ))}
+                            </Carousel>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
+              <LinkButton
+                text="Edit"
+                className="bg-black hover:bg-gray-800 text-xl cursor-pointer text-white transition-colors"
+                showArrow={false}
+                onClick={() =>
+                  router.push(`/Admin/Products/Edit/${product.id}`)
+                }
+              />
             </li>
           ))}
         </ul>

@@ -103,7 +103,7 @@ export default function Footer() {
             </h3>
             <p className="text-sm">
               <a href="tel:+380441234567" className="hover:underline">
-                +38 (044) 123-45-67
+                +38 (050) 710-41-06
               </a>
             </p>
             <p className="text-sm">
@@ -113,7 +113,7 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 className="hover:underline"
               >
-                Kyiv, Khreshchatyk Street, 1
+                Kharkiv, Bryhady Khartiia Street, 47
               </a>
             </p>
           </div>

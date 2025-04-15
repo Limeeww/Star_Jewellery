@@ -21,10 +21,8 @@ export default async function handler(
         variants: data.variants || [],
         createdAt: data.createdAt,
         updatedAt: data.updatedAt,
-        price: data.price,
         isHidden: data.isHidden,
         additionalDescription: data.additionalDescription,
-        quantitySize: data.quantitySize || [],
       } as Product;
     });
 

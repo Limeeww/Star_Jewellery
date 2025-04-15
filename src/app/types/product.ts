@@ -20,7 +20,7 @@ export interface ProductVariant {
   materialColor: string;
   insert: string;
   insertColor: string;
-  quantity: number;
+  quantitySize: QuantitySize[];
   images?: string[];
 }
 
@@ -38,8 +38,6 @@ export interface Product {
   variants: ProductVariant[];
   createdAt: Timestamp;
   updatedAt: Timestamp;
-  price: number;
-  isHidden: boolean; 
-  additionalDescription: string; 
-  quantitySize: QuantitySize[];
+  isHidden: boolean;
+  additionalDescription: string;
 }
