@@ -36,7 +36,7 @@ export default function SignUpPage() {
   const router = useRouter();
 
   const [user, loading, error] = useAuthState(auth);
-  
+
   const [createUserWithEmailAndPassword, userEmail, loadingEmail, errorEmail] =
     useCreateUserWithEmailAndPassword(auth);
 
@@ -103,6 +103,7 @@ export default function SignUpPage() {
           addresses: userData.addresses || [],
           bonuses: userData.bonuses || "0",
           cartItems: userData.cartItems || [],
+          role: "user",
         };
         await setDoc(doc(db, "users", userCredential.user.uid), finalUserData);
         router.push("/Account/Overview");

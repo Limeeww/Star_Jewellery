@@ -50,4 +50,11 @@ export interface UserData {
   lastAnniversaryChange?: Timestamp;
   lastRelationshipStatusChange?: Timestamp;
   cartItems?: CartItem[];
+  role: "admin" | "user";
 }
+
+export type UserItem = {
+  uid: string;
+  email: string | null;
+  role: "admin" | "user" | null;
+};
