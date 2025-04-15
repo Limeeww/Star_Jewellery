@@ -174,7 +174,7 @@ export default function ProductImageSlider({
               <AiOutlineClose size={24} className="text-white" />
             </button>
             <motion.div
-              className="relative w-[90vw] max-w-[1000px] overflow-hidden"
+              className="relative w-[90vw] max-w-[800px] overflow-hidden"
               style={{ paddingTop: "100%" }} 
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}

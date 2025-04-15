@@ -1,4 +1,3 @@
-// utils/fetchProducts.ts
 
 import { collection, getDocs, query, limit } from "firebase/firestore";
 import { db } from "../../firebase/firebaseConfig";

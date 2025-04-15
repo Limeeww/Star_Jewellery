@@ -1,4 +1,3 @@
-// useProductDetails.ts
 import { useEffect, useState, useCallback } from "react";
 import {
   collection,

@@ -67,6 +67,7 @@ export default function ProductPage() {
     },
   });
 
+  // Callback, вызываемый, если найден вариант по variantID. Устанавливаем значения по умолчанию для формы.
   const onVariantFound = (variant: ProductVariant) => {
     setSelectedInsert(variant.insert);
     setSelectedMaterialColor(variant.materialColor);
@@ -74,27 +75,32 @@ export default function ProductPage() {
     setValue("materialColor", variant.materialColor);
   };
 
+  // Используем хук для получения данных продукта, коллекции и скидок.
   const { product, collectionData, activeDiscount, loading } =
     useProductDetails(slug, variantID ?? null, onVariantFound);
 
   const [sideModalOpen, setSideModalOpen] = useState(false);
   const cartItems = useCartItems(user ? user.uid : null);
-
   useRequireAuth(user, loadingAuth);
   const { notify, notification, clearNotification } = useNotification();
 
-  const discountedPrice = product
-    ? calculateDiscountedPrice(product, activeDiscount)
+  const displayedVariant = product ? product.variants[0] : undefined;
+  const discountedPrice = displayedVariant
+    ? calculateDiscountedPrice(displayedVariant, activeDiscount)
     : null;
 
   const onSubmit = async (data: FormValues) => {
     if (!user || !product) return;
-    const finalPrice = discountedPrice ?? product.price;
+
+    // Находим вариант для добавления в корзину по выбранным inserts и materialColor.
     const variantForCart =
       product.variants.find(
         (v) =>
           v.insert === data.inserts && v.materialColor === data.materialColor
       ) || product.variants[0];
+
+    const finalPrice = discountedPrice ?? variantForCart.price;
+
     const cartItem = {
       productId: product.id,
       name: product.name,
@@ -105,6 +111,7 @@ export default function ProductPage() {
       insert: data.inserts,
       materialColor: data.materialColor,
     };
+
     try {
       await addOrIncrementCartItem(user.uid, cartItem);
       setSideModalOpen(true);
@@ -119,18 +126,30 @@ export default function ProductPage() {
 
   if (loading || !product) return <Loading />;
 
-  const sizeOptions = (product.variants || []).map((item) => ({
-    value: item.size.toString(),
-    label: `Size ${item.size} (${item.quantity} available)`,
+  const allQuantitySizes = product.variants.flatMap(
+    (variant) => variant.quantitySize
+  );
+  const uniqueSizeMap = new Map<number, { size: number; quantity: number }>();
+  allQuantitySizes.forEach((qs) => {
+    if (!uniqueSizeMap.has(qs.size)) {
+      uniqueSizeMap.set(qs.size, qs);
+    }
+  });
+  const sizeOptions = Array.from(uniqueSizeMap.values()).map((qs) => ({
+    value: qs.size.toString(),
+    label: `Size ${qs.size} (${qs.quantity} available)`,
   }));
-  const uniqueInserts = [...new Set(product.variants.map((v) => v.insert))];
+
+  const uniqueInserts = Array.from(
+    new Set(product.variants.map((v) => v.insert))
+  );
   const insertOptions = uniqueInserts.map((insert) => ({
     value: insert,
     label: insert,
   }));
-  const uniqueMaterialColors = [
-    ...new Set(product.variants.map((v) => v.materialColor)),
-  ];
+  const uniqueMaterialColors = Array.from(
+    new Set(product.variants.map((v) => v.materialColor))
+  );
   const materialColorOptions = uniqueMaterialColors.map((color) => ({
     value: color,
     label: color,
@@ -184,7 +203,7 @@ export default function ProductPage() {
             {discountedPrice ? (
               <div className="mb-6">
                 <p className="text-xl text-gray-500 line-through">
-                  {formatPrice(product.price)} ₴
+                  {formatPrice(displayedVariant?.price || 0)} ₴
                 </p>
                 <p className="text-2xl font-bold text-red-600">
                   {formatPrice(discountedPrice)} ₴
@@ -195,7 +214,7 @@ export default function ProductPage() {
               </div>
             ) : (
               <p className="text-2xl font-bold text-gray-800 mb-6">
-                {formatPrice(product.price)} ₴
+                {formatPrice(displayedVariant?.price || 0)} ₴
               </p>
             )}
 
