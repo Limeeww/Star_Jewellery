@@ -42,7 +42,7 @@ export default function AdminProductsPage() {
     }
   };
 
-  const formatTimestamp = (timestamp: { toDate?: () => Date; _seconds?: number } | null | undefined) => {
+  const formatTimestamp = (timestamp: { toDate?: () => Date; _seconds?: number } | null | undefinedd) => {
     if (!timestamp) return "N/A";
 
     if (typeof timestamp.toDate === "function") {
