@@ -55,7 +55,7 @@ export default function AdminRolesPage() {
 
       if (!res.ok) throw new Error(result.error || "Ошибка изменения роли");
 
-      await fetchUsers(); // обновим список после изменения
+      await fetchUsers();
     } catch (err) {
       const error = err instanceof Error ? err : new Error("Unknown error");
       console.error("Set role error:", error);
@@ -77,49 +77,51 @@ export default function AdminRolesPage() {
           MANAGING ROLES
         </h3>
         <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {users.map((user) => (
-            <li
-              key={user.uid}
-              className="flex flex-col justify-between border p-4 sm:p-5 rounded-xl bg-white shadow-sm transition hover:shadow-md"
-            >
-              <div className="mb-4 space-y-2 text-sm text-gray-800">
-                <p>
-                  <span className="font-semibold">Email:</span> {user.email}
-                </p>
-                <p>
-                  <span className="font-semibold">Role:</span>{" "}
-                  <span
-                    className={`${
-                      user.role === "admin"
-                        ? "text-green-600 font-semibold"
-                        : "text-gray-600 font-semibold"
-                    } font-medium`}
-                  >
-                    {user.role || "not assigned"}
-                  </span>
-                </p>
-              </div>
+          {users
+            .filter((u) => u.uid !== user?.uid)
+            .map((user) => (
+              <li
+                key={user.uid}
+                className="flex flex-col justify-between border p-4 sm:p-5 rounded-xl bg-white shadow-sm transition hover:shadow-md"
+              >
+                <div className="mb-4 space-y-2 text-sm text-gray-800">
+                  <p>
+                    <span className="font-semibold">Email:</span> {user.email}
+                  </p>
+                  <p>
+                    <span className="font-semibold">Role:</span>{" "}
+                    <span
+                      className={`${
+                        user.role === "admin"
+                          ? "text-green-600 font-semibold"
+                          : "text-gray-600 font-semibold"
+                      } font-medium`}
+                    >
+                      {user.role || "not assigned"}
+                    </span>
+                  </p>
+                </div>
 
-              <div className="flex gap-2 flex-wrap mt-auto">
-                {user.role !== "admin" && (
-                  <ActionButton
-                    text="Make Admin"
-                    disabled={updatingUid === user.uid}
-                    className="px-4 py-2 bg-green-600 text-white hover:bg-green-700 text-sm"
-                    onClick={() => changeRole(user.uid, "admin")}
-                  />
-                )}
-                {user.role !== "user" && (
-                  <ActionButton
-                    text="Make User"
-                    disabled={updatingUid === user.uid}
-                    className="px-4 py-2 bg-black text-white hover:bg-gray-800 text-sm"
-                    onClick={() => changeRole(user.uid, "user")}
-                  />
-                )}
-              </div>
-            </li>
-          ))}
+                <div className="flex gap-2 flex-wrap mt-auto">
+                  {user.role !== "admin" && (
+                    <ActionButton
+                      text="Make Admin"
+                      disabled={updatingUid === user.uid}
+                      className="px-4 py-2 bg-green-600 text-white hover:bg-green-700 text-sm"
+                      onClick={() => changeRole(user.uid, "admin")}
+                    />
+                  )}
+                  {user.role !== "user" && (
+                    <ActionButton
+                      text="Make User"
+                      disabled={updatingUid === user.uid}
+                      className="px-4 py-2 bg-black text-white hover:bg-gray-800 text-sm"
+                      onClick={() => changeRole(user.uid, "user")}
+                    />
+                  )}
+                </div>
+              </li>
+            ))}
         </ul>
       </AccountLayout>
     </>

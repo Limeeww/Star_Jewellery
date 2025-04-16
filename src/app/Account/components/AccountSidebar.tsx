@@ -7,8 +7,8 @@ interface NavLink {
 }
 
 interface AccountSidebarProps {
-  navLinks: NavLink[];
-  pathname: string;
+  navLinks?: NavLink[];
+  pathname: string | null;
 }
 
 const SIDE_LINKS = [

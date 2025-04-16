@@ -12,12 +12,19 @@ export interface Discount {
   priority?: number;
 }
 
+export interface Category {
+  id: number;
+  name: string;
+  //TO DO add fields
+}
+
 export interface ProductVariant {
   id: number;
   price: number;
   weight: number;
   material: string;
   materialColor: string;
+  purity?: string;
   insert: string;
   insertColor: string;
   quantitySize: QuantitySize[];
