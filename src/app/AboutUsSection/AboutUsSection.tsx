@@ -1,5 +1,5 @@
 import Image from "next/image";
-import LinkButtonForm from "../components/FormComponents/LinkButtonForm";
+import Link from "next/link";
 
 export default function AboutUsSection() {
   return (
@@ -39,11 +39,19 @@ export default function AboutUsSection() {
             heritage, innovation, and the brilliance of rare gemstones.
           </p>
 
-          <LinkButtonForm
-            href="/about-us"
-            label="LEARN MORE"
-            className="text-right md:text-left"
-          />
+          <Link href="/about-us" className="inline-block text-right md:text-left">
+            <p
+              className="
+                text-sm 
+                md:text-base 
+                text-gray-600 
+                hover:text-gray-800 
+                underline
+              "
+            >
+              LEARN MORE
+            </p>
+          </Link>
         </div>
 
         <div className="overflow-hidden">
