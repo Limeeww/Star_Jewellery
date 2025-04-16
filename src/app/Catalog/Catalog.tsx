@@ -1,21 +1,19 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Item from "../components/Item/Item";
-import EmblaCarousel from "../components/EmblaCarousel/EmblaCarousel";
 import { EmblaOptionsType } from "embla-carousel";
 import { Product } from "../types/product";
 import { fetchProducts } from "../utils/product";
+import EmblaCarousel from "../components/EmblaCarousel/EmblaCarousel";
 
 const OPTIONS: EmblaOptionsType = { dragFree: true };
-const SLIDE_COUNT = 10;
-const SLIDES = Array.from(Array(SLIDE_COUNT).keys());
 
 export default function CollectionPage() {
   const [items, setItems] = useState<Product[]>([]);
 
   useEffect(() => {
     async function loadProducts() {
-      const products = await fetchProducts(4);
+      const products = await fetchProducts(10);
       setItems(products);
     }
     loadProducts();
@@ -34,7 +32,7 @@ export default function CollectionPage() {
         CATALOG
       </h1>
 
-      <div className="text-center mb-6">
+      <div className="text-center mb-">
         <Link
           href="/all-collections"
           className="text-sm text-gray-600 hover:text-gray-800 underline"
@@ -43,12 +41,13 @@ export default function CollectionPage() {
         </Link>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <EmblaCarousel options={OPTIONS}>
         {items.map((product) => (
-          <Item key={product.id} product={product} />
+          <div key={product.id} className="flex-shrink-0 w-1/2 md:w-1/4 px-2">
+            <Item product={product} />
+          </div>
         ))}
-      </div>
-      <EmblaCarousel slides={SLIDES} options={OPTIONS} />
+      </EmblaCarousel>
     </div>
   );
 }

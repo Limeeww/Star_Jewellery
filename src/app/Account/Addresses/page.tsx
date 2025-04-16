@@ -18,7 +18,7 @@ import {
   updateUserProfile,
   notify,
 } from "../../utils/auth";
-import AddressCard from "../components/AddressCard"; 
+import AddressCard from "../components/AddressCard";
 import ConfirmDeleteModal from "../components/Modals/ConfirmDeleteModal";
 
 export default function Addresses() {
@@ -36,16 +36,19 @@ export default function Addresses() {
 
   useRequireAuth(user, loading);
 
-  const [profileData, setProfileData] = useProfileData(user);
+  const [profileData, setProfileData] = useProfileData(user ?? null);
 
   if (loading) {
     return <Loading />;
   }
 
   const handleEdit = (index: number) => {
-    if (!profileData || !profileData.addresses) return;
+    if (!profileData || !(profileData as { addresses: Address[] }).addresses)
+      return;
     setEditingIndex(index);
-    setAddressToEdit(profileData.addresses[index]);
+    setAddressToEdit(
+      (profileData as { addresses: Address[] }).addresses[index]
+    );
     setShowAddressModal(true);
   };
 
@@ -66,7 +69,7 @@ export default function Addresses() {
     }
 
     try {
-      const newAddresses = [...profileData.addresses];
+      const newAddresses = [...(profileData.addresses as Address[])];
       newAddresses.splice(removingIndex, 1);
 
       await updateUserProfile(user.uid, { addresses: newAddresses });
@@ -88,13 +91,21 @@ export default function Addresses() {
   return (
     <>
       <Navbar isScrolled={true} isLoggedIn={isLoggedIn} />
-      <AccountLayout pathname={pathname}>
+      <AccountLayout pathname={pathname ?? ""} sideLinks={[]}>
         <WelcomeBlock
-          firstName={profileData?.firstName}
-          lastName={profileData?.lastName}
+          firstName={
+            (profileData as { firstName?: string; lastName?: string })
+              ?.firstName
+          }
+          lastName={
+            (profileData as { firstName?: string; lastName?: string })?.lastName
+          }
         />
 
-        <div className="mt-6 space-y-4 text-sm text-gray-800" style={{ fontFamily: "var(--font-poppins)" }}>
+        <div
+          className="mt-6 space-y-4 text-sm text-gray-800"
+          style={{ fontFamily: "var(--font-poppins)" }}
+        >
           <h2
             className="text-2xl font-semibold"
             style={{ fontFamily: "var(--font-playfair)" }}
@@ -107,7 +118,9 @@ export default function Addresses() {
             address, and it will automatically appear during checkout.
           </p>
 
-          {!profileData?.addresses || profileData.addresses.length === 0 ? (
+          {(Array.isArray(profileData?.addresses)
+            ? profileData.addresses.length
+            : 0) === 0 ? (
             <div className="flex items-center justify-between mt-4 py-2">
               <p className="text-sm text-gray-800">
                 You haven&apos;t saved any addresses yet.
@@ -127,8 +140,15 @@ export default function Addresses() {
             <div className="mt-4">
               <div className="flex flex items-center justify-between mt-4 py-2">
                 <h3 className="text-sm font-medium mb-2">
-                  You have {profileData.addresses.length} saved{" "}
-                  {profileData.addresses.length > 1 ? "addresses" : "address"}
+                  You have{" "}
+                  {Array.isArray(profileData?.addresses)
+                    ? (profileData.addresses as Address[]).length
+                    : 0}{" "}
+                  saved{" "}
+                  {Array.isArray(profileData?.addresses) &&
+                  (profileData.addresses as Address[]).length > 1
+                    ? "addresses"
+                    : "address"}
                 </h3>
                 <div className="flex justify-end">
                   <LinkButton
@@ -144,12 +164,13 @@ export default function Addresses() {
                 </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {profileData.addresses.map((address, index) => (
+                {(profileData?.addresses as Address[]).map((address, index) => (
                   <AddressCard
                     key={index}
                     address={address}
                     onEdit={() => handleEdit(index)}
                     onRemove={handleRemove}
+                    index={index}
                   />
                 ))}
               </div>

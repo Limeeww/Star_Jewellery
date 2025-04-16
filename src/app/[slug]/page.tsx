@@ -2,7 +2,7 @@
 
 import { useParams, useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { set, useForm } from "react-hook-form";
 
 import { auth } from "../../firebase/firebaseConfig";
 
@@ -24,20 +24,13 @@ import MainFeaturesList from "./components/MainFeatureList";
 import SimilarProducts from "../components/SimilarProducts/SimilarProducts";
 import AboutCollection from "./components/AboutCollection";
 import ShareButton from "../components/ShareButton/ShareButton";
-import SideModal from "../components/SideModal/SideModal";
-import CartItemComponent from "../components/CartItem/CartItemComponent";
 import { useCartItems } from "../utils/cartUtils";
-import {
-  addOrIncrementCartItem,
-  decrementQuantity,
-  incrementQuantity,
-  removeItem,
-} from "../utils/cartActions";
-import LinkButtonForm from "../components/FormComponents/LinkButtonForm";
+import { addOrIncrementCartItem } from "../utils/cartActions";
 import { calculateDiscountedPrice } from "../utils/priceUtils";
 import ProductImageSlider from "./components/ProductImageBlock";
 import { useProductDetails } from "../utils/useProductDetails";
 import { formatPrice } from "../utils/priceUtils";
+import CartSideModal from "../components/SideModal/CartSideModal";
 
 interface FormValues {
   size: string;
@@ -51,6 +44,7 @@ export default function ProductPage() {
   const searchParams = useSearchParams();
   const variantID = searchParams?.get("variantID");
 
+  const [addedToCart, setAddedToCart] = useState(false);
   const [selectedInsert, setSelectedInsert] = useState("");
   const [selectedMaterialColor, setSelectedMaterialColor] = useState("");
 
@@ -67,7 +61,6 @@ export default function ProductPage() {
     },
   });
 
-  // Callback, вызываемый, если найден вариант по variantID. Устанавливаем значения по умолчанию для формы.
   const onVariantFound = (variant: ProductVariant) => {
     setSelectedInsert(variant.insert);
     setSelectedMaterialColor(variant.materialColor);
@@ -75,7 +68,6 @@ export default function ProductPage() {
     setValue("materialColor", variant.materialColor);
   };
 
-  // Используем хук для получения данных продукта, коллекции и скидок.
   const { product, collectionData, activeDiscount, loading } =
     useProductDetails(slug, variantID ?? null, onVariantFound);
 
@@ -92,7 +84,6 @@ export default function ProductPage() {
   const onSubmit = async (data: FormValues) => {
     if (!user || !product) return;
 
-    // Находим вариант для добавления в корзину по выбранным inserts и materialColor.
     const variantForCart =
       product.variants.find(
         (v) =>
@@ -115,6 +106,7 @@ export default function ProductPage() {
     try {
       await addOrIncrementCartItem(user.uid, cartItem);
       setSideModalOpen(true);
+      setAddedToCart(true);
     } catch (error) {
       notify({
         type: "error",
@@ -310,73 +302,13 @@ export default function ProductPage() {
 
       <Footer />
 
-      <SideModal isOpen={sideModalOpen} onClose={() => setSideModalOpen(false)}>
-        <div className="p-4 h-full flex flex-col max-h-screen overflow-y-auto">
-          <div className="flex-1">
-            <h2
-              className="text-2xl font-semibold mb-2"
-              style={{ fontFamily: "var(--font-playfair)" }}
-            >
-              Product successfully added to cart!
-            </h2>
-            <p className="mb-4">
-              You can continue shopping or view your cart items below.
-            </p>
-
-            {cartItems && cartItems.length > 0 ? (
-              cartItems.map((item) => (
-                <div
-                  key={`${item.productId}-${item.size}-${item.insert}-${item.materialColor}`}
-                  className="mb-4"
-                >
-                  <CartItemComponent
-                    item={item}
-                    onIncrement={() => {
-                      if (user?.uid) {
-                        incrementQuantity(
-                          user.uid,
-                          item.productId,
-                          item.size,
-                          item.insert,
-                          item.materialColor
-                        );
-                      }
-                    }}
-                    onDecrement={() => {
-                      if (user?.uid) {
-                        decrementQuantity(
-                          user.uid,
-                          item.productId,
-                          item.size,
-                          item.insert,
-                          item.materialColor
-                        );
-                      }
-                    }}
-                    onRemove={() => {
-                      if (user?.uid) {
-                        removeItem(
-                          user.uid,
-                          item.productId,
-                          item.size,
-                          item.insert,
-                          item.materialColor
-                        );
-                      }
-                    }}
-                  />
-                </div>
-              ))
-            ) : (
-              <p>Your cart is currently empty.</p>
-            )}
-          </div>
-
-          <div className="mt-auto">
-            <LinkButtonForm href="/cart" label="View Cart" showArrow />
-          </div>
-        </div>
-      </SideModal>
+      <CartSideModal
+        isOpen={sideModalOpen}
+        onClose={() => setSideModalOpen(false)}
+        cartItems={cartItems}
+        user={user ?? null}
+        added={addedToCart}
+      />
     </>
   );
 }

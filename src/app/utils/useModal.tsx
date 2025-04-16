@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+  import { useEffect, useRef } from "react";
 
 export function useModalClose(onClose: () => void) {
   const modalRef = useRef<HTMLDivElement>(null);

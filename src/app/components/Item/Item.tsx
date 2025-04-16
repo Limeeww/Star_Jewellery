@@ -63,7 +63,7 @@ export default function Item({ product }: ItemProps) {
           <p className="text-sm text-gray-500">{product.description}</p>
         </div>
 
-        {product.price && (
+        {product.variants[0].price && (
           <p
             className="
             text-base 
@@ -73,7 +73,7 @@ export default function Item({ product }: ItemProps) {
           "
             style={{ fontFamily: "var(--font-poppins)" }}
           >
-            ₴<span className="font-semibold">{product.price.toLocaleString()}</span>
+            ₴ <span className="font-semibold">{product.variants[0].price.toLocaleString()}</span>
           </p>
         )}
       </div>
