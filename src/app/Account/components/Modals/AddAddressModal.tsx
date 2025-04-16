@@ -98,11 +98,18 @@ export default function AddAddressModal({
 
       reset();
       onClose();
-    } catch (err: any) {
-      notify({
-        message: err.message || "Failed to save address.",
-        type: "error",
-      });
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        notify({
+          message: err.message,
+          type: "error",
+        });
+      } else {
+        notify({
+          message: "Failed to save address.",
+          type: "error",
+        });
+      }
     }
   };
 

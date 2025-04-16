@@ -1,18 +1,24 @@
+"use client";
+
 import Image from "next/image";
-import Item from "../components/Item/Item";
-import { Product } from "../types/product";
 import { useEffect, useState } from "react";
-import { fetchProducts } from "../utils/product";
+import CartCollection from "../components/CartCollection/CartCollection"
+import { Collection } from "../types/collection";
+import { fetchCollections } from "../utils/collection"; 
 
 export default function CollectionsSection() {
-  const [items, setItems] = useState<Product[]>([]);
+  const [collections, setCollections] = useState<Collection[]>([]);
 
   useEffect(() => {
-    async function loadProducts() {
-      const products = await fetchProducts(4);
-      setItems(products);
+    async function loadCollections() {
+      try {
+        const cols = await fetchCollections(4); 
+        setCollections(cols);
+      } catch (error) {
+        console.error("Error fetching collections:", error);
+      }
     }
-    loadProducts();
+    loadCollections();
   }, []);
 
   return (
@@ -23,28 +29,29 @@ export default function CollectionsSection() {
     >
       <h2
         className="text-2xl xl:text-3xl font-bold mb-8 text-gray-800 text-center"
-        style={{
-          fontFamily: "var(--font-playfair)",
-          letterSpacing: "0.05em",
-        }}
+        style={{ fontFamily: "var(--font-playfair)", letterSpacing: "0.05em" }}
       >
         COLLECTIONS
       </h2>
 
       <div className="grid grid-cols-1 2xl:grid-cols-2 gap-4">
         <div className="order-2 2xl:order-1 grid grid-cols-2 gap-2">
-          {items.map((product) => (
-            <Item key={product.id} product={product} />
-          ))}
+          {collections.length > 0 ? (
+            collections.map((collection) => (
+              <CartCollection key={collection.id} collection={collection} />
+            ))
+          ) : (
+            <p className="col-span-full text-center text-gray-500">No collections available.</p>
+          )}
         </div>
 
         <div className="overflow-hidden order-1 2xl:order-2">
           <Image
-            src="/images/collection/model.jpg"
+            src="/images/collections/model.jpg"
             alt="Model wearing jewelry"
             width={600}
             height={800}
-            className="w-full h-[50vh] md:h-[65vh] 2xl:h-[105vh] object-cover"
+            className="w-full h-[50vh] md:h-[80vh] 2xl:h-[108vh] object-cover"
           />
         </div>
       </div>
