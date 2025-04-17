@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useUserRole } from "../../../hooks/useUserRole";
 
 interface NavLink {
   label: string;
@@ -6,8 +7,8 @@ interface NavLink {
 }
 
 interface AccountSidebarProps {
-  navLinks: NavLink[];
-  pathname: string;
+  navLinks?: NavLink[];
+  pathname: string | null;
 }
 
 const SIDE_LINKS = [
@@ -19,13 +20,32 @@ const SIDE_LINKS = [
   { label: "My Bonuses", href: "/Account/Bonuses" },
 ];
 
+const ADMIN_LINKS = [
+  { label: "Overview", href: "/Account/Overview" },
+  { label: "My Profile", href: "/Account/Profile" },
+  { label: "My Orders", href: "/Account/Orders" },
+  { label: "My Addresses", href: "/Account/Addresses" },
+  { label: "My Wish List", href: "/Account/Wishlist" },
+  { label: "My Bonuses", href: "/Account/Bonuses" },
+  { label: "Manage User Roles", href: "/Admin/Roles" },
+  { label: "Manage Products", href: "/Admin/Products" },
+];
+
+const getLinks = (role?: string | null): NavLink[] => {
+  if (role === "admin") return ADMIN_LINKS;
+  return SIDE_LINKS;
+};
+
 export default function AccountSidebar({
-  navLinks=SIDE_LINKS,
+  navLinks,
   pathname,
 }: AccountSidebarProps) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { user, role, loading } = useUserRole();
+  const linksToRender = navLinks || getLinks(role);
   return (
     <nav className="space-y-4 text-sm text-gray-700 flex flex-col">
-      {navLinks.map((link) => {
+      {linksToRender.map((link) => {
         const isActive = pathname === link.href;
         return (
           <Link

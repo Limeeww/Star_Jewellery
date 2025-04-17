@@ -10,8 +10,7 @@ import Link from "next/link";
 import Navbar from "@/app/components/Navbar/Navbar";
 import Footer from "@/app/components/Footer/Footer";
 import CartItemComponent from "@/app/components/CartItem/CartItemComponent";
-import GiftOptions from "@/app/components/GiftOptions/GiftOptions";
-import OrderSummary from "@/app/components/OrderSummary/OrderSummary";
+import OrderSummary from "@/app/cart/components/OrderSummary";
 import RecentlyViewed from "@/app/components/RecentlyViewed/RecentlyViewed";
 
 import { CartItem } from "@/app/types/cartItem";
@@ -23,32 +22,17 @@ import {
   getShippingCost,
   getGiftOptionsTotal,
   getTotal,
+  useCartItems,
 } from "@/app/utils/cartUtils";
+import GiftOptions from "./components/GiftOptions";
 
 export default function CartPage() {
   const [user, loading] = useAuthState(auth);
   const isLoggedIn = !!user && !loading;
 
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [recentlyViewed, setRecentlyViewed] = useState<Product[]>([]);
 
-
-  useEffect(() => {
-    if (!user) return;
-
-    const userDocRef = doc(db, "users", user.uid);
-    const unsubscribe = onSnapshot(userDocRef, (snapshot) => {
-      if (!snapshot.exists()) {
-        setCartItems([]);
-        return;
-      }
-      const data = snapshot.data();
-      setCartItems(data.cartItems || []);
-    });
-
-    return () => unsubscribe();
-  }, [user]);
-
+  const cartItems = useCartItems(user ? user.uid : null);
 
   useEffect(() => {
     try {
@@ -61,7 +45,6 @@ export default function CartPage() {
       console.error("Ошибка чтения localStorage:", error);
     }
   }, []);
-
 
   const incrementQuantity = async (productId: number) => {
     if (!user) return;

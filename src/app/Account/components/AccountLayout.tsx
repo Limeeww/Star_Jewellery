@@ -6,8 +6,8 @@ import { FiChevronUp, FiChevronDown } from "react-icons/fi";
 
 interface AccountLayoutProps {
   children: React.ReactNode;
-  sideLinks: { label: string; href: string }[];
-  pathname: string;
+  sideLinks?: { label: string; href: string }[];
+  pathname: string | null;
 }
 
 export default function AccountLayout({

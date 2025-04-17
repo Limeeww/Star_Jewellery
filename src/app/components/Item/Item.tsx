@@ -10,12 +10,13 @@ type ItemProps = {
 };
 
 export default function Item({ product }: ItemProps) {
-  
   return (
     <Link
       key={product.id}
       href={
-        product.slug ? `/${product.slug}/?variantID=${product.variants[0].id}` : "#" // TODO: get konkret id from product that 
+        product.slug
+          ? `/${product.slug}/?variantID=${product.variants[0].id}`
+          : "#" // TODO: get exact id from product that
       }
       className="
       border 
@@ -32,7 +33,7 @@ export default function Item({ product }: ItemProps) {
     >
       <div className="overflow-hidden">
         <Image
-          src={product.imageUrl}
+          src={product.variants[0].images[0]}
           alt={product.name}
           width={300}
           height={300}
@@ -62,17 +63,17 @@ export default function Item({ product }: ItemProps) {
           <p className="text-sm text-gray-500">{product.description}</p>
         </div>
 
-        {product.price && (
+        {product.variants[0].price && (
           <p
             className="
             text-base 
             md:text-lg 
-            font-semibold 
+            
             mt-1
           "
             style={{ fontFamily: "var(--font-poppins)" }}
           >
-            €{product.price.toLocaleString()}
+            ₴ <span className="font-semibold">{product.variants[0].price.toLocaleString()}</span>
           </p>
         )}
       </div>

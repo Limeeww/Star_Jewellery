@@ -109,7 +109,7 @@ export default function HomePage() {
             />
           </div>
 
-          <div className="flex flex-col justify-center items-center lg:p-12 order-2 xl:order-2">
+          <div className="flex flex-col justify-center items-center lg:p-10 order-2 xl:order-2">
             <div className="text-center max-w-lg">
               <h2 className="font-serif text-2xl md:text-3xl tracking-widest text-gray-800 mb-4">
                 LUXURY JEWELRY COLLECTION

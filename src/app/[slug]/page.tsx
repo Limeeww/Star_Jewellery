@@ -1,20 +1,22 @@
 "use client";
 
-import { useParams, useSearchParams } from "next/navigation";
-import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import {
+  useParams,
+  useSearchParams,
+  useRouter,
+  usePathname,
+} from "next/navigation";
 import { useForm } from "react-hook-form";
-
-import { auth, db } from "../../firebase/firebaseConfig";
 import {
   collection,
   query,
   where,
   getDocs,
-  updateDoc,
-  arrayUnion,
   doc,
+  getDoc,
 } from "firebase/firestore";
+import { auth, db } from "../../firebase/firebaseConfig";
 import { useAuthState } from "react-firebase-hooks/auth";
 
 import Navbar from "../components/Navbar/Navbar";
@@ -23,157 +25,282 @@ import Footer from "../components/Footer/Footer";
 import Notification from "../components/MessageHandling/Notification";
 import SelectField from "../components/FormComponents/SelectField";
 import SubmitButton from "../components/FormComponents/SubmitButton";
+import MainFeaturesList from "./components/MainFeatureList";
+import AboutCollection from "./components/AboutCollection";
+import SimilarProducts from "../components/SimilarProducts/SimilarProducts";
+import ProductImageSlider from "./components/ProductImageBlock";
+import ShareButton from "../components/ShareButton/ShareButton";
+import SideModal from "../components/SideModal/SideModal";
+import CartItemComponent from "../components/CartItem/CartItemComponent";
+import LinkButtonForm from "../components/FormComponents/LinkButtonForm";
 
-import { Product } from "../types/product";
+import { AiOutlineShoppingCart } from "react-icons/ai";
+
+import {
+  addOrIncrementCartItem,
+  decrementQuantity,
+  incrementQuantity,
+  removeItem,
+} from "../utils/cartActions";
+import { useCartItems } from "../utils/cartUtils";
 import { useRequireAuth } from "../utils/auth";
 import { useNotification } from "../utils/useNotification";
+import { calculateDiscountedPrice, formatPrice } from "../utils/priceUtils";
+
+import { Collection } from "../types/collection";
+import { Discount, Product, ProductVariant } from "../types/product";
+import InfoBlocks from "./components/InfoItem";
+
+interface FormValues {
+  size: string;
+  inserts: string;
+  materialColor: string;
+}
+
+const norm = (s: string) => s.trim().toLowerCase();
 
 export default function ProductPage() {
-  const [user, loading] = useAuthState(auth);
-  const { slug } = useParams();
+  const [user, loadingAuth] = useAuthState(auth);
+  const { slug } = useParams() as { slug: string };
   const searchParams = useSearchParams();
-  const variantID = searchParams.get("variantID");
+  const router = useRouter();
+  const pathname = usePathname();
+  const variantID = searchParams?.get("variantID");
+
   const [product, setProduct] = useState<Product | null>(null);
-  const isLoggedIn = !loading && !!user;
+  const [collectionData, setCollectionData] = useState<Collection[]>([]);
+  const [activeDiscount, setActiveDiscount] = useState<Discount | null>(null);
+
+  const [selectedInsert, setSelectedInsert] = useState("");
+  const [selectedMaterialColor, setSelectedMaterialColor] = useState("");
+
+  const [sideModalOpen, setSideModalOpen] = useState(false);
+
+  const { notify, notification, clearNotification } = useNotification();
 
   const {
     register,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors },
-  } = useForm();
+  } = useForm<FormValues>({
+    defaultValues: { size: "", inserts: "", materialColor: "" },
+  });
 
-  const sizeOptions = (product?.quantitySize || []).map((item) => ({
-    value: item.size.toString(),
-    label: `Size ${item.size} (${item.quantity} available)`,
-  }));
+  const watchInsert = watch("inserts");
+  const watchColor = watch("materialColor");
 
-  const insertOptions = (product?.variants || []).map((variant) => ({
-    value: `${variant.insert}-${variant.insertColor}`,
-    label: `${variant.insert} (${variant.insertColor})`,
-  }));
-
-  const specOptions = (product?.variants || []).map((obj) => ({
-    value: obj.materialColor,
-    label: obj.materialColor,
-  }));
-
-  useRequireAuth(user, loading);
-  const { notify, notification={type: 'success', message: 'Product added to cart!', duration: 3000}, clearNotification } = useNotification();
-
-
-  const something = {type: 'success', message: 'Product added to cart!', duration: 3000};
   useEffect(() => {
     if (!slug) return;
 
-    async function fetchProduct() {
+    (async () => {
       try {
-        const productsRef = collection(db, "products");
-        const q = query(productsRef, where("slug", "==", slug));
-        const querySnap = await getDocs(q);
-
-        if (!querySnap.empty) {
-          const docSnap = querySnap.docs[0];
-          const fetchedProduct = docSnap.data() as Product;
-
-          if (variantID && fetchedProduct.variants) {
-            fetchedProduct.variants = fetchedProduct.variants.map((v) => ({
-              ...v,
-              id: Number(variantID),
-            }));
-          }
-          setProduct(fetchedProduct);
-        } else {
+        const productSnap = await getDocs(
+          query(collection(db, "products"), where("slug", "==", slug))
+        );
+        if (productSnap.empty) {
           notify({
             type: "warning",
-            message: `No product found for slug: ${slug}`,
+            message: `Product with slug ${slug} not found`,
           });
+          return;
         }
-      } catch (error) {
-        notify({
-          type: "error",
-          message: `Error fetching product: ${String(error)}`,
-        });
+        const fetchedProduct = productSnap.docs[0].data() as Product;
+        setProduct(fetchedProduct);
+
+        /* pick variant from URL (if any) */
+        let initialVariant: ProductVariant | null = null;
+        if (variantID) {
+          initialVariant =
+            fetchedProduct.variants.find((v) => v.id === Number(variantID)) ||
+            null;
+        }
+        if (!initialVariant) initialVariant = fetchedProduct.variants[0];
+
+        setSelectedInsert(initialVariant.insert);
+        setSelectedMaterialColor(initialVariant.materialColor);
+        setValue("inserts", initialVariant.insert);
+        setValue("materialColor", initialVariant.materialColor);
+
+        /* collection */
+        if (fetchedProduct.categoryId) {
+          const colSnap = await getDoc(
+            doc(db, "collections", fetchedProduct.categoryId.toString())
+          );
+          if (colSnap.exists()) {
+            const d = colSnap.data();
+            setCollectionData([
+              {
+                id: Number(colSnap.id),
+                name: d.name || "",
+                description: d.description || "",
+                images: d.images || [],
+                parentCategory: Number(d.parentCategory) || 0,
+                isActive: d.isActive ?? true,
+                createdAt: d.createdAt,
+              },
+            ]);
+          }
+        }
+
+        /* discounts */
+        const discSnap = await getDocs(
+          query(
+            collection(db, "discounts"),
+            where("applicableTo", "array-contains", fetchedProduct.id)
+          )
+        );
+        if (!discSnap.empty) {
+          const now = new Date();
+          const valid = discSnap.docs
+            .map((d) => ({ ...d.data(), id: Number(d.id) } as Discount))
+            .filter((dis) => {
+              const from = dis.validFrom.toDate();
+              const to = dis.validUntil.toDate();
+              return now >= from && now <= to;
+            })
+            .sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0));
+          setActiveDiscount(valid[0] ?? null);
+        } else setActiveDiscount(null);
+      } catch (e) {
+        notify({ type: "error", message: `${e}` });
       }
-    }
+    })();
+  }, [slug, variantID, notify, setValue]);
 
-    fetchProduct();
-  }, [slug, variantID, notify]);
+  const displayedVariant: ProductVariant | undefined = useMemo(() => {
+    if (!product) return undefined;
+    return (
+      product.variants.find(
+        (v) =>
+          norm(v.insert) === norm(selectedInsert) &&
+          norm(v.materialColor) === norm(selectedMaterialColor)
+      ) || product.variants[0]
+    );
+  }, [product, selectedInsert, selectedMaterialColor]);
 
-  if (!product) return <Loading />;
+  const discountedPrice = useMemo(() => {
+    if (!displayedVariant) return null;
+    return calculateDiscountedPrice(displayedVariant, activeDiscount);
+  }, [displayedVariant, activeDiscount]);
 
-  const onSubmit = async (data: any) => {
-    if (!user) return;
+  useEffect(() => {
+    if (!product) return;
+    if (!watchInsert || !watchColor) return;
+
+    const matched = product.variants.find(
+      (v) =>
+        norm(v.insert) === norm(watchInsert) &&
+        norm(v.materialColor) === norm(watchColor)
+    );
+    if (!matched) return;
+
+    if (matched.id === Number(variantID)) return;
+
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("variantID", matched.id.toString());
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  }, [
+    watchInsert,
+    watchColor,
+    product,
+    variantID,
+    router,
+    pathname,
+    searchParams,
+  ]);
+
+  useRequireAuth(user, loadingAuth);
+  const cartItems = useCartItems(user ? user.uid : null);
+
+  const onSubmit = async (data: FormValues) => {
+    if (!user || !product || !displayedVariant) return;
+
     const cartItem = {
       productId: product.id,
       name: product.name,
-      imageUrl: product.imageUrl,
-      price: product.price,
+      imageUrl: displayedVariant.images?.[0] || "",
+      price: discountedPrice ?? displayedVariant.price,
       quantity: 1,
       size: Number(data.size),
-      insert: data.inserts,
-      materialColor: data.materialColor,
+      insert: displayedVariant.insert,
+      materialColor: displayedVariant.materialColor,
     };
 
     try {
-      const userRef = doc(db, "users", user.uid);
-      await updateDoc(userRef, {
-        cartItems: arrayUnion(cartItem),
-      });
-      notify({ type: "success", message: "Product added to cart!", duration: 3000 });
-    } catch (error) {
-      notify({
-        type: "error",
-        message: `Error adding product to cart: ${String(error)}`,
-        duration: 3000 
-      });
+      await addOrIncrementCartItem(user.uid, cartItem);
+      setSideModalOpen(true);
+    } catch (e) {
+      notify({ type: "error", message: `Error adding to cart: ${e}` });
     }
   };
 
-  console.log(notification);
+  if (!product || !displayedVariant) return <Loading />;
+
+  const allQuantitySizes = product.variants.flatMap(
+    (variant) => variant.quantitySize
+  );
+  const uniqueSizeMap = new Map<number, { size: number; quantity: number }>();
+  allQuantitySizes.forEach((qs) => {
+    if (!uniqueSizeMap.has(qs.size)) {
+      uniqueSizeMap.set(qs.size, qs);
+    }
+  });
+  const sizeOptions = Array.from(uniqueSizeMap.values()).map((qs) => ({
+    value: qs.size.toString(),
+    label: `Size ${qs.size} (${qs.quantity} available)`,
+  }));
+  const insertOptions = Array.from(
+    new Set(product.variants.map((v) => v.insert))
+  ).map((i) => ({ value: i, label: i }));
+  const materialColorOptions = Array.from(
+    new Set(product.variants.map((v) => v.materialColor.trim()))
+  ).map((c) => ({ value: c, label: c }));
 
   return (
     <>
-      <Navbar isScrolled={true} isLoggedIn={isLoggedIn} />
+      <Navbar isScrolled isLoggedIn={!!user} />
 
-      <section
-        className="px-4 py-16 sm:px-6 lg:px-8"
-        style={{ fontFamily: "var(--font-poppins)" }}
-        id="product-page"
-      >
+      <section className="px-4 py-16 sm:px-6 lg:px-8" id="product-page">
         {notification && (
-          <Notification
-            message={notification.message}
-            type={notification.type}
-            duration={notification.duration}
-            onClose={clearNotification}
-          />
+          <Notification {...notification} onClose={clearNotification} />
         )}
-       
-        <div className="grid grid-cols-1 2xl:grid-cols-2 gap-8 items-center">
-          <div className="overflow-hidden shadow-lg mt-6">
-            <Image
-              src={product.imageUrl}
-              alt={product.name}
-              width={600}
-              height={600}
-              className="w-full h-[90vh] object-cover"
-            />
-          </div>
 
-          <div>
+        <div className="grid grid-cols-1 2xl:grid-cols-2 gap-8 items-start">
+          <ProductImageSlider
+            key={`${displayedVariant.insert}-${displayedVariant.materialColor}`}
+            images={displayedVariant.images || []}
+            altText={`${displayedVariant.insert} - ${displayedVariant.materialColor}`}
+          />
+
+          <div className="mt-6">
             <h1
-              className="text-3xl md:text-4xl font-bold text-gray-800 mb-4"
+              className="text-3xl md:text-4xl font-bold mb-4"
               style={{ fontFamily: "var(--font-playfair)" }}
             >
               {product.name}
             </h1>
-            <p className="text-base md:text-lg text-gray-600 leading-relaxed mb-6">
+
+            <p className="text-base md:text-lg text-gray-600 mb-6">
               {product.description}
             </p>
 
-            {product.additionalDescription && (
-              <p className="text-sm md:text-base text-gray-700 leading-relaxed mb-6">
-                {product.additionalDescription}
+            {discountedPrice ? (
+              <div className="mb-6">
+                <p className="text-xl text-gray-500 line-through">
+                  {formatPrice(displayedVariant.price)} ₴
+                </p>
+                <p className="text-2xl font-bold text-red-600">
+                  {formatPrice(discountedPrice)} ₴
+                </p>
+                <p className="text-sm text-red-500 mt-1">
+                  {activeDiscount?.name || "Discount"}
+                </p>
+              </div>
+            ) : (
+              <p className="text-2xl font-bold mb-6">
+                {formatPrice(displayedVariant.price)} ₴
               </p>
             )}
 
@@ -190,11 +317,9 @@ export default function ProductPage() {
                 />
 
                 <SelectField
-                  label="Inserts, Carat"
+                  label="Inserts"
                   id="inserts"
-                  register={register("inserts", {
-                    required: "Insert is required",
-                  })}
+                  register={register("inserts", { required: true })}
                   error={errors.inserts}
                   options={insertOptions}
                   placeholder="Select insert"
@@ -202,32 +327,112 @@ export default function ProductPage() {
                 />
               </div>
 
-              <p className="text-2xl font-bold text-gray-800 mb-6">
-                {product.price ?? "unknown"} ₴
-              </p>
-
               <SelectField
                 label="Material Color"
                 id="materialColor"
-                register={register("materialColor", {
-                  required: "Material color is required",
-                })}
+                register={register("materialColor", { required: true })}
                 error={errors.materialColor}
-                options={specOptions}
+                options={materialColorOptions}
                 placeholder="Select Material Color"
                 className="w-full mb-6"
               />
 
               <SubmitButton
-                label="Record for a personal order"
+                label={
+                  <>
+                    <AiOutlineShoppingCart className="inline mr-2 text-lg" />
+                    Add to basket
+                  </>
+                }
                 isLoading={false}
                 className="w-full"
               />
             </form>
+
+            <div className="mt-8">
+              <MainFeaturesList product={product} />
+            </div>
+
+            <div className="mt-6">
+              <InfoBlocks />
+              <div className="mt-4 items-end flex">
+                <ShareButton
+                  title="Share this product"
+                  text="Check out this amazing product!"
+                  url={
+                    typeof window !== "undefined" ? window.location.href : ""
+                  }
+                />
+              </div>
+            </div>
           </div>
         </div>
+
+        <div className="mt-12">
+          <AboutCollection
+            firebaseProduct={product}
+            collection={collectionData[0]}
+          />
+        </div>
+
+        <div className="mt-2">
+          <SimilarProducts />
+        </div>
       </section>
+
       <Footer />
+
+      <SideModal isOpen={sideModalOpen} onClose={() => setSideModalOpen(false)}>
+        <div className="p-4 h-full flex flex-col max-h-screen overflow-y-auto">
+          <h2 className="text-2xl font-semibold mb-2">
+            Product successfully added to cart!
+          </h2>
+          {cartItems?.length ? (
+            cartItems.map((it) => (
+              <CartItemComponent
+                key={`${it.productId}-${it.size}-${it.insert}-${it.materialColor}`}
+                item={it}
+                onIncrement={() =>
+                  user &&
+                  incrementQuantity(
+                    user.uid,
+                    it.productId,
+                    it.size,
+                    it.insert,
+                    it.materialColor
+                  )
+                }
+                onDecrement={() =>
+                  user &&
+                  decrementQuantity(
+                    user.uid,
+                    it.productId,
+                    it.size,
+                    it.insert,
+                    it.materialColor
+                  )
+                }
+                onRemove={() =>
+                  user &&
+                  removeItem(
+                    user.uid,
+                    it.productId,
+                    it.size,
+                    it.insert,
+                    it.materialColor
+                  )
+                }
+              />
+            ))
+          ) : (
+            <p>Your cart is empty.</p>
+          )}
+
+          <div className="mt-auto">
+            <LinkButtonForm href="/cart" label="View cart" showArrow />
+          </div>
+        </div>
+      </SideModal>
     </>
   );
 }

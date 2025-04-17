@@ -1,7 +1,7 @@
 import React from "react";
 import { UseFormRegister } from "react-hook-form";
 import { GiftOptionsForm } from "../../types/order";
-import CheckboxField from "../FormComponents/CheckboxField";
+import CheckboxField from "../../components/FormComponents/CheckboxField";
 
 interface GiftOptionsProps {
   register: UseFormRegister<GiftOptionsForm>;
