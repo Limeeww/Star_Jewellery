@@ -259,7 +259,7 @@ export default function ProductPage() {
   ).map((c) => ({ value: c, label: c }));
 
   return (
-    <>
+    <div  style={{ fontFamily: "var(--font-poppins)" }}>
       <Navbar isScrolled isLoggedIn={!!user} />
 
       <section className="px-4 py-16 sm:px-6 lg:px-8" id="product-page">
@@ -433,6 +433,6 @@ export default function ProductPage() {
           </div>
         </div>
       </SideModal>
-    </>
+    </div>
   );
 }
