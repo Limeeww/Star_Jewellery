@@ -23,6 +23,7 @@ export default function ProductImageSlider({
   const [direction, setDirection] = useState(0);
   const [isModalOpen, setModalOpen] = useState(false);
 
+
   const imageCount = images.length;
   const currentImage =
     imageCount > 0 ? images[page] : "/images/placeholder.png";
@@ -39,7 +40,7 @@ export default function ProductImageSlider({
 
   const handleDragEnd = (e: PointerEvent, info: PanInfo) => {
     const swipeDistance = info.offset.x;
-    const swipeThreshold = 300; 
+    const swipeThreshold = 300;
 
     if (swipeDistance < -swipeThreshold && page < imageCount - 1) {
       paginate(1);
@@ -76,6 +77,7 @@ export default function ProductImageSlider({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
+
   return (
     <div className="relative w-full mx-auto">
       <div className="relative w-full aspect-square overflow-hidden shadow-lg mt-6 max-h-[90vh]">
@@ -93,6 +95,7 @@ export default function ProductImageSlider({
             className="absolute w-full h-full"
           >
             <Image
+              key={currentImage}
               src={currentImage}
               alt={altText}
               fill
@@ -147,7 +150,7 @@ export default function ProductImageSlider({
           >
             <div className="relative w-[80px] h-[80px]">
               <Image
-              src={img}
+                src={img}
                 alt={`Thumbnail ${i + 1}`}
                 fill
                 className="object-cover"
@@ -175,7 +178,7 @@ export default function ProductImageSlider({
             </button>
             <motion.div
               className="relative w-[90vw] max-w-[800px] overflow-hidden"
-              style={{ paddingTop: "100%" }} 
+              style={{ paddingTop: "100%" }}
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}

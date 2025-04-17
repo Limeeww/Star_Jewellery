@@ -1,11 +1,9 @@
 "use client";
 
 import { useParams, useSearchParams } from "next/navigation";
-import { useState } from "react";
-import { set, useForm } from "react-hook-form";
-
+import { useMemo, useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { auth } from "../../firebase/firebaseConfig";
-
 import { useAuthState } from "react-firebase-hooks/auth";
 
 import Navbar from "../components/Navbar/Navbar";
@@ -14,23 +12,21 @@ import Footer from "../components/Footer/Footer";
 import Notification from "../components/MessageHandling/Notification";
 import SelectField from "../components/FormComponents/SelectField";
 import SubmitButton from "../components/FormComponents/SubmitButton";
+import MainFeaturesList from "./components/MainFeatureList";
+import SimilarProducts from "../components/SimilarProducts/SimilarProducts";
+import AboutCollection from "./components/AboutCollection";
+import ProductImageSlider from "./components/ProductImageBlock";
+import ShareButton from "../components/ShareButton/ShareButton";
+import CartSideModal from "../components/SideModal/CartSideModal";
+import { AiOutlineShoppingCart } from "react-icons/ai";
 
 import { ProductVariant } from "../types/product";
 import { useRequireAuth } from "../utils/auth";
 import { useNotification } from "../utils/useNotification";
-import InfoBlocks from "./components/InfoItem";
-import { AiOutlineShoppingCart } from "react-icons/ai";
-import MainFeaturesList from "./components/MainFeatureList";
-import SimilarProducts from "../components/SimilarProducts/SimilarProducts";
-import AboutCollection from "./components/AboutCollection";
-import ShareButton from "../components/ShareButton/ShareButton";
 import { useCartItems } from "../utils/cartUtils";
 import { addOrIncrementCartItem } from "../utils/cartActions";
-import { calculateDiscountedPrice } from "../utils/priceUtils";
-import ProductImageSlider from "./components/ProductImageBlock";
+import { calculateDiscountedPrice, formatPrice } from "../utils/priceUtils";
 import { useProductDetails } from "../utils/useProductDetails";
-import { formatPrice } from "../utils/priceUtils";
-import CartSideModal from "../components/SideModal/CartSideModal";
 
 interface FormValues {
   size: string;
@@ -39,64 +35,75 @@ interface FormValues {
 }
 
 export default function ProductPage() {
+  /* ───────────────────────────── state & params ─────────────────────────── */
   const [user, loadingAuth] = useAuthState(auth);
   const { slug } = useParams() as { slug: string };
   const searchParams = useSearchParams();
   const variantID = searchParams?.get("variantID");
 
+  const [sideModalOpen, setSideModalOpen] = useState(false);
   const [addedToCart, setAddedToCart] = useState(false);
-  const [selectedInsert, setSelectedInsert] = useState("");
-  const [selectedMaterialColor, setSelectedMaterialColor] = useState("");
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    setValue,
-  } = useForm<FormValues>({
-    defaultValues: {
-      size: "",
-      inserts: "",
-      materialColor: "",
-    },
-  });
+  /* ───────────────────────────── notifications ──────────────────────────── */
+  const { notify, notification, clearNotification } = useNotification();
 
   const onVariantFound = (variant: ProductVariant) => {
-    setSelectedInsert(variant.insert);
-    setSelectedMaterialColor(variant.materialColor);
-    setValue("inserts", variant.insert);
-    setValue("materialColor", variant.materialColor);
+    setValue("inserts", variant.insert, { shouldValidate: true });
+    setValue("materialColor", variant.materialColor, { shouldValidate: true });
   };
 
   const { product, collectionData, activeDiscount, loading } =
     useProductDetails(slug, variantID ?? null, onVariantFound);
 
-  const [sideModalOpen, setSideModalOpen] = useState(false);
-  const cartItems = useCartItems(user ? user.uid : null);
-  useRequireAuth(user, loadingAuth);
-  const { notify, notification, clearNotification } = useNotification();
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm<FormValues>({
+    defaultValues: { size: "", inserts: "", materialColor: "" },
+  });
 
-  const displayedVariant = product ? product.variants[0] : undefined;
-  const discountedPrice = displayedVariant
-    ? calculateDiscountedPrice(displayedVariant, activeDiscount)
-    : null;
+  useEffect(() => {
+    if (!product) return;
+    const firstVariant = product.variants[0];
+    setValue("inserts", firstVariant.insert);
+    setValue("materialColor", firstVariant.materialColor);
+  }, [product, setValue]);
 
-  const onSubmit = async (data: FormValues) => {
-    if (!user || !product) return;
+  const selectedInsert = watch("inserts");
+  const selectedMaterialColor = watch("materialColor");
 
-    const variantForCart =
+  const displayedVariant = useMemo(() => {
+    if (!product) return undefined;
+    return (
       product.variants.find(
         (v) =>
-          v.insert === data.inserts && v.materialColor === data.materialColor
-      ) || product.variants[0];
+          v.insert === selectedInsert &&
+          v.materialColor === selectedMaterialColor
+      ) || product.variants[0]
+    );
+  }, [product, selectedInsert, selectedMaterialColor]);
 
-    const finalPrice = discountedPrice ?? variantForCart.price;
+  const discountedPrice = useMemo(() => {
+    if (!displayedVariant) return null;
+    return calculateDiscountedPrice(displayedVariant, activeDiscount);
+  }, [displayedVariant, activeDiscount]);
+
+  useRequireAuth(user, loadingAuth);
+  const cartItems = useCartItems(user ? user.uid : null);
+
+  const onSubmit = async (data: FormValues) => {
+    if (!user || !product || !displayedVariant) return;
+
+    const priceForCart = discountedPrice ?? displayedVariant.price;
 
     const cartItem = {
       productId: product.id,
       name: product.name,
-      imageUrl: variantForCart.images?.[0] || "",
-      price: finalPrice,
+      imageUrl: displayedVariant.images?.[0] || "",
+      price: priceForCart,
       quantity: 1,
       size: Number(data.size),
       insert: data.inserts,
@@ -116,36 +123,29 @@ export default function ProductPage() {
     }
   };
 
-  if (loading || !product) return <Loading />;
+  if (loading || !product || !displayedVariant) return <Loading />;
 
   const allQuantitySizes = product.variants.flatMap(
     (variant) => variant.quantitySize
   );
+
   const uniqueSizeMap = new Map<number, { size: number; quantity: number }>();
   allQuantitySizes.forEach((qs) => {
-    if (!uniqueSizeMap.has(qs.size)) {
-      uniqueSizeMap.set(qs.size, qs);
-    }
+    if (!uniqueSizeMap.has(qs.size)) uniqueSizeMap.set(qs.size, qs);
   });
+
   const sizeOptions = Array.from(uniqueSizeMap.values()).map((qs) => ({
     value: qs.size.toString(),
     label: `Size ${qs.size} (${qs.quantity} available)`,
   }));
 
-  const uniqueInserts = Array.from(
+  const insertOptions = Array.from(
     new Set(product.variants.map((v) => v.insert))
-  );
-  const insertOptions = uniqueInserts.map((insert) => ({
-    value: insert,
-    label: insert,
-  }));
-  const uniqueMaterialColors = Array.from(
+  ).map((insert) => ({ value: insert, label: insert }));
+
+  const materialColorOptions = Array.from(
     new Set(product.variants.map((v) => v.materialColor))
-  );
-  const materialColorOptions = uniqueMaterialColors.map((color) => ({
-    value: color,
-    label: color,
-  }));
+  ).map((color) => ({ value: color, label: color }));
 
   return (
     <>
@@ -166,15 +166,13 @@ export default function ProductPage() {
         )}
 
         <div className="grid grid-cols-1 2xl:grid-cols-2 gap-8 items-start">
-          <div>
-            <ProductImageSlider
-              images={product.variants[0].images || []}
-              altText={`${selectedInsert || product.variants[0].insert} - ${
-                selectedMaterialColor || product.variants[0].materialColor
-              }`}
-            />
-          </div>
-          <div className="xl:mt-6 ">
+          <ProductImageSlider
+            key={`${displayedVariant.insert}-${displayedVariant.materialColor}`}
+            images={displayedVariant.images || []}
+            altText={`${selectedInsert} - ${selectedMaterialColor}`}
+          />
+
+          <div className="xl:mt-6">
             <h1
               className="text-3xl md:text-4xl font-bold text-gray-800 mb-4"
               style={{ fontFamily: "var(--font-playfair)" }}
@@ -195,7 +193,7 @@ export default function ProductPage() {
             {discountedPrice ? (
               <div className="mb-6">
                 <p className="text-xl text-gray-500 line-through">
-                  {formatPrice(displayedVariant?.price || 0)} ₴
+                  {formatPrice(displayedVariant.price)} ₴
                 </p>
                 <p className="text-2xl font-bold text-red-600">
                   {formatPrice(discountedPrice)} ₴
@@ -206,7 +204,7 @@ export default function ProductPage() {
               </div>
             ) : (
               <p className="text-2xl font-bold text-gray-800 mb-6">
-                {formatPrice(displayedVariant?.price || 0)} ₴
+                {formatPrice(displayedVariant.price)} ₴
               </p>
             )}
 
@@ -227,11 +225,6 @@ export default function ProductPage() {
                   id="inserts"
                   register={register("inserts", {
                     required: "Insert is required",
-                    onChange: (e) => {
-                      const newInsert = e.target.value;
-                      setSelectedInsert(newInsert);
-                      setValue("inserts", newInsert);
-                    },
                   })}
                   error={errors.inserts}
                   options={insertOptions}
@@ -245,11 +238,6 @@ export default function ProductPage() {
                 id="materialColor"
                 register={register("materialColor", {
                   required: "Material color is required",
-                  onChange: (e) => {
-                    const newColor = e.target.value;
-                    setSelectedMaterialColor(newColor);
-                    setValue("materialColor", newColor);
-                  },
                 })}
                 error={errors.materialColor}
                 options={materialColorOptions}
@@ -274,8 +262,7 @@ export default function ProductPage() {
             </div>
 
             <div className="mt-6">
-              <InfoBlocks />
-              <div className="mt-4 items-end flex">
+              <div className="mt-4 flex items-end">
                 <ShareButton
                   title="Share this product"
                   text="Check out this amazing product!"
@@ -295,9 +282,9 @@ export default function ProductPage() {
           />
         </div>
 
-        <div className="mt-2">
+        {/* <div className="mt-2">
           <SimilarProducts />
-        </div>
+        </div> */}
       </section>
 
       <Footer />
