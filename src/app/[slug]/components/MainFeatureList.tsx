@@ -2,11 +2,7 @@
 
 import { useState } from "react";
 import { Product } from "../../types/product";
-import {
-  
-  IoIosArrowDown,
-  IoIosArrowUp,
-} from "react-icons/io";
+import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import InfoItem from "@/app/components/InfoItem/InfoItem";
 
 interface Props {
@@ -16,7 +12,6 @@ interface Props {
 const MainFeaturesList = ({ product }: Props) => {
   const [expanded, setExpanded] = useState(false);
   const variant = product.variants?.[0];
-
 
   // GET FEATURES FROM FIREBASE
   const features = [
@@ -29,10 +24,9 @@ const MainFeaturesList = ({ product }: Props) => {
       label: "Metal",
       value: (
         <div className="flex items-center">
-          Gold{" "}
+          {variant?.material + " "}
           <span className="ml-1 text-gray-400 text-xs">
-            <InfoItem
-              text="The information about the metal is provided by the manufacturer. It is not a guarantee of the quality of the product."/>
+            <InfoItem text="The information about the metal is provided by the manufacturer. It is not a guarantee of the quality of the product." />
           </span>
         </div>
       ),
@@ -40,7 +34,7 @@ const MainFeaturesList = ({ product }: Props) => {
     },
     {
       label: "Purity",
-      value: product.quantitySize?.[0]?.size ?? "—",
+      value: variant?.purity ?? "—",
       valueClass: "text-gray-800",
     },
     {

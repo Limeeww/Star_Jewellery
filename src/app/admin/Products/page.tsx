@@ -70,6 +70,12 @@ export default function AdminProductsPage() {
         >
           MANAGING PRODUCTS
         </h3>
+        <LinkButton
+          text="Add Product"
+          className="w-full bg-black text-white text-md font-medium px-4 py-2 hover:bg-gray-800 transition-colors my-2"
+          showArrow={false}
+          onClick={() => router.push(`/Admin/Products/Add`)}
+        />
         <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {products.map((product) => (
             <li
@@ -113,47 +119,116 @@ export default function AdminProductsPage() {
                 </p>
 
                 {product.variants.length > 0 && (
-                  <div className="pt-2">
-                    <p className="font-semibold underline">Variants:</p>
-                    <ul className="pl-4 list-disc">
-                      {product.variants.map((variant, i) => (
-                        <li key={i}>
-                          <span className="block">
-                            Material: {variant.material}
+                  <div className="grid grid-cols-1 gap-6 pt-2">
+                    {product.variants.map((variant, i) => (
+                      <div
+                        key={i}
+                        className="rounded-xl border border-gray-200 p-4 shadow-sm bg-gray-50"
+                      >
+                        <div className="grid grid-cols-2 gap-2 text-sm text-gray-700">
+                          <span>
+                            <strong>Material:</strong> {variant.material}
                           </span>
-                          <span className="block">
-                            Color: {variant.materialColor}
+                          <span>
+                            <strong>Color:</strong> {variant.materialColor}
                           </span>
-                          <span className="block">
-                            Insert: {variant.insert}
+                          <span>
+                            <strong>Insert:</strong> {variant.insert}
                           </span>
-                          <span className="block">
-                            Insert Color: {variant.insertColor}
+                          <span>
+                            <strong>Insert Color:</strong> {variant.insertColor}
                           </span>
-                          <span className="block">
-                            Weight: {variant.weight}
+                          <span>
+                            <strong>Weight:</strong> {variant.weight} g
                           </span>
-                          <span className="block">Price: ${variant.price}</span>
-                          {variant.quantitySize.length > 0 && (
-                            <div className="pt-2">
-                              <p className="font-semibold underline">
-                                Quantity by Size:
-                              </p>
-                              <ul className="pl-4 list-disc">
-                                {variant.quantitySize.map((item, i) => (
-                                  <li key={i}>
-                                    Size {item.size}: {item.quantity} pcs
-                                  </li>
-                                ))}
-                              </ul>
+                          <span>
+                            <strong>Price:</strong> ${variant.price}
+                          </span>
+                        </div>
+
+                        {variant.quantitySize.length > 0 && (
+                          <div className="mt-4">
+                            <p className="font-medium text-sm text-gray-800 mb-1">
+                              Quantity by Size:
+                            </p>
+                            <div className="flex flex-wrap gap-2 text-sm text-gray-600">
+                              {variant.quantitySize.map((item, i) => (
+                                <div
+                                  key={i}
+                                  className="px-2 py-1 border border-gray-300 rounded-md bg-white"
+                                >
+                                  Size {item.size}: {item.quantity} pcs
+                                </div>
+                              ))}
                             </div>
-                          )}
-                          {variant.images && variant.images.length > 0 && (
+                          </div>
+                        )}
+
+                        {variant.images && variant.images.length > 0 && (
+                          <div className="mt-4">
                             <Carousel
                               showThumbs={false}
                               showStatus={false}
                               infiniteLoop
                               className="mt-2"
+                              renderArrowPrev={(
+                                onClickHandler,
+                                hasPrev,
+                                label
+                              ) =>
+                                hasPrev && (
+                                  <button
+                                    type="button"
+                                    onClick={onClickHandler}
+                                    title={label}
+                                    className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-white/80 p-2 rounded-full shadow hover:bg-white hidden md:block"
+                                  >
+                                    <svg
+                                      width="24"
+                                      height="24"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                    >
+                                      <path
+                                        d="M15 18l-6-6 6-6"
+                                        stroke="black"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                      />
+                                    </svg>
+                                  </button>
+                                )
+                              }
+                              renderArrowNext={(
+                                onClickHandler,
+                                hasNext,
+                                label
+                              ) =>
+                                hasNext && (
+                                  <button
+                                    type="button"
+                                    onClick={onClickHandler}
+                                    title={label}
+                                    className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-white/80 p-2 rounded-full shadow hover:bg-white hidden md:block"
+                                  >
+                                    <svg
+                                      width="24"
+                                      height="24"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                    >
+                                      <path
+                                        d="M9 6l6 6-6 6"
+                                        stroke="black"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                      />
+                                    </svg>
+                                  </button>
+                                )
+                              }
                             >
                               {variant.images.map((photo, idx) => (
                                 <div key={idx} className="w-full h-64 relative">
@@ -166,10 +241,10 @@ export default function AdminProductsPage() {
                                 </div>
                               ))}
                             </Carousel>
-                          )}
-                        </li>
-                      ))}
-                    </ul>
+                          </div>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
@@ -178,7 +253,7 @@ export default function AdminProductsPage() {
                 className="w-full bg-black text-white text-md font-medium px-4 py-2 hover:bg-gray-800 transition-colors"
                 showArrow={false}
                 onClick={() =>
-                  router.push(`/Admin/Products/Edit/${product.id}`)
+                  router.push(`/Admin/Products/Edit/${product.slug}`)
                 }
               />
             </li>

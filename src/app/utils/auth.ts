@@ -125,7 +125,10 @@ export const updateUserProfileWithChecks = async (
 /**
  * Hook to require authentication. Redirects to "/" if no user.
  */
-export function useRequireAuth(user: User | null | undefined, loading: boolean) {
+export function useRequireAuth(
+  user: User | null | undefined,
+  loading: boolean
+) {
   const router = useRouter();
   useEffect(() => {
     if (!loading && !user) {
@@ -133,6 +136,7 @@ export function useRequireAuth(user: User | null | undefined, loading: boolean) 
     }
   }, [user, loading, router]);
 }
+
 /**
  * Hook to fetch and manage profile data.
  */
