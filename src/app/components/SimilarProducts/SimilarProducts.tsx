@@ -18,7 +18,7 @@ const SimilarProducts = () => {
 
   useEffect(() => {
     async function loadSimilarProducts() {
-      const products = await fetchProducts(4);
+      const products = await fetchProducts(6);
       setItems(products);
     }
     loadSimilarProducts();

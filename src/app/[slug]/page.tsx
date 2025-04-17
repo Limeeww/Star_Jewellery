@@ -109,7 +109,6 @@ export default function ProductPage() {
         const fetchedProduct = productSnap.docs[0].data() as Product;
         setProduct(fetchedProduct);
 
-        /* pick variant from URL (if any) */
         let initialVariant: ProductVariant | null = null;
         if (variantID) {
           initialVariant =
@@ -123,7 +122,6 @@ export default function ProductPage() {
         setValue("inserts", initialVariant.insert);
         setValue("materialColor", initialVariant.materialColor);
 
-        /* collection */
         if (fetchedProduct.categoryId) {
           const colSnap = await getDoc(
             doc(db, "collections", fetchedProduct.categoryId.toString())
@@ -144,7 +142,6 @@ export default function ProductPage() {
           }
         }
 
-        /* discounts */
         const discSnap = await getDocs(
           query(
             collection(db, "discounts"),

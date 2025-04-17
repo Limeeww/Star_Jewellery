@@ -121,7 +121,6 @@ export default function ProductImageBlock({
       setModalDirection
     );
 
-  // свайп для основного слайдера
   const handleDragEnd = (_: PointerEvent, info: PanInfo) => {
     const offset = info.offset.x;
     const threshold = 300;
@@ -233,7 +232,6 @@ export default function ProductImageBlock({
         ))}
       </div>
 
-      {/* Модалка */}
       <AnimatePresence>
         {isModalOpen && (
           <motion.div
@@ -255,13 +253,6 @@ export default function ProductImageBlock({
               ref={modalRef}
               className="relative w-[90vw] max-w-[800px] overflow-visible cursor-auto cursor-zoom-out-custom"
               style={{ paddingTop: "100%" }}
-              onClick={(e) => {
-                if (window.innerWidth < 768) {
-                  e.stopPropagation();
-                } else {
-                  setModalOpen(false);
-                }
-              }}
             >
               <AnimatePresence initial={false} custom={modalDirection}>
                 <motion.div
@@ -276,7 +267,13 @@ export default function ProductImageBlock({
                   <Image
                     src={images[modalPage]}
                     alt={altText}
-                    onClick={handleOverlayClick}
+                    onClick={(e) => {
+                      if (window.innerWidth < 768) {
+                        e.stopPropagation();
+                      } else {
+                        setModalOpen(false);
+                      }
+                    }}
                     fill
                     className="object-contain"
                   />

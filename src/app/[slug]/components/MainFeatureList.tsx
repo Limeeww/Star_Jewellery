@@ -15,7 +15,6 @@ interface Props {
 const MainFeaturesList = ({ product, collection, displayedVariant }: Props) => {
   const [expanded, setExpanded] = useState(false);
 
-  // GET FEATURES FROM FIREBASE
   const features = [
     {
       label: "Vendor code",
