@@ -350,7 +350,7 @@ export default function ProductPage() {
             </form>
 
             <div className="mt-8">
-              <MainFeaturesList product={product} />
+              <MainFeaturesList displayedVariant={displayedVariant} collection={collectionData[0]} product={product} />
             </div>
 
             <div className="mt-6">
