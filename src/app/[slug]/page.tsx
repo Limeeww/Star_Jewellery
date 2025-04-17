@@ -74,7 +74,7 @@ export default function ProductPage() {
   const [selectedInsert, setSelectedInsert] = useState("");
   const [selectedMaterialColor, setSelectedMaterialColor] = useState("");
 
-  const [sideModalOpen, setSideModalOpen] = useState(true);
+  const [sideModalOpen, setSideModalOpen] = useState(false);
 
   const { notify, notification, clearNotification } = useNotification();
 
@@ -223,6 +223,8 @@ export default function ProductPage() {
       size: Number(data.size),
       insert: displayedVariant.insert,
       materialColor: displayedVariant.materialColor,
+      variantID: displayedVariant.id,
+      slug: product.slug || "",
     };
 
     try {
@@ -256,7 +258,7 @@ export default function ProductPage() {
   ).map((c) => ({ value: c, label: c }));
 
   return (
-    <div  style={{ fontFamily: "var(--font-poppins)" }}>
+    <div style={{ fontFamily: "var(--font-poppins)" }}>
       <Navbar isScrolled isLoggedIn={!!user} />
 
       <section className="px-4 py-16 sm:px-6 lg:px-8" id="product-page">
@@ -347,7 +349,11 @@ export default function ProductPage() {
             </form>
 
             <div className="mt-8">
-              <MainFeaturesList displayedVariant={displayedVariant} collection={collectionData[0]} product={product} />
+              <MainFeaturesList
+                displayedVariant={displayedVariant}
+                collection={collectionData[0]}
+                product={product}
+              />
             </div>
 
             <div className="mt-6">

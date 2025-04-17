@@ -14,7 +14,7 @@ function GiftOptions({ register } : GiftOptionsProps) {
             <div className="flex flex-col gap-3">
                 <div className="flex items-center justify-between">
                     <CheckboxField label="Add gift packaging" id="giftPackaging" register={register("giftPackaging")} />
-                    <p className="text-sm font-semibold">€3.50</p>
+                    <p className="text-sm font-semibold">₴50</p>
                 </div>
                 <div className="flex items-center justify-between">
                     <CheckboxField label="Add gift message" id="giftMessage" register={register("giftMessage")} />

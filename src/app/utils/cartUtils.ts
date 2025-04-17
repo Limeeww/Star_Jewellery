@@ -12,7 +12,7 @@ export const getSubtotal = (cartItems: CartItem[]): number =>
   cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
 export const getShippingCost = (subtotal: number): number =>
-  subtotal > 100 ? 0 : 10;
+  subtotal > 100 ? 0 : 50;
 
 export const getGiftOptionsTotal = (giftOptions: GiftOptionsForm): number => {
   const giftPackagingCost = giftOptions.giftPackaging ? 3.5 : 0;

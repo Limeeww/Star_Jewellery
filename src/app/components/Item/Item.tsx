@@ -10,70 +10,64 @@ type ItemProps = {
 };
 
 export default function Item({ product }: ItemProps) {
+  const defaultVariant = product.variants[0];
+
+  const href = defaultVariant
+    ? `/${product.slug ?? `product/${product.id}`}?variantID=${
+        defaultVariant.id
+      }`
+    : product.slug
+    ? `/${product.slug}`
+    : `/product/${product.id}`;
+
   return (
     <Link
-      key={product.id}
-      href={
-        product.slug
-          ? `/${product.slug}/?variantID=${product.variants[0].id}`
-          : "#" // TODO: get exact id from product that
-      }
+      href={href}
       className="
-      border 
-      p-2 
-      text-gray-800  
-      hover:shadow-lg 
-      transition-shadow 
-      duration-300 
-      bg-white 
-      flex 
-      flex-col
-      h-full
-    "
+        w-full
+        max-w-xs sm:max-w-sm md:max-w-none
+        border p-2 bg-white text-gray-800
+        hover:shadow-lg transition-shadow duration-300
+        flex flex-col h-full
+        break-inside-avoid
+      "
     >
-      <div className="overflow-hidden">
+      <div className="relative w-full pb-[100%] overflow-hidden">
         <Image
-          src={product.variants[0].images[0]}
+          src={defaultVariant?.images?.[0] ?? "/placeholder.jpg"}
           alt={product.name}
-          width={300}
-          height={300}
+          fill
+          sizes="(max-width: 640px) 100vw, 300px"
           className="
-          w-full
-          object-cover
-          transform
-          transition
-          duration-300
-          hover:scale-105
-          aspect-square
-        "
+            absolute inset-0
+            object-cover
+            transition-transform duration-300
+            hover:scale-105
+          "
         />
       </div>
 
-      <div className="mt-2 flex flex-col flex-grow justify-between">
+      <div className="mt-2 flex flex-col flex-grow justify-between min-h-0">
         <div>
-          <h3
-            className="
-            text-base 
-            md:text-lg 
-            font-medium
-          "
-          >
+          <h3 className="text-base md:text-lg font-medium break-words">
             {product.name}
           </h3>
-          <p className="text-sm text-gray-500">{product.description}</p>
+          {product.description && (
+            <p className="text-sm text-gray-500 overflow-hidden text-ellipsis">
+              {product.description}
+            </p>
+          )}
         </div>
 
-        {product.variants[0].price && (
+        {defaultVariant?.price != null && (
           <p
-            className="
-            text-base 
-            md:text-lg 
-            
-            mt-1
-          "
+            className="text-base md:text-lg mt-1"
             style={{ fontFamily: "var(--font-poppins)" }}
           >
-            ₴ <span className="font-semibold">{product.variants[0].price.toLocaleString()}</span>
+            ₴{" "}
+            <span className="font-semibold">
+              {defaultVariant.price.toLocaleString()}
+            </span>
           </p>
         )}
       </div>

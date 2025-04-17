@@ -1,69 +1,62 @@
-import React from "react";
-import Image from "next/image";
-import { CartItem } from "../../types/cartItem";
-import { Product } from "../../types/product";
+// components/CartItem/CartItemComponent.tsx
+"use client";
 
-interface CartItemComponentProps {
-  item: CartItem;
-  product?: Product;
-  onIncrement: (item: number) => void;
-  onDecrement: (item: number) => void;
-  onRemove: (item: number) => void;
+import React from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { CartItem } from "@/app/types/cartItem";
+
+interface CartItemWithLink extends CartItem {
+  slug: string;
+  variantId: number;
 }
 
-function CartItemComponent({
+interface CartItemComponentProps {
+  item: CartItemWithLink;
+  onIncrement: () => void;
+  onDecrement: () => void;
+  onRemove: () => void;
+}
+
+export default function CartItemComponent({
   item,
-  product,
   onIncrement,
   onDecrement,
   onRemove,
 }: CartItemComponentProps) {
-  const productDescription = product?.description || "";
+  console.log("CartItemComponent", item);
+  const href = `/${item.slug}?variantID=${item.variantId}`;
 
   return (
-    <div className="bg-white p-4 shadow-md flex items-center gap-4">
-      <div className="relative w-16 h-16 flex-shrink-0">
+    <div className="flex items-center bg-white p-4 rounded shadow space-x-4">
+      <Link href={href} className="flex-shrink-0 w-20 h-20 overflow-hidden rounded">
         <Image
           src={item.imageUrl}
           alt={item.name}
-          fill
-          className="object-cover"
+          width={80}
+          height={80}
+          className="object-cover w-full h-full"
         />
+      </Link>
+
+      <div className="flex-1">
+        <Link href={href} className="text-lg font-medium hover:underline block">
+          {item.name}
+        </Link>
+
+        <div className="flex items-center space-x-2 mt-2">
+          <button onClick={onDecrement} className="px-2 py-1 bg-gray-200 rounded">–</button>
+          <span>{item.quantity}</span>
+          <button onClick={onIncrement} className="px-2 py-1 bg-gray-200 rounded">+</button>
+          <button onClick={onRemove} className="ml-4 text-red-500 hover:underline">
+            Remove
+          </button>
+        </div>
       </div>
-      <div className="flex flex-col flex-grow">
-        <p className="font-semibold text-sm md:text-base">{item.name}</p>
-        {productDescription && (
-          <p className="text-xs md:text-sm text-gray-500">
-            {productDescription}
-          </p>
-        )}
+
+      <div className="font-semibold">
+        ₴{item.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}
       </div>
-      <div className="flex items-center gap-2">
-        <button
-          onClick={() => onDecrement(item.productId)}
-          className="px-2 py-1 border text-sm hover:bg-gray-100 transition"
-        >
-          -
-        </button>
-        <span className="w-6 text-center">{item.quantity}</span>
-        <button
-          onClick={() => onIncrement(item.productId)}
-          className="px-2 py-1 border text-sm hover:bg-gray-100 transition"
-        >
-          +
-        </button>
-      </div>
-      <button
-        onClick={() => onRemove(item.productId)}
-        className="text-sm underline text-gray-700 hover:text-black transition-colors"
-      >
-        Remove
-      </button>
-      <p className="font-semibold text-sm md:text-base">
-        {(item.price * item.quantity).toFixed(2)} UAH
-      </p>
     </div>
   );
 }
-
-export default CartItemComponent;
