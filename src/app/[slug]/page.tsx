@@ -74,7 +74,7 @@ export default function ProductPage() {
   const [selectedInsert, setSelectedInsert] = useState("");
   const [selectedMaterialColor, setSelectedMaterialColor] = useState("");
 
-  const [sideModalOpen, setSideModalOpen] = useState(false);
+  const [sideModalOpen, setSideModalOpen] = useState(true);
 
   const { notify, notification, clearNotification } = useNotification();
 
@@ -381,7 +381,7 @@ export default function ProductPage() {
 
       <SideModal isOpen={sideModalOpen} onClose={() => setSideModalOpen(false)}>
         <div className="p-4 h-full flex flex-col max-h-screen overflow-y-auto">
-          <h2 className="text-2xl font-semibold mb-2">
+          <h2 className="text-2xl font-semibold mb-4">
             Product successfully added to cart!
           </h2>
           {cartItems?.length ? (

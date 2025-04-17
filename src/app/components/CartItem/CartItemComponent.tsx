@@ -1,4 +1,3 @@
-// components/CartItem/CartItem.tsx
 import React from "react";
 import Image from "next/image";
 import { CartItem } from "../../types/cartItem";
@@ -6,7 +5,7 @@ import { Product } from "../../types/product";
 
 interface CartItemComponentProps {
   item: CartItem;
-  product?: Product; // additional info 
+  product?: Product;
   onIncrement: (item: number) => void;
   onDecrement: (item: number) => void;
   onRemove: (item: number) => void;
@@ -22,7 +21,7 @@ function CartItemComponent({
   const productDescription = product?.description || "";
 
   return (
-    <div className="bg-white p-4 rounded shadow flex items-center gap-4">
+    <div className="bg-white p-4 shadow-md flex items-center gap-4">
       <div className="relative w-16 h-16 flex-shrink-0">
         <Image
           src={item.imageUrl}
@@ -61,7 +60,7 @@ function CartItemComponent({
         Remove
       </button>
       <p className="font-semibold text-sm md:text-base">
-        {(item.price * item.quantity).toFixed(2)} EUR
+        {(item.price * item.quantity).toFixed(2)} UAH
       </p>
     </div>
   );
