@@ -16,13 +16,71 @@ interface ProductImageBlockProps {
   altText: string;
 }
 
+interface ArrowButtonProps {
+  onClick: () => void;
+  disabled: boolean;
+  offsetClass: string;
+  sizeClass?: string;
+  children: React.ReactNode;
+}
+const ArrowButton = ({
+  onClick,
+  disabled,
+  offsetClass,
+  sizeClass = "p-2",
+  children,
+}: ArrowButtonProps) => (
+  <button
+    onClick={onClick}
+    disabled={disabled}
+    className={
+      `hidden md:flex items-center justify-center absolute top-1/2 -translate-y-1/2 bg-white rounded-full shadow text-gray-700 disabled:opacity-50 ` +
+      sizeClass +
+      " " +
+      offsetClass
+    }
+  >
+    {children}
+  </button>
+);
+
+interface DotNavProps {
+  count: number;
+  activeIndex: number;
+  onSelect: (i: number) => void;
+  containerClass: string;
+  dotSizeClass: string;
+  activeClass: string;
+  inactiveClass: string;
+}
+const DotNav = ({
+  count,
+  activeIndex,
+  onSelect,
+  containerClass,
+  dotSizeClass,
+  activeClass,
+  inactiveClass,
+}: DotNavProps) => (
+  <div className={containerClass}>
+    {Array.from({ length: count }, (_, i) => (
+      <div
+        key={i}
+        className={`${dotSizeClass} rounded-full ${
+          i === activeIndex ? activeClass : inactiveClass
+        }`}
+        onClick={() => onSelect(i)}
+      />
+    ))}
+  </div>
+);
+
 export default function ProductImageBlock({
   images,
   altText,
 }: ProductImageBlockProps) {
   const [page, setPage] = useState(0);
   const [direction, setDirection] = useState(0);
-
   const [isModalOpen, setModalOpen] = useState(false);
   const [modalPage, setModalPage] = useState(0);
   const [modalDirection, setModalDirection] = useState(0);
@@ -38,22 +96,32 @@ export default function ProductImageBlock({
     }
   }, [isModalOpen, page]);
 
-  const paginate = (newDirection: number) => {
-    setPage((old) => {
-      const next = Math.min(Math.max(old + newDirection, 0), imageCount - 1);
-      return next;
-    });
-    setDirection(newDirection);
+  const changeIndex = (
+    newIndex: number,
+    current: number,
+    setIndex: React.Dispatch<React.SetStateAction<number>>,
+    setDir: React.Dispatch<React.SetStateAction<number>>
+  ) => {
+    const dir = newIndex > current ? 1 : -1;
+    setDir(dir);
+    setIndex(newIndex);
   };
+  const paginate = (dir: number) =>
+    changeIndex(
+      Math.min(Math.max(page + dir, 0), imageCount - 1),
+      page,
+      setPage,
+      setDirection
+    );
+  const modalPaginate = (dir: number) =>
+    changeIndex(
+      Math.min(Math.max(modalPage + dir, 0), imageCount - 1),
+      modalPage,
+      setModalPage,
+      setModalDirection
+    );
 
-  const modalPaginate = (newDirection: number) => {
-    setModalPage((old) => {
-      const next = Math.min(Math.max(old + newDirection, 0), imageCount - 1);
-      return next;
-    });
-    setModalDirection(newDirection);
-  };
-
+  // свайп для основного слайдера
   const handleDragEnd = (_: PointerEvent, info: PanInfo) => {
     const offset = info.offset.x;
     const threshold = 300;
@@ -111,20 +179,20 @@ export default function ProductImageBlock({
           </motion.div>
         </AnimatePresence>
 
-        <button
+        <ArrowButton
           onClick={() => paginate(-1)}
           disabled={page <= 0}
-          className="hidden md:flex items-center justify-center absolute top-1/2 left-2 -translate-y-1/2 bg-white rounded-full p-2 shadow text-gray-700 disabled:opacity-50"
+          offsetClass="left-2"
         >
           <AiOutlineLeft size={24} />
-        </button>
-        <button
+        </ArrowButton>
+        <ArrowButton
           onClick={() => paginate(1)}
           disabled={page >= imageCount - 1}
-          className="hidden md:flex items-center justify-center absolute top-1/2 right-2 -translate-y-1/2 bg-white rounded-full p-2 shadow text-gray-700 disabled:opacity-50"
+          offsetClass="right-2"
         >
           <AiOutlineRight size={24} />
-        </button>
+        </ArrowButton>
 
         <button
           onClick={() => setModalOpen(true)}
@@ -134,29 +202,21 @@ export default function ProductImageBlock({
         </button>
       </div>
 
-      <div className="flex md:hidden items-center justify-center space-x-2 mt-2">
-        {images.map((_, i) => (
-          <div
-            key={i}
-            className={`w-2 h-2 rounded-full ${
-              i === page ? "bg-gray-800" : "bg-gray-300"
-            }`}
-            onClick={() => {
-              setDirection(i > page ? 1 : -1);
-              setPage(i);
-            }}
-          />
-        ))}
-      </div>
+      <DotNav
+        count={imageCount}
+        activeIndex={page}
+        onSelect={(i) => changeIndex(i, page, setPage, setDirection)}
+        containerClass="flex md:hidden items-center justify-center space-x-2 mt-2"
+        dotSizeClass="w-2 h-2"
+        activeClass="bg-gray-800"
+        inactiveClass="bg-gray-300"
+      />
 
       <div className="hidden md:flex items-center justify-center space-x-2 mt-4">
         {images.map((img, i) => (
           <div
             key={i}
-            onClick={() => {
-              setDirection(i > page ? 1 : -1);
-              setPage(i);
-            }}
+            onClick={() => changeIndex(i, page, setPage, setDirection)}
             className={`cursor-pointer border-2 p-1 rounded ${
               i === page ? "border-gray-800" : "border-transparent"
             }`}
@@ -173,6 +233,7 @@ export default function ProductImageBlock({
         ))}
       </div>
 
+      {/* Модалка */}
       <AnimatePresence>
         {isModalOpen && (
           <motion.div
@@ -194,7 +255,13 @@ export default function ProductImageBlock({
               ref={modalRef}
               className="relative w-[90vw] max-w-[800px] overflow-visible cursor-auto cursor-zoom-out-custom"
               style={{ paddingTop: "100%" }}
-              onClick={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                if (window.innerWidth < 768) {
+                  e.stopPropagation();
+                } else {
+                  setModalOpen(false);
+                }
+              }}
             >
               <AnimatePresence initial={false} custom={modalDirection}>
                 <motion.div
@@ -209,43 +276,41 @@ export default function ProductImageBlock({
                   <Image
                     src={images[modalPage]}
                     alt={altText}
+                    onClick={handleOverlayClick}
                     fill
                     className="object-contain"
-                    onClick={handleOverlayClick}
                   />
                 </motion.div>
               </AnimatePresence>
 
-              <button
+              <ArrowButton
                 onClick={() => modalPaginate(-1)}
                 disabled={modalPage <= 0}
-                className="hidden md:block absolute left-[-60px] top-1/2 -translate-y-1/2 bg-white rounded-full p-3 shadow disabled:opacity-50"
+                offsetClass="left-[-60px]"
+                sizeClass="p-3"
               >
                 <AiOutlineLeft size={24} />
-              </button>
-              <button
+              </ArrowButton>
+              <ArrowButton
                 onClick={() => modalPaginate(1)}
                 disabled={modalPage >= imageCount - 1}
-                className="hidden md:block absolute right-[-60px] top-1/2 -translate-y-1/2 bg-white rounded-full p-3 shadow disabled:opacity-50"
+                offsetClass="right-[-60px]"
+                sizeClass="p-3"
               >
                 <AiOutlineRight size={24} />
-              </button>
+              </ArrowButton>
 
-              <div className="flex md:hidden absolute bottom-[-40px] left-1/2 -translate-x-1/2 space-x-2">
-                {images.map((_, i) => (
-                  <div
-                    key={i}
-                    className={`w-4 h-4 rounded-full ${
-                      i === modalPage ? "bg-white" : "bg-gray-500"
-                    }`}
-                    onClick={() => {
-                      const dir = i > modalPage ? 1 : -1;
-                      setModalDirection(dir);
-                      setModalPage(i);
-                    }}
-                  />
-                ))}
-              </div>
+              <DotNav
+                count={imageCount}
+                activeIndex={modalPage}
+                onSelect={(i) =>
+                  changeIndex(i, modalPage, setModalPage, setModalDirection)
+                }
+                containerClass="flex md:hidden absolute bottom-[-40px] left-1/2 -translate-x-1/2 space-x-2"
+                dotSizeClass="w-4 h-4"
+                activeClass="bg-white"
+                inactiveClass="bg-gray-500"
+              />
             </div>
           </motion.div>
         )}
