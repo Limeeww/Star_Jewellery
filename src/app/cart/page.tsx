@@ -15,7 +15,7 @@ import GiftOptions from "@/app/cart/components/GiftOptions";
 
 import { GiftOptionsForm } from "@/app/types/order";
 import { Product } from "@/app/types/product";
-import Notification from "../components/MessageHandling/Notification";
+import Notification from "@/app/components/MessageHandling/Notification";
 
 import {
   getTotalCount,
@@ -30,7 +30,7 @@ import {
   decrementQuantity,
   removeItem,
 } from "@/app/utils/cartActions";
-import { useNotification } from "../utils/useNotification";
+import { useNotification } from "@/app/utils/useNotification";
 
 export default function CartPage() {
   const [user, loading] = useAuthState(auth);
@@ -71,6 +71,11 @@ export default function CartPage() {
   const giftOptionsTotal = getGiftOptionsTotal(giftOptionsValues);
   const total = getTotal(subtotal, shipping, giftOptionsTotal);
 
+  const originalPriceSum = cartItems.reduce(
+    (sum, item) => sum + (item.originalPrice ?? item.price) * item.quantity,
+    0
+  );
+
   if (!isLoggedIn) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -96,7 +101,7 @@ export default function CartPage() {
             className="text-4xl mb-6 mt-10 text-center"
             style={{ fontFamily: "var(--font-playfair)" }}
           >
-            Cart ({totalCount} {totalCount > 1 ? "Items" : "Item"})
+            Your Cart ({totalCount} {totalCount > 1 ? "Items" : "Item"})
           </h1>
 
           {cartItems.length === 0 ? (
@@ -154,6 +159,7 @@ export default function CartPage() {
 
               <div className="col-span-full lg:col-span-1">
                 <OrderSummary
+                  originalPrice={originalPriceSum}
                   subtotal={subtotal}
                   shipping={shipping}
                   giftOptionsTotal={giftOptionsTotal}
