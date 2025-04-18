@@ -4,7 +4,7 @@ import React from "react";
 import { formatPrice } from "@/app/utils/priceUtils";
 
 interface DiscountDisplayProps {
-  originalPrice: number;
+  originalPrice?: number;
   discountedPrice: number;
   discountName?: string;
   quantity?: number;
@@ -18,14 +18,16 @@ export default function DiscountDisplay({
   quantity = 1,
   className = "",
 }: DiscountDisplayProps) {
-  const origTotal = originalPrice * quantity;
+  const origTotal = (originalPrice ?? 0) * quantity;
   const discTotal = discountedPrice * quantity;
 
   return (
-    <div className={`space-y-1 ${className}`}>
-      <p className="text-sm text-gray-500 line-through">
-        {formatPrice(origTotal)} ₴
-      </p>
+    <div className={`space-y-1 ${originalPrice ? "mb-4" : ""} ${className}`}>
+      {originalPrice && (
+        <p className="text-sm text-gray-500 line-through">
+          {formatPrice(origTotal)} ₴
+        </p>
+      )}
       <p className="text-base font-bold text-red-600">
         {formatPrice(discTotal)} ₴
       </p>

@@ -3,9 +3,9 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { formatPrice } from "@/app/utils/priceUtils";
 import ConfirmModal from "@/app/components/MessageHandling/ConfirmModal";
 import { CartItem } from "../../types/cartItem";
+import DiscountDisplay from "../DiscountDisplay/DiscountDisplay";
 
 interface CartItemComponentProps {
   item: CartItem & {
@@ -107,22 +107,10 @@ export default function CartItemComponent({
         </button>
 
         <div className="ml-auto text-right">
-          {hasDiscount ? (
-            <div className="space-y-1">
-              <p className="text-sm text-gray-500 line-through">
-                {formatPrice(item.originalPrice! * item.quantity)} ₴
-              </p>
-              <p className="text-base font-bold text-red-600">
-                {formatPrice(item.price * item.quantity)} ₴
-              </p>
-              {item.discountName && (
-                <p className="text-xs text-red-500">{item.discountName}</p>
-              )}
-            </div>
-          ) : (
-            <p className="font-semibold text-sm md:text-base whitespace-nowrap">
-              {formatPrice(item.price * item.quantity)} ₴
-            </p>
+          {hasDiscount && (
+            <DiscountDisplay
+              discountedPrice={item.price}
+            />
           )}
         </div>
       </div>

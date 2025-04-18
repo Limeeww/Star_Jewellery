@@ -1,10 +1,11 @@
 "use client";
 
+import Image from "next/image";
+import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase/firebaseConfig";
 import { useForm } from "react-hook-form";
-import Link from "next/link";
 
 import Navbar from "@/app/components/Navbar/Navbar";
 import Footer from "@/app/components/Footer/Footer";
@@ -12,7 +13,6 @@ import CartItemComponent from "@/app/components/CartItem/CartItemComponent";
 import OrderSummary from "@/app/cart/components/OrderSummary";
 import RecentlyViewed from "@/app/components/RecentlyViewed/RecentlyViewed";
 import GiftOptions from "@/app/cart/components/GiftOptions";
-
 import { GiftOptionsForm } from "@/app/types/order";
 import { Product } from "@/app/types/product";
 import Notification from "@/app/components/MessageHandling/Notification";
@@ -57,12 +57,14 @@ export default function CartPage() {
       giftPackaging: false,
       giftMessage: false,
       giftReceipt: false,
+      giftMessageText: "",
     },
   });
   const giftOptionsValues = {
     giftPackaging: watch("giftPackaging"),
     giftMessage: watch("giftMessage"),
     giftReceipt: watch("giftReceipt"),
+    giftMessageText: watch("giftMessageText") ?? "",
   };
 
   const totalCount = getTotalCount(cartItems);
@@ -87,7 +89,6 @@ export default function CartPage() {
   return (
     <>
       <Navbar isScrolled={true} isLoggedIn={isLoggedIn} />
-
       {notification && (
         <Notification {...notification} onClose={clearNotification} />
       )}
@@ -116,6 +117,7 @@ export default function CartPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Левая часть: список товаров + опции подарка */}
               <div className="col-span-1 lg:col-span-2 space-y-6">
                 {cartItems.map((item) => (
                   <CartItemComponent
@@ -153,11 +155,11 @@ export default function CartPage() {
                     }
                   />
                 ))}
-
-                <GiftOptions register={register} />
+                <GiftOptions register={register} watch={watch} />
               </div>
 
-              <div className="col-span-full lg:col-span-1">
+              {/* Правая колонка: OrderSummary и PaymentMethods */}
+              <div className="col-span-full lg:col-span-1 space-y-6">
                 <OrderSummary
                   originalPrice={originalPriceSum}
                   subtotal={subtotal}
@@ -165,9 +167,50 @@ export default function CartPage() {
                   giftOptionsTotal={giftOptionsTotal}
                   total={total}
                 />
+
+                <div className="bg-white p-4 rounded shadow space-y-2 w-full">
+                  <h3 className="text-lg font-semibold mb-2">
+                    Payment Methods
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      {
+                        src: "https://upload.wikimedia.org/wikipedia/commons/4/40/Klarna_Payment_Badge.svg",
+                        alt: "Klarna",
+                      },
+                      {
+                        src: "https://upload.wikimedia.org/wikipedia/commons/0/04/Visa.svg",
+                        alt: "Visa",
+                      },
+                      {
+                        src: "https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg",
+                        alt: "PayPal",
+                      },
+                      {
+                        src: "https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg",
+                        alt: "Mastercard",
+                      },
+                    ].map(({ src, alt }) => (
+                      <div
+                        key={alt}
+                        className="flex-1 py-3 transition"
+                      >
+                        <div className="relative w-full h-6">
+                          <Image
+                            src={src}
+                            alt={alt}
+                            fill
+                            className="object-contain"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
           )}
+
           <div className="mt-6">
             <RecentlyViewed products={recentlyViewed} />
           </div>

@@ -34,6 +34,7 @@ export default function OrderSummary({
             <DiscountDisplay
               originalPrice={originalPrice!}
               discountedPrice={subtotal}
+              discountName="Order Discount"
               className="mb-4"
             />
           )}
