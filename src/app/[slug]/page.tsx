@@ -15,6 +15,7 @@ import {
   getDocs,
   doc,
   getDoc,
+  Timestamp,
 } from "firebase/firestore";
 import { auth, db } from "../../firebase/firebaseConfig";
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -90,6 +91,15 @@ export default function ProductPage() {
 
   const watchInsert = watch("inserts");
   const watchColor = watch("materialColor");
+
+  type RecentEntry = {
+    id: number;
+    slug: string;
+    name: string;
+    image: string;
+    variantId: number;
+    newDate: Timestamp;
+  };
 
   useEffect(() => {
     if (!slug) return;
@@ -234,6 +244,33 @@ export default function ProductPage() {
     }
   };
 
+  useEffect(() => {
+    if (!product) return;
+    if (typeof window === "undefined") return;
+    try {
+      const stored = localStorage.getItem("recentlyViewed");
+      const parsed: RecentEntry[] = stored ? JSON.parse(stored) : [];
+
+      const entry: RecentEntry = {
+        id: product.id,
+        slug: product.slug ?? "",
+        name: product.name,
+        image: displayedVariant?.images?.[0] ?? "/placeholder.jpg",
+        variantId: displayedVariant?.id ?? 0,
+        newDate: Timestamp.now(),
+      };
+
+      const withoutCurrent = parsed.filter((p) => p.id !== entry.id);
+
+      const updated = [entry, ...withoutCurrent].slice(0, 10);
+
+      localStorage.setItem("recentlyViewed", JSON.stringify(updated));
+    } catch (e) {
+      console.error("Failed to update recently viewed:", e);
+    }
+  }, [product, displayedVariant?.id, displayedVariant?.images]);
+
+  console.log("Displayed Variant ", displayedVariant?.images?.[0])
   if (!product || !displayedVariant) return <Loading />;
 
   const allQuantitySizes = product.variants.flatMap(

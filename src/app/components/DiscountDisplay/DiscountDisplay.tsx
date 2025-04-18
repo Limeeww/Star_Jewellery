@@ -22,7 +22,7 @@ export default function DiscountDisplay({
   const discTotal = discountedPrice * quantity;
 
   return (
-    <div className={`space-y-1 ${originalPrice ? "mb-4" : ""} ${className}`}>
+    <div className={`space-y-1 text-right ${originalPrice ? "mb-4" : ""} ${className}`}>
       {originalPrice && (
         <p className="text-sm text-gray-500 line-through">
           {formatPrice(origTotal)} ₴

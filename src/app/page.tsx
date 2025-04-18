@@ -8,7 +8,6 @@ import { auth } from "../firebase/firebaseConfig";
 import Image from "next/image";
 import Catalog from "./Catalog/Catalog";
 
-
 import Collection from "./Collections/Collection";
 import AboutUsSection from "./AboutUsSection/AboutUsSection";
 import { FaGift, FaHeadset, FaShippingFast } from "react-icons/fa";
@@ -44,7 +43,11 @@ export default function HomePage() {
 
   return (
     <>
-      <Navbar isScrolled={isScrolled} isLoggedIn={isLoggedIn} navLinks={NAV_LINKS} />
+      <Navbar
+        isScrolled={isScrolled}
+        isLoggedIn={isLoggedIn}
+        navLinks={NAV_LINKS}
+      />
 
       <div className="relative w-full h-screen" ref={header}>
         <video

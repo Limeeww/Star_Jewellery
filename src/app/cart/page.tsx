@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase/firebaseConfig";
 import { useForm } from "react-hook-form";
@@ -14,7 +14,6 @@ import OrderSummary from "@/app/cart/components/OrderSummary";
 import RecentlyViewed from "@/app/components/RecentlyViewed/RecentlyViewed";
 import GiftOptions from "@/app/cart/components/GiftOptions";
 import { GiftOptionsForm } from "@/app/types/order";
-import { Product } from "@/app/types/product";
 import Notification from "@/app/components/MessageHandling/Notification";
 
 import {
@@ -35,22 +34,9 @@ import { useNotification } from "@/app/utils/useNotification";
 export default function CartPage() {
   const [user, loading] = useAuthState(auth);
   const isLoggedIn = !!user && !loading;
-  const { notify, notification, clearNotification } = useNotification();
-
-  const [recentlyViewed, setRecentlyViewed] = useState<Product[]>([]);
+  const { notification, clearNotification } = useNotification();
   const cartItems = useCartItems(user ? user.uid : null);
 
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem("recentlyViewed");
-      if (stored) setRecentlyViewed(JSON.parse(stored));
-    } catch (e) {
-      notify({
-        type: "error",
-        message: `Error loading recently viewed products, ${e}`,
-      });
-    }
-  }, [notify]);
 
   const { register, watch } = useForm<GiftOptionsForm>({
     defaultValues: {
@@ -112,12 +98,11 @@ export default function CartPage() {
                 href="/"
                 className="inline-block mt-2 text-sm underline text-gray-700 hover:text-black transition-colors"
               >
-                Return to shop
+                Return to the shop
               </Link>
             </div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Левая часть: список товаров + опции подарка */}
               <div className="col-span-1 lg:col-span-2 space-y-6">
                 {cartItems.map((item) => (
                   <CartItemComponent
@@ -158,7 +143,6 @@ export default function CartPage() {
                 <GiftOptions register={register} watch={watch} />
               </div>
 
-              {/* Правая колонка: OrderSummary и PaymentMethods */}
               <div className="col-span-full lg:col-span-1 space-y-6">
                 <OrderSummary
                   originalPrice={originalPriceSum}
@@ -212,7 +196,7 @@ export default function CartPage() {
           )}
 
           <div className="mt-6">
-            <RecentlyViewed products={recentlyViewed} />
+            <RecentlyViewed />
           </div>
         </div>
       </main>
