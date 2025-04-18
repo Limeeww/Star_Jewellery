@@ -1,21 +1,23 @@
-// components/CartItem/CartItemComponent.tsx
 "use client";
 
-import React from "react";
-import Link from "next/link";
+import React, { useState } from "react";
 import Image from "next/image";
-import { CartItem } from "@/app/types/cartItem";
-
-interface CartItemWithLink extends CartItem {
-  slug: string;
-  variantId: number;
-}
+import Link from "next/link";
+import { formatPrice } from "@/app/utils/priceUtils";
+import ConfirmModal from "@/app/components/MessageHandling/ConfirmModal";
+import { CartItem } from "../../types/cartItem";
 
 interface CartItemComponentProps {
-  item: CartItemWithLink;
-  onIncrement: () => void;
-  onDecrement: () => void;
-  onRemove: () => void;
+  item: CartItem & {
+    originalPrice?: number;
+    discountName?: string;
+    slug: string;
+    variantId: number;
+    description?: string;
+  };
+  onIncrement: (itemId: number) => void;
+  onDecrement: (itemId: number) => void;
+  onRemove: (itemId: number) => void;
 }
 
 export default function CartItemComponent({
@@ -24,39 +26,120 @@ export default function CartItemComponent({
   onDecrement,
   onRemove,
 }: CartItemComponentProps) {
-  console.log("CartItemComponent", item);
   const href = `/${item.slug}?variantID=${item.variantId}`;
+  const hasDiscount = item.originalPrice != null && item.originalPrice > item.price;
+
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [actionIsRemove, setActionIsRemove] = useState(false);
+
+  const handleDecrement = () => {
+    if (item.quantity > 1) {
+      onDecrement(item.productId);
+    } else {
+      setActionIsRemove(false);
+      setConfirmOpen(true);
+    }
+  };
+
+  const handleRemove = () => {
+    setActionIsRemove(true);
+    setConfirmOpen(true);
+  };
+
+  const handleConfirm = () => {
+    if (actionIsRemove) {
+      onRemove(item.productId);
+    } else {
+      onDecrement(item.productId);
+    }
+    setConfirmOpen(false);
+  };
 
   return (
-    <div className="flex items-center bg-white p-4 rounded shadow space-x-4">
-      <Link href={href} className="flex-shrink-0 w-20 h-20 overflow-hidden rounded">
-        <Image
-          src={item.imageUrl}
-          alt={item.name}
-          width={80}
-          height={80}
-          className="object-cover w-full h-full"
-        />
-      </Link>
-
-      <div className="flex-1">
-        <Link href={href} className="text-lg font-medium hover:underline block">
-          {item.name}
+    <>
+      <div className="w-full flex-wrap bg-white p-4 shadow-md flex items-center gap-4">
+        <Link href={href} className="flex-shrink-0">
+          <div className="relative w-16 h-16">
+            <Image
+              src={item.imageUrl}
+              alt={item.name}
+              fill
+              className="object-cover rounded"
+            />
+          </div>
         </Link>
 
-        <div className="flex items-center space-x-2 mt-2">
-          <button onClick={onDecrement} className="px-2 py-1 bg-gray-200 rounded">–</button>
-          <span>{item.quantity}</span>
-          <button onClick={onIncrement} className="px-2 py-1 bg-gray-200 rounded">+</button>
-          <button onClick={onRemove} className="ml-4 text-red-500 hover:underline">
-            Remove
+        <div className="flex flex-col flex-grow min-w-0">
+          <Link
+            href={href}
+            className="block truncate font-semibold text-sm md:text-base hover:underline"
+          >
+            {item.name}
+          </Link>
+          {item.description && (
+            <p className="text-xs md:text-sm text-gray-500 truncate">
+              {item.description}
+            </p>
+          )}
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleDecrement}
+            className="px-2 py-1 border text-sm hover:bg-gray-100 transition"
+          >
+            –
           </button>
+          <span className="w-6 text-center">{item.quantity}</span>
+          <button
+            onClick={() => onIncrement(item.productId)}
+            className="px-2 py-1 border text-sm hover:bg-gray-100 transition"
+          >
+            +
+          </button>
+        </div>
+
+        <button
+          onClick={handleRemove}
+          className="text-sm underline text-red-600 hover:text-black transition-colors"
+        >
+          Remove
+        </button>
+
+        <div className="ml-auto text-right">
+          {hasDiscount ? (
+            <div className="space-y-1">
+              <p className="text-sm text-gray-500 line-through">
+                {formatPrice(item.originalPrice! * item.quantity)} ₴
+              </p>
+              <p className="text-base font-bold text-red-600">
+                {formatPrice(item.price * item.quantity)} ₴
+              </p>
+              {item.discountName && (
+                <p className="text-xs text-red-500">{item.discountName}</p>
+              )}
+            </div>
+          ) : (
+            <p className="font-semibold text-sm md:text-base whitespace-nowrap">
+              {formatPrice(item.price * item.quantity)} ₴
+            </p>
+          )}
         </div>
       </div>
 
-      <div className="font-semibold">
-        ₴{item.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-      </div>
-    </div>
+      <ConfirmModal
+        isOpen={confirmOpen}
+        title={actionIsRemove ? "Remove Item" : "Decrease Quantity"}
+        message={
+          actionIsRemove
+            ? "Are you sure you want to remove this item from your cart?"
+            : "Quantity will become zero. Remove item?"
+        }
+        cancelLabel="Cancel"
+        confirmLabel={actionIsRemove ? "Remove" : "Yes"}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={handleConfirm}
+      />
+    </>
   );
 }

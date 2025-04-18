@@ -1,7 +1,8 @@
-
 import { collection, getDocs, query, limit } from "firebase/firestore";
 import { db } from "../../firebase/firebaseConfig";
-import { Product } from "../types/product";
+import { Product, ProductVariant } from "../types/product";
+
+const norm = (s: string) => s.trim().toLowerCase();
 
 export async function fetchProducts(limitNum: number): Promise<Product[]> {
   try {
@@ -35,4 +36,18 @@ export async function fetchProducts(limitNum: number): Promise<Product[]> {
     console.error("Error fetching products: ", error);
     return [];
   }
+}
+
+export function findByVariantAttributes(
+  variants: ProductVariant[],
+  insert: string,
+  materialColor: string
+): ProductVariant | undefined {
+  return (
+    variants.find(
+      (v) =>
+        norm(v.insert) === norm(insert) &&
+        norm(v.materialColor) === norm(materialColor)
+    ) || variants[0]
+  );
 }

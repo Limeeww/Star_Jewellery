@@ -87,11 +87,15 @@ export default function CartPage() {
         <Notification {...notification} onClose={clearNotification} />
       )}
 
-      <main className="min-h-screen bg-gray-50 p-4 text-gray-800 mt-10"
-      style={{ fontFamily: "var(--font-poppins)" }}>
+      <main
+        className="min-h-screen bg-gray-50 p-4 text-gray-800 mt-10"
+        style={{ fontFamily: "var(--font-poppins)" }}
+      >
         <div className="container mx-auto">
-          <h1 className="text-4xl mb-6 mt-10 text-center"
-          style={{ fontFamily: "var(--font-playfair)" }}>
+          <h1
+            className="text-4xl mb-6 mt-10 text-center"
+            style={{ fontFamily: "var(--font-playfair)" }}
+          >
             Cart ({totalCount} {totalCount > 1 ? "Items" : "Item"})
           </h1>
 
@@ -107,12 +111,11 @@ export default function CartPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="col-span-2 space-y-6">
+              <div className="col-span-1 lg:col-span-2 space-y-6">
                 {cartItems.map((item) => (
                   <CartItemComponent
                     key={`${item.productId}-${item.size}-${item.insert}-${item.materialColor}`}
                     item={item}
-                    subtotal={getSubtotal([item])}
                     onIncrement={() =>
                       user &&
                       incrementQuantity(
@@ -147,11 +150,9 @@ export default function CartPage() {
                 ))}
 
                 <GiftOptions register={register} />
-
-                <RecentlyViewed products={recentlyViewed} />
               </div>
 
-              <div className="col-span-1">
+              <div className="col-span-full lg:col-span-1">
                 <OrderSummary
                   subtotal={subtotal}
                   shipping={shipping}
@@ -161,6 +162,9 @@ export default function CartPage() {
               </div>
             </div>
           )}
+          <div className="mt-6">
+            <RecentlyViewed products={recentlyViewed} />
+          </div>
         </div>
       </main>
 

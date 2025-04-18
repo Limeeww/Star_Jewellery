@@ -46,18 +46,18 @@ import { useCartItems } from "../utils/cartUtils";
 import { useRequireAuth } from "../utils/auth";
 import { useNotification } from "../utils/useNotification";
 import { calculateDiscountedPrice, formatPrice } from "../utils/priceUtils";
+import { findByVariantAttributes } from "../utils/product";
 
 import { Collection } from "../types/collection";
 import { Discount, Product, ProductVariant } from "../types/product";
 import InfoBlocks from "./components/InfoItem";
+import { CartItem } from "../types/cartItem";
 
 interface FormValues {
   size: string;
   inserts: string;
   materialColor: string;
 }
-
-const norm = (s: string) => s.trim().toLowerCase();
 
 export default function ProductPage() {
   const [user, loadingAuth] = useAuthState(auth);
@@ -166,14 +166,12 @@ export default function ProductPage() {
     })();
   }, [slug, variantID, notify, setValue]);
 
-  const displayedVariant: ProductVariant | undefined = useMemo(() => {
+  const displayedVariant = useMemo<ProductVariant | undefined>(() => {
     if (!product) return undefined;
-    return (
-      product.variants.find(
-        (v) =>
-          norm(v.insert) === norm(selectedInsert) &&
-          norm(v.materialColor) === norm(selectedMaterialColor)
-      ) || product.variants[0]
+    return findByVariantAttributes(
+      product.variants,
+      selectedInsert,
+      selectedMaterialColor
     );
   }, [product, selectedInsert, selectedMaterialColor]);
 
@@ -183,16 +181,14 @@ export default function ProductPage() {
   }, [displayedVariant, activeDiscount]);
 
   useEffect(() => {
-    if (!product) return;
-    if (!watchInsert || !watchColor) return;
+    if (!product || !watchInsert || !watchColor || !searchParams) return;
 
-    const matched = product.variants.find(
-      (v) =>
-        norm(v.insert) === norm(watchInsert) &&
-        norm(v.materialColor) === norm(watchColor)
+    const matched = findByVariantAttributes(
+      product.variants,
+      watchInsert,
+      watchColor
     );
     if (!matched) return;
-
     if (matched.id === Number(variantID)) return;
 
     const params = new URLSearchParams(searchParams.toString());
@@ -214,8 +210,13 @@ export default function ProductPage() {
   const onSubmit = async (data: FormValues) => {
     if (!user || !product || !displayedVariant) return;
 
-    const cartItem = {
+    const cartItem: CartItem = {
       productId: product.id,
+      slug: product.slug!,
+      description: product.description,
+      variantId: displayedVariant.id,
+      originalPrice: displayedVariant.price,
+      discountName: activeDiscount?.name,
       name: product.name,
       imageUrl: displayedVariant.images?.[0] || "",
       price: discountedPrice ?? displayedVariant.price,
@@ -223,8 +224,6 @@ export default function ProductPage() {
       size: Number(data.size),
       insert: displayedVariant.insert,
       materialColor: displayedVariant.materialColor,
-      variantID: displayedVariant.id,
-      slug: product.slug || "",
     };
 
     try {
@@ -390,7 +389,8 @@ export default function ProductPage() {
           <h2 className="text-2xl font-semibold mb-4">
             Product successfully added to cart!
           </h2>
-          {cartItems?.length ? (
+
+          {cartItems.length > 0 ? (
             cartItems.map((it) => (
               <CartItemComponent
                 key={`${it.productId}-${it.size}-${it.insert}-${it.materialColor}`}

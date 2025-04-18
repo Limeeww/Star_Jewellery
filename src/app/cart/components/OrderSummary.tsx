@@ -1,4 +1,3 @@
-// components/OrderSummary/OrderSummary.tsx
 import React from "react";
 
 interface OrderSummaryProps {
