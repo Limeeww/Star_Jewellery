@@ -46,18 +46,18 @@ import { useCartItems } from "../utils/cartUtils";
 import { useRequireAuth } from "../utils/auth";
 import { useNotification } from "../utils/useNotification";
 import { calculateDiscountedPrice, formatPrice } from "../utils/priceUtils";
+import { findByVariantAttributes } from "../utils/product";
 
 import { Collection } from "../types/collection";
 import { Discount, Product, ProductVariant } from "../types/product";
 import InfoBlocks from "./components/InfoItem";
+import { CartItem } from "../types/cartItem";
 
 interface FormValues {
   size: string;
   inserts: string;
   materialColor: string;
 }
-
-const norm = (s: string) => s.trim().toLowerCase();
 
 export default function ProductPage() {
   const [user, loadingAuth] = useAuthState(auth);
@@ -109,7 +109,6 @@ export default function ProductPage() {
         const fetchedProduct = productSnap.docs[0].data() as Product;
         setProduct(fetchedProduct);
 
-        /* pick variant from URL (if any) */
         let initialVariant: ProductVariant | null = null;
         if (variantID) {
           initialVariant =
@@ -123,7 +122,6 @@ export default function ProductPage() {
         setValue("inserts", initialVariant.insert);
         setValue("materialColor", initialVariant.materialColor);
 
-        /* collection */
         if (fetchedProduct.categoryId) {
           const colSnap = await getDoc(
             doc(db, "collections", fetchedProduct.categoryId.toString())
@@ -144,7 +142,6 @@ export default function ProductPage() {
           }
         }
 
-        /* discounts */
         const discSnap = await getDocs(
           query(
             collection(db, "discounts"),
@@ -169,14 +166,12 @@ export default function ProductPage() {
     })();
   }, [slug, variantID, notify, setValue]);
 
-  const displayedVariant: ProductVariant | undefined = useMemo(() => {
+  const displayedVariant = useMemo<ProductVariant | undefined>(() => {
     if (!product) return undefined;
-    return (
-      product.variants.find(
-        (v) =>
-          norm(v.insert) === norm(selectedInsert) &&
-          norm(v.materialColor) === norm(selectedMaterialColor)
-      ) || product.variants[0]
+    return findByVariantAttributes(
+      product.variants,
+      selectedInsert,
+      selectedMaterialColor
     );
   }, [product, selectedInsert, selectedMaterialColor]);
 
@@ -186,16 +181,14 @@ export default function ProductPage() {
   }, [displayedVariant, activeDiscount]);
 
   useEffect(() => {
-    if (!product) return;
-    if (!watchInsert || !watchColor) return;
+    if (!product || !watchInsert || !watchColor || !searchParams) return;
 
-    const matched = product.variants.find(
-      (v) =>
-        norm(v.insert) === norm(watchInsert) &&
-        norm(v.materialColor) === norm(watchColor)
+    const matched = findByVariantAttributes(
+      product.variants,
+      watchInsert,
+      watchColor
     );
     if (!matched) return;
-
     if (matched.id === Number(variantID)) return;
 
     const params = new URLSearchParams(searchParams.toString());
@@ -217,8 +210,13 @@ export default function ProductPage() {
   const onSubmit = async (data: FormValues) => {
     if (!user || !product || !displayedVariant) return;
 
-    const cartItem = {
+    const cartItem: CartItem = {
       productId: product.id,
+      slug: product.slug!,
+      description: product.description,
+      variantId: displayedVariant.id,
+      originalPrice: displayedVariant.price,
+      discountName: activeDiscount?.name,
       name: product.name,
       imageUrl: displayedVariant.images?.[0] || "",
       price: discountedPrice ?? displayedVariant.price,
@@ -259,7 +257,7 @@ export default function ProductPage() {
   ).map((c) => ({ value: c, label: c }));
 
   return (
-    <>
+    <div style={{ fontFamily: "var(--font-poppins)" }}>
       <Navbar isScrolled isLoggedIn={!!user} />
 
       <section className="px-4 py-16 sm:px-6 lg:px-8" id="product-page">
@@ -350,7 +348,11 @@ export default function ProductPage() {
             </form>
 
             <div className="mt-8">
-              <MainFeaturesList product={product} />
+              <MainFeaturesList
+                displayedVariant={displayedVariant}
+                collection={collectionData[0]}
+                product={product}
+              />
             </div>
 
             <div className="mt-6">
@@ -384,10 +386,11 @@ export default function ProductPage() {
 
       <SideModal isOpen={sideModalOpen} onClose={() => setSideModalOpen(false)}>
         <div className="p-4 h-full flex flex-col max-h-screen overflow-y-auto">
-          <h2 className="text-2xl font-semibold mb-2">
+          <h2 className="text-2xl font-semibold mb-4">
             Product successfully added to cart!
           </h2>
-          {cartItems?.length ? (
+
+          {cartItems.length > 0 ? (
             cartItems.map((it) => (
               <CartItemComponent
                 key={`${it.productId}-${it.size}-${it.insert}-${it.materialColor}`}
@@ -433,6 +436,6 @@ export default function ProductPage() {
           </div>
         </div>
       </SideModal>
-    </>
+    </div>
   );
 }

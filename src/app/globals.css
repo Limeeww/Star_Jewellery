@@ -197,3 +197,10 @@ body {
   background: #d1d5db;
   border-radius: 2px;
 }
+@layer utilities {
+  @media (min-width: 768px) {
+    .cursor-zoom-out-custom {
+      cursor: url("/cursors/zoom-out.svg") 24 24, auto;
+    }
+  }
+}

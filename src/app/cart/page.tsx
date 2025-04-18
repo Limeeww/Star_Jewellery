@@ -2,8 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { auth, db } from "@/firebase/firebaseConfig";
-import { doc, onSnapshot, getDoc, updateDoc } from "firebase/firestore";
+import { auth } from "@/firebase/firebaseConfig";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
 
@@ -12,10 +11,12 @@ import Footer from "@/app/components/Footer/Footer";
 import CartItemComponent from "@/app/components/CartItem/CartItemComponent";
 import OrderSummary from "@/app/cart/components/OrderSummary";
 import RecentlyViewed from "@/app/components/RecentlyViewed/RecentlyViewed";
+import GiftOptions from "@/app/cart/components/GiftOptions";
 
-import { CartItem } from "@/app/types/cartItem";
 import { GiftOptionsForm } from "@/app/types/order";
 import { Product } from "@/app/types/product";
+import Notification from "../components/MessageHandling/Notification";
+
 import {
   getTotalCount,
   getSubtotal,
@@ -24,102 +25,44 @@ import {
   getTotal,
   useCartItems,
 } from "@/app/utils/cartUtils";
-import GiftOptions from "./components/GiftOptions";
+import {
+  incrementQuantity,
+  decrementQuantity,
+  removeItem,
+} from "@/app/utils/cartActions";
+import { useNotification } from "../utils/useNotification";
 
 export default function CartPage() {
   const [user, loading] = useAuthState(auth);
   const isLoggedIn = !!user && !loading;
+  const { notify, notification, clearNotification } = useNotification();
 
   const [recentlyViewed, setRecentlyViewed] = useState<Product[]>([]);
-
   const cartItems = useCartItems(user ? user.uid : null);
 
   useEffect(() => {
     try {
       const stored = localStorage.getItem("recentlyViewed");
-      if (stored) {
-        const parsed = JSON.parse(stored) as Product[];
-        setRecentlyViewed(parsed);
-      }
-    } catch (error) {
-      console.error("Ошибка чтения localStorage:", error);
+      if (stored) setRecentlyViewed(JSON.parse(stored));
+    } catch (e) {
+      notify({
+        type: "error",
+        message: `Error loading recently viewed products, ${e}`,
+      });
     }
-  }, []);
+  }, [notify]);
 
-  const incrementQuantity = async (productId: number) => {
-    if (!user) return;
-    const userRef = doc(db, "users", user.uid);
-
-    const snap = await getDoc(userRef);
-    if (!snap.exists()) return;
-
-    const data = snap.data();
-    let updatedCart: CartItem[] = data.cartItems || [];
-
-    updatedCart = updatedCart.map((item) => {
-      if (item.productId === productId) {
-        return { ...item, quantity: item.quantity + 1 };
-      }
-      return item;
-    });
-
-    await updateDoc(userRef, { cartItems: updatedCart });
-  };
-
-  const decrementQuantity = async (productId: number) => {
-    if (!user) return;
-    const userRef = doc(db, "users", user.uid);
-
-    const snap = await getDoc(userRef);
-    if (!snap.exists()) return;
-
-    let updatedCart: CartItem[] = snap.data().cartItems || [];
-
-    updatedCart = updatedCart.map((item) => {
-      if (item.productId === productId && item.quantity > 1) {
-        return { ...item, quantity: item.quantity - 1 };
-      }
-      return item;
-    });
-
-    await updateDoc(userRef, { cartItems: updatedCart });
-  };
-
-  const removeItem = async (productId: number) => {
-    if (!user) return;
-    const userRef = doc(db, "users", user.uid);
-
-    const snap = await getDoc(userRef);
-    if (!snap.exists()) return;
-
-    let updatedCart: CartItem[] = snap.data().cartItems || [];
-    console.log(updatedCart);
-    updatedCart = updatedCart.filter((item) => {
-      return item.productId === productId;
-    });
-
-    await updateDoc(userRef, { cartItems: updatedCart });
-  };
-
-  /**
-   * 4) Расчёт итоговой суммы и т.д.
-   */
-  const {
-    register,
-    watch,
-    formState: { errors },
-  } = useForm<GiftOptionsForm>({
+  const { register, watch } = useForm<GiftOptionsForm>({
     defaultValues: {
       giftPackaging: false,
       giftMessage: false,
       giftReceipt: false,
     },
   });
-
   const giftOptionsValues = {
-    giftPackaging: watch("giftPackaging", false),
-    giftMessage: watch("giftMessage", false),
-    giftReceipt: watch("giftReceipt", false),
+    giftPackaging: watch("giftPackaging"),
+    giftMessage: watch("giftMessage"),
+    giftReceipt: watch("giftReceipt"),
   };
 
   const totalCount = getTotalCount(cartItems);
@@ -140,10 +83,20 @@ export default function CartPage() {
     <>
       <Navbar isScrolled={true} isLoggedIn={isLoggedIn} />
 
-      <main className="min-h-screen bg-gray-50 p-4 text-gray-800 mt-10">
+      {notification && (
+        <Notification {...notification} onClose={clearNotification} />
+      )}
+
+      <main
+        className="min-h-screen bg-gray-50 p-4 text-gray-800 mt-10"
+        style={{ fontFamily: "var(--font-poppins)" }}
+      >
         <div className="container mx-auto">
-          <h1 className="text-4xl font-semibold mb-6 mt-10 text-center">
-            Cart ({totalCount})
+          <h1
+            className="text-4xl mb-6 mt-10 text-center"
+            style={{ fontFamily: "var(--font-playfair)" }}
+          >
+            Cart ({totalCount} {totalCount > 1 ? "Items" : "Item"})
           </h1>
 
           {cartItems.length === 0 ? (
@@ -158,24 +111,48 @@ export default function CartPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="col-span-2 space-y-6">
+              <div className="col-span-1 lg:col-span-2 space-y-6">
                 {cartItems.map((item) => (
                   <CartItemComponent
-                    key={item.productId}
+                    key={`${item.productId}-${item.size}-${item.insert}-${item.materialColor}`}
                     item={item}
-                    onIncrement={() => incrementQuantity(item.productId)}
-                    onDecrement={() => decrementQuantity(item.productId)}
-                    onRemove={() => removeItem(item.productId)}
+                    onIncrement={() =>
+                      user &&
+                      incrementQuantity(
+                        user.uid,
+                        item.productId,
+                        item.size,
+                        item.insert,
+                        item.materialColor
+                      )
+                    }
+                    onDecrement={() =>
+                      user &&
+                      decrementQuantity(
+                        user.uid,
+                        item.productId,
+                        item.size,
+                        item.insert,
+                        item.materialColor
+                      )
+                    }
+                    onRemove={() =>
+                      user &&
+                      removeItem(
+                        user.uid,
+                        item.productId,
+                        item.size,
+                        item.insert,
+                        item.materialColor
+                      )
+                    }
                   />
                 ))}
 
                 <GiftOptions register={register} />
-
-                {/* Recently Viewed из localStorage */}
-                <RecentlyViewed products={recentlyViewed} />
               </div>
 
-              <div className="col-span-1">
+              <div className="col-span-full lg:col-span-1">
                 <OrderSummary
                   subtotal={subtotal}
                   shipping={shipping}
@@ -185,6 +162,9 @@ export default function CartPage() {
               </div>
             </div>
           )}
+          <div className="mt-6">
+            <RecentlyViewed products={recentlyViewed} />
+          </div>
         </div>
       </main>
 

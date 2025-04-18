@@ -19,7 +19,7 @@ import {
   notify,
 } from "../../utils/auth";
 import AddressCard from "../components/AddressCard";
-import ConfirmDeleteModal from "../components/Modals/ConfirmDeleteModal";
+import ConfirmModal from "@/app/components/MessageHandling/ConfirmModal";
 
 export default function Addresses() {
   const [showAdressModal, setShowAddressModal] = useState(false);
@@ -183,8 +183,12 @@ export default function Addresses() {
             addressToEdit={addressToEdit}
             addressIndex={editingIndex}
           />
-          <ConfirmDeleteModal
+          <ConfirmModal
             isOpen={showDeleteModal}
+            title="Delete Address"
+            message="Are you sure you want to delete this address?"
+            cancelLabel="No, keep it"
+            confirmLabel="Yes, delete"
             onClose={() => setShowDeleteModal(false)}
             onConfirm={confirmDelete}
           />

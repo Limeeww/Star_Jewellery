@@ -1,25 +1,30 @@
-
 "use client";
+
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { IoCloseOutline } from "react-icons/io5";
-import { useModalClose } from "../../../utils/useModal"; 
-import { useNotification } from "../../../utils/useNotification"; 
-import Notification from "@/app/components/MessageHandling/Notification";
+import { useModalClose } from "@/app/utils/useModal";
 
-interface ConfirmDeleteModalProps {
+interface ConfirmModalProps {
   isOpen: boolean;
+  title: string;
+  message: string;
+  confirmLabel?: string;
+  cancelLabel?: string;
   onClose: () => void;
   onConfirm: () => void;
 }
 
-export default function ConfirmDeleteModal({
+export default function ConfirmModal({
   isOpen,
+  title,
+  message,
+  confirmLabel = "Yes",
+  cancelLabel = "No",
   onClose,
   onConfirm,
-}: ConfirmDeleteModalProps) {
+}: ConfirmModalProps) {
   const { modalRef, handleOutsideClick } = useModalClose(onClose);
-  const { notification, clearNotification } = useNotification();
 
   return (
     <AnimatePresence>
@@ -32,43 +37,32 @@ export default function ConfirmDeleteModal({
           onClick={handleOutsideClick}
         >
           <motion.div
-            className="bg-white p-6 m-0 rounded-md shadow-md w-full max-w-sm relative"
             ref={modalRef}
+            className="bg-white p-6 rounded-md shadow-md w-full max-w-sm relative"
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.8, opacity: 0 }}
           >
-            {notification && (
-              <Notification
-                message={notification.message}
-                type={notification.type}
-                duration={3000}
-                onClose={clearNotification}
-              />
-            )}
-
             <button
               onClick={onClose}
-              className="absolute top-6 right-4 text-gray-500 hover:text-gray-700"
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
             >
               <IoCloseOutline size={24} />
             </button>
-
-            <h2 className="text-xl font-semibold mb-4">Delete Address</h2>
-            <p className="mb-6">Are you sure you want to delete this address?</p>
-
+            <h2 className="text-xl font-semibold mb-4">{title}</h2>
+            <p className="mb-6 text-gray-700">{message}</p>
             <div className="flex justify-end gap-4">
               <button
                 onClick={onClose}
-                className="px-4 py-2 border bg-white hover:bg-gray-200"
+                className="px-4 py-2 border bg-white hover:bg-gray-100 rounded"
               >
-                No
+                {cancelLabel}
               </button>
               <button
                 onClick={onConfirm}
-                className="px-4 py-2 border bg-red-100 hover:bg-red-200"
+                className="px-4 py-2 bg-red-600 text-white hover:bg-red-700 rounded"
               >
-                Yes
+                {confirmLabel}
               </button>
             </div>
           </motion.div>

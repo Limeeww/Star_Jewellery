@@ -1,19 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import { Product } from "../../types/product";
+import { Product, ProductVariant } from "../../types/product";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import InfoItem from "@/app/components/InfoItem/InfoItem";
+import { Collection } from "@/app/types/collection";
 
 interface Props {
   product: Product;
+  collection: Collection;
+  displayedVariant: ProductVariant | undefined;
 }
 
-const MainFeaturesList = ({ product }: Props) => {
+const MainFeaturesList = ({ product, collection, displayedVariant }: Props) => {
   const [expanded, setExpanded] = useState(false);
-  const variant = product.variants?.[0];
 
-  // GET FEATURES FROM FIREBASE
   const features = [
     {
       label: "Vendor code",
@@ -24,7 +25,7 @@ const MainFeaturesList = ({ product }: Props) => {
       label: "Metal",
       value: (
         <div className="flex items-center">
-          {variant?.material + " "}
+          {displayedVariant?.material + " "}
           <span className="ml-1 text-gray-400 text-xs">
             <InfoItem text="The information about the metal is provided by the manufacturer. It is not a guarantee of the quality of the product." />
           </span>
@@ -34,23 +35,25 @@ const MainFeaturesList = ({ product }: Props) => {
     },
     {
       label: "Purity",
-      value: variant?.purity ?? "—",
+      value: displayedVariant?.purity ?? "—",
       valueClass: "text-gray-800",
     },
     {
       label: "Average weight",
-      value: variant?.weight?.toFixed(1) ?? "—",
+      value: displayedVariant?.weight.toFixed(1) ?? "—",
       valueClass: "font-semibold text-gray-800",
     },
 
     {
       label: "Insert",
-      value: variant?.insert ? variant.insert : "Without insertion",
+      value: displayedVariant?.insert
+        ? displayedVariant?.insert
+        : "Without insertion",
       valueClass: "text-gray-800 font-medium",
     },
     {
       label: "Collection",
-      value: "Мегаполис",
+      value: collection?.name,
       valueClass: "text-gray-800 font-medium",
     },
   ];
