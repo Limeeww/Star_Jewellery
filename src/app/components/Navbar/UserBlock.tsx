@@ -1,7 +1,8 @@
-import React from "react";
+"use client";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { LuLogOut, LuUserRound } from "react-icons/lu";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 import { signOutUser } from "@/app/utils/auth";
 
 type UserBlockProps = {
@@ -10,22 +11,28 @@ type UserBlockProps = {
   onClose?: () => void;
 };
 
-
-export default function UserBlock({isScrolled, isLoggedIn, onClose}: UserBlockProps) {
+export default function UserBlock({ isScrolled, isLoggedIn, onClose }: UserBlockProps) {
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const linkClass = `
-    transition-colors 
-    duration-300 
-    hover:underline 
-    flex 
-    items-center 
+    transition-colors
+    duration-300
+    hover:underline
+    flex
+    items-center
     space-x-1
   `;
 
   const textColor = isScrolled
     ? "text-gray-800 hover:text-gray-500"
     : "text-white hover:text-gray-300";
+
+  if (!mounted) return null;
 
   if (isLoggedIn) {
     return (
@@ -36,7 +43,7 @@ export default function UserBlock({isScrolled, isLoggedIn, onClose}: UserBlockPr
           onClick={onClose}
         >
           <LuUserRound size={18} />
-          <span>My Account</span> {/* TO DO create model type User and import it to get users name*/}
+          <span>My Account</span>
         </Link>
         <button
           className={`${linkClass} ${textColor} text-left`}

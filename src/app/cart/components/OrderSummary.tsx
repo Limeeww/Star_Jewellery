@@ -29,7 +29,7 @@ export default function OrderSummary({
 
       <div className="flex justify-between">
         <p className="text-gray-600">Subtotal</p>
-        <p className="font-semibold">
+        <div className="font-semibold">
           {shouldDisplayDiscount && (
             <DiscountDisplay
               originalPrice={originalPrice!}
@@ -38,20 +38,20 @@ export default function OrderSummary({
               className="mb-4"
             />
           )}
-        </p>
+        </div>
       </div>
 
       <div className="flex justify-between">
         <p className="text-gray-600">Shipping</p>
         <p className="font-semibold">
-          {shipping === 0 ? "Free" : `₴${formatPrice(shipping)}`}
+          {shipping === 0 ? "Free" : `${formatPrice(shipping)} ₴`}
         </p>
       </div>
 
       {giftOptionsTotal > 0 && (
         <div className="flex justify-between">
           <p className="text-gray-600">Gift Options</p>
-          <p className="font-semibold">₴{formatPrice(giftOptionsTotal)}</p>
+          <p className="font-semibold">{formatPrice(giftOptionsTotal)} ₴</p>
         </div>
       )}
 
@@ -59,7 +59,7 @@ export default function OrderSummary({
 
       <div className="flex justify-between">
         <p className="font-semibold">Total</p>
-        <p className="font-semibold">₴{formatPrice(total)}</p>
+        <p className="font-semibold">{formatPrice(total)} ₴</p>
       </div>
 
       <LinkButtonForm

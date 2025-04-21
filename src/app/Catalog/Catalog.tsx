@@ -43,7 +43,7 @@ export default function CollectionPage() {
 
       <EmblaCarousel options={OPTIONS}>
         {items.map((product) => (
-          <div key={product.id} className="flex-shrink-0 w-1/2 md:w-1/4 px-2">
+          <div key={product.id} className="flex-shrink-0 w-1/2 md:w-1/4">
             <Item product={product} />
           </div>
         ))}

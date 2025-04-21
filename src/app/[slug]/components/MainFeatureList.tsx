@@ -8,7 +8,7 @@ import { Collection } from "@/app/types/collection";
 
 interface Props {
   product: Product;
-  collection: Collection;
+  collection?: Collection;
   displayedVariant: ProductVariant | undefined;
 }
 

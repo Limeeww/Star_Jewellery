@@ -61,6 +61,8 @@ export default function HomePage() {
           Your browser does not support video format.
         </video>
 
+        <div className="absolute inset-0 bg-black/40 -z-10" />
+
         <div className="absolute top-0 left-0 w-full h-full flex items-center">
           <div className="container mx-auto px-4">
             <h1

@@ -33,15 +33,14 @@ export default function RecentlyViewed() {
 
   if (recent.length === 0) return null;
 
-  console.log("recently viewed", recent);
 
   return (
     <div className="bg-white p-4 rounded shadow">
-      <h2 className="text-lg font-semibold mb-4">Recently Viewed</h2>
+      <h2 className="text-lg font-semibold">Recently Viewed</h2>
 
       <EmblaCarousel options={{ align: "start", dragFree: true }}>
         {recent.map((p) => (
-          <div key={p.id} className="min-w-[220px] pr-4">
+          <div key={p.id} className="min-w-[320px]">
             <Item product={p} />
           </div>
         ))}
