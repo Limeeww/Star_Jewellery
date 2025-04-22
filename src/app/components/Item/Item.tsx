@@ -61,7 +61,8 @@ export default function Item({ product, displayedVariant }: Props) {
 
         <div className="mt-2 flex flex-col flex-grow justify-between min-h-0">
           <h3 className="text-base md:text-lg font-medium break-words">
-            {product.name}
+            {product.name}{" "}
+            <span className="text-sm text-gray-400">#{variant?.id}</span>
           </h3>
           {variant?.price != null && (
             <p
