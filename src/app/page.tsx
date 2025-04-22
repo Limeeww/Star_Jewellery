@@ -8,7 +8,6 @@ import { auth } from "../firebase/firebaseConfig";
 import Image from "next/image";
 import Catalog from "./Catalog/Catalog";
 
-
 import Collection from "./Collections/Collection";
 import AboutUsSection from "./AboutUsSection/AboutUsSection";
 import { FaGift, FaHeadset, FaShippingFast } from "react-icons/fa";
@@ -44,7 +43,11 @@ export default function HomePage() {
 
   return (
     <>
-      <Navbar isScrolled={isScrolled} isLoggedIn={isLoggedIn} navLinks={NAV_LINKS} />
+      <Navbar
+        isScrolled={isScrolled}
+        isLoggedIn={isLoggedIn}
+        navLinks={NAV_LINKS}
+      />
 
       <div className="relative w-full h-screen" ref={header}>
         <video
@@ -57,6 +60,8 @@ export default function HomePage() {
           <source src="/videos/background.mp4" type="video/mp4" />
           Your browser does not support video format.
         </video>
+
+        <div className="absolute inset-0 bg-black/40 -z-10" />
 
         <div className="absolute top-0 left-0 w-full h-full flex items-center">
           <div className="container mx-auto px-4">

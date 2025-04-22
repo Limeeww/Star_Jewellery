@@ -8,7 +8,7 @@ import { Collection } from "@/app/types/collection";
 
 interface AboutCollectionProps {
   firebaseProduct: Product;
-  collection: Collection;
+  collection?: Collection;
 }
 
 export default function AboutCollection({

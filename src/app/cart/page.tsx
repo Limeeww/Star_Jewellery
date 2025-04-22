@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import React from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase/firebaseConfig";
 import { useForm } from "react-hook-form";
-import Link from "next/link";
 
 import Navbar from "@/app/components/Navbar/Navbar";
 import Footer from "@/app/components/Footer/Footer";
@@ -12,10 +13,8 @@ import CartItemComponent from "@/app/components/CartItem/CartItemComponent";
 import OrderSummary from "@/app/cart/components/OrderSummary";
 import RecentlyViewed from "@/app/components/RecentlyViewed/RecentlyViewed";
 import GiftOptions from "@/app/cart/components/GiftOptions";
-
 import { GiftOptionsForm } from "@/app/types/order";
-import { Product } from "@/app/types/product";
-import Notification from "../components/MessageHandling/Notification";
+import Notification from "@/app/components/MessageHandling/Notification";
 
 import {
   getTotalCount,
@@ -30,39 +29,28 @@ import {
   decrementQuantity,
   removeItem,
 } from "@/app/utils/cartActions";
-import { useNotification } from "../utils/useNotification";
+import { useNotification } from "@/app/utils/useNotification";
 
 export default function CartPage() {
   const [user, loading] = useAuthState(auth);
   const isLoggedIn = !!user && !loading;
-  const { notify, notification, clearNotification } = useNotification();
-
-  const [recentlyViewed, setRecentlyViewed] = useState<Product[]>([]);
+  const { notification, clearNotification } = useNotification();
   const cartItems = useCartItems(user ? user.uid : null);
 
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem("recentlyViewed");
-      if (stored) setRecentlyViewed(JSON.parse(stored));
-    } catch (e) {
-      notify({
-        type: "error",
-        message: `Error loading recently viewed products, ${e}`,
-      });
-    }
-  }, [notify]);
 
   const { register, watch } = useForm<GiftOptionsForm>({
     defaultValues: {
       giftPackaging: false,
       giftMessage: false,
       giftReceipt: false,
+      giftMessageText: "",
     },
   });
   const giftOptionsValues = {
     giftPackaging: watch("giftPackaging"),
     giftMessage: watch("giftMessage"),
     giftReceipt: watch("giftReceipt"),
+    giftMessageText: watch("giftMessageText") ?? "",
   };
 
   const totalCount = getTotalCount(cartItems);
@@ -70,6 +58,11 @@ export default function CartPage() {
   const shipping = getShippingCost(subtotal);
   const giftOptionsTotal = getGiftOptionsTotal(giftOptionsValues);
   const total = getTotal(subtotal, shipping, giftOptionsTotal);
+
+  const originalPriceSum = cartItems.reduce(
+    (sum, item) => sum + (item.originalPrice ?? item.price) * item.quantity,
+    0
+  );
 
   if (!isLoggedIn) {
     return (
@@ -82,7 +75,6 @@ export default function CartPage() {
   return (
     <>
       <Navbar isScrolled={true} isLoggedIn={isLoggedIn} />
-
       {notification && (
         <Notification {...notification} onClose={clearNotification} />
       )}
@@ -96,7 +88,7 @@ export default function CartPage() {
             className="text-4xl mb-6 mt-10 text-center"
             style={{ fontFamily: "var(--font-playfair)" }}
           >
-            Cart ({totalCount} {totalCount > 1 ? "Items" : "Item"})
+            Your Cart ({totalCount} {totalCount > 1 ? "Items" : "Item"})
           </h1>
 
           {cartItems.length === 0 ? (
@@ -106,7 +98,7 @@ export default function CartPage() {
                 href="/"
                 className="inline-block mt-2 text-sm underline text-gray-700 hover:text-black transition-colors"
               >
-                Return to shop
+                Return to the shop
               </Link>
             </div>
           ) : (
@@ -148,22 +140,63 @@ export default function CartPage() {
                     }
                   />
                 ))}
-
-                <GiftOptions register={register} />
+                <GiftOptions register={register} watch={watch} />
               </div>
 
-              <div className="col-span-full lg:col-span-1">
+              <div className="col-span-full lg:col-span-1 space-y-6">
                 <OrderSummary
+                  originalPrice={originalPriceSum}
                   subtotal={subtotal}
                   shipping={shipping}
                   giftOptionsTotal={giftOptionsTotal}
                   total={total}
                 />
+
+                <div className="bg-white p-4 rounded shadow space-y-2 w-full">
+                  <h3 className="text-lg font-semibold mb-2">
+                    Payment Methods
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      {
+                        src: "https://upload.wikimedia.org/wikipedia/commons/4/40/Klarna_Payment_Badge.svg",
+                        alt: "Klarna",
+                      },
+                      {
+                        src: "https://upload.wikimedia.org/wikipedia/commons/0/04/Visa.svg",
+                        alt: "Visa",
+                      },
+                      {
+                        src: "https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg",
+                        alt: "PayPal",
+                      },
+                      {
+                        src: "https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg",
+                        alt: "Mastercard",
+                      },
+                    ].map(({ src, alt }) => (
+                      <div
+                        key={alt}
+                        className="flex-1 py-3 transition"
+                      >
+                        <div className="relative w-full h-6">
+                          <Image
+                            src={src}
+                            alt={alt}
+                            fill
+                            className="object-contain"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
           )}
+
           <div className="mt-6">
-            <RecentlyViewed products={recentlyViewed} />
+            <RecentlyViewed />
           </div>
         </div>
       </main>
