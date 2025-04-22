@@ -3,19 +3,25 @@
 import React, { useEffect, useState, useCallback } from "react";
 import EmblaCarousel from "@/app/components/EmblaCarousel/EmblaCarousel";
 import Item from "@/app/components/Item/Item";
-import { Product } from "@/app/types/product";
 import { useNotification } from "@/app/utils/useNotification";
 
-
+export interface RecentEntry {
+  id: number;
+  slug: string;
+  name: string;
+  image: string;
+  variantId: number;
+  date: Date;
+}
 
 export default function RecentlyViewed() {
-  const [recent, setRecent] = useState<Product[]>([]);
+  const [recent, setRecent] = useState<RecentEntry[]>([]);
   const { notify } = useNotification();
 
   const loadFromStorage = useCallback(() => {
     try {
       const stored = localStorage.getItem("recentlyViewed");
-      setRecent(stored ? (JSON.parse(stored) as Product[]) : []);
+      setRecent(stored ? (JSON.parse(stored) as RecentEntry[]) : []);
     } catch (e) {
       notify({ type: "error", message: `Error reading recently viewed: ${e}` });
     }
@@ -40,7 +46,7 @@ export default function RecentlyViewed() {
 
       <EmblaCarousel options={{ align: "start", dragFree: true }}>
         {recent.map((p) => (
-          <div key={p.id} className="min-w-[320px]">
+          <div key={`${p.id}-${p.variantId}`} className="min-w-[320px]">
             <Item product={p} />
           </div>
         ))}
