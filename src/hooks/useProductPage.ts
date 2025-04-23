@@ -10,7 +10,7 @@ import { Timestamp } from "firebase/firestore";
 import { Product, ProductVariant, Discount } from "@/app/types/product";
 import { Collection } from "@/app/types/collection";
 
-import { useNotification } from "@/app/utils/useNotification";
+import { useNotification } from "@/hooks/useNotification";
 import {
   fetchProductBySlug,
   fetchCollectionById,

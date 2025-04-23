@@ -15,8 +15,8 @@ import TextField from "@/app/components/FormComponents/TextField";
 import SubmitButton from "@/app/components/FormComponents/SubmitButton";
 import Notification from "../../../components/MessageHandling/Notification";
 import { isEmailTaken, useSyncUserEmail } from "@/app/utils/auth";
-import { useModalClose } from "@/app/utils/useModal";
-import { useNotification } from "@/app/utils/useNotification";
+import { useModalClose } from "@/hooks/useModal";
+import { useNotification } from "@/hooks/useNotification";
 
 interface ChangeEmailForm {
   newEmail: string;

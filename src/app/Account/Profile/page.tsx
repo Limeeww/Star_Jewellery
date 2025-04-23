@@ -29,13 +29,12 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { validationSchemaProfile } from "@/app/utils/validationSchemaProfile";
 import LinkButton from "../components/LinkButton";
 
-
 import {
   useRequireAuth,
   useProfileData,
   updateUserProfileWithChecks,
 } from "../../utils/auth";
-import { useNotification } from "@/app/utils/useNotification";
+import { useNotification } from "@/hooks/useNotification";
 
 export default function Profile() {
   const [user, loading, error] = useAuthState(auth);
@@ -94,7 +93,7 @@ export default function Profile() {
       });
     }
   };
-  
+
   return (
     <>
       <Navbar isScrolled={true} isLoggedIn={!!user} />

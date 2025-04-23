@@ -30,7 +30,7 @@ import Loading from "../components/Loading/Loading";
 import SubmitButton from "../components/FormComponents/SubmitButton";
 
 import Notification from "../components/MessageHandling/Notification";
-import { useNotification } from "../utils/useNotification";
+import { useNotification } from "../../hooks/useNotification";
 
 export default function SignUpPage() {
   const router = useRouter();

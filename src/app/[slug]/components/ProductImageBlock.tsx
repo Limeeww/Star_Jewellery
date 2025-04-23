@@ -9,7 +9,7 @@ import {
   AiOutlineLeft,
   AiOutlineRight,
 } from "react-icons/ai";
-import { useModalClose } from "@/app/utils/useModal";
+import { useModalClose } from "@/hooks/useModal";
 
 interface ProductImageBlockProps {
   images: string[];

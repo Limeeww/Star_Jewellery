@@ -29,14 +29,13 @@ import {
   decrementQuantity,
   removeItem,
 } from "@/app/utils/cartActions";
-import { useNotification } from "@/app/utils/useNotification";
+import { useNotification } from "@/hooks/useNotification";
 
 export default function CartPage() {
   const [user, loading] = useAuthState(auth);
   const isLoggedIn = !!user && !loading;
   const { notification, clearNotification } = useNotification();
   const cartItems = useCartItems(user ? user.uid : null);
-
 
   const { register, watch } = useForm<GiftOptionsForm>({
     defaultValues: {
@@ -175,10 +174,7 @@ export default function CartPage() {
                         alt: "Mastercard",
                       },
                     ].map(({ src, alt }) => (
-                      <div
-                        key={alt}
-                        className="flex-1 py-3 transition"
-                      >
+                      <div key={alt} className="flex-1 py-3 transition">
                         <div className="relative w-full h-6">
                           <Image
                             src={src}

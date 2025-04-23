@@ -10,8 +10,8 @@ import CheckboxField from "@/app/components/FormComponents/CheckboxField";
 import PhoneNumberField from "@/app/components/FormComponents/PhoneNumberField";
 import SubmitButton from "@/app/components/FormComponents/SubmitButton";
 import Notification from "@/app/components/MessageHandling/Notification";
-import { useModalClose } from "../../../utils/useModal";
-import { useNotification } from "../../../utils/useNotification";
+import { useModalClose } from "../../../../hooks/useModal";
+import { useNotification } from "../../../../hooks/useNotification";
 import { updateUserProfile, fetchUserData } from "../../../utils/auth";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase/firebaseConfig";
@@ -88,11 +88,19 @@ export default function AddAddressModal({
 
       if (addressIndex !== null && addressIndex !== undefined) {
         addresses[addressIndex] = data;
-        notify({ message: "Address updated successfully!", duration:3000, type: "success" });
+        notify({
+          message: "Address updated successfully!",
+          duration: 3000,
+          type: "success",
+        });
         await updateUserProfile(user.uid, { addresses });
       } else {
         addresses.push(data);
-        notify({ message: "Address added successfully!", duration:3000, type: "success" });
+        notify({
+          message: "Address added successfully!",
+          duration: 3000,
+          type: "success",
+        });
         await updateUserProfile(user.uid, { addresses });
       }
 

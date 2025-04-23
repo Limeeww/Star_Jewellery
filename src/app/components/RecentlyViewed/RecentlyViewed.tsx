@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import EmblaCarousel from "@/app/components/EmblaCarousel/EmblaCarousel";
 import Item from "@/app/components/Item/Item";
-import { useNotification } from "@/app/utils/useNotification";
+import { useNotification } from "@/hooks/useNotification";
 
 export interface RecentEntry {
   id: number;
@@ -38,7 +38,6 @@ export default function RecentlyViewed() {
   }, [loadFromStorage]);
 
   if (recent.length === 0) return null;
-
 
   return (
     <div className="bg-white p-4 rounded shadow">
