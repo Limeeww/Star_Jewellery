@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase/firebaseConfig";
 import { useForm } from "react-hook-form";
@@ -29,7 +29,9 @@ import {
   decrementQuantity,
   removeItem,
 } from "@/app/utils/cartActions";
-import { useNotification } from "@/app/utils/useNotification";
+import { useNotification } from "@/hooks/useNotification";
+import SelectShippingAddress from "@/app/cart/components/SelectShippingAddress";
+import { Address } from "@/app/types/userTypes";
 
 export default function CartPage() {
   const [user, loading] = useAuthState(auth);
@@ -37,6 +39,11 @@ export default function CartPage() {
   const { notification, clearNotification } = useNotification();
   const cartItems = useCartItems(user ? user.uid : null);
 
+  const [shipAddress, setShipAddress] = useState<Address | null>(null);
+
+  const handleAddressSelect = (addr: Address) => {
+    setShipAddress(addr);
+  };
 
   const { register, watch } = useForm<GiftOptionsForm>({
     defaultValues: {
@@ -151,6 +158,12 @@ export default function CartPage() {
                   giftOptionsTotal={giftOptionsTotal}
                   total={total}
                 />
+                <div className="bg-white p-4 rounded shadow mt-6">
+                  <h3 className="text-lg font-semibold mb-2">
+                    Shipping Address
+                  </h3>
+                  <SelectShippingAddress onSelect={handleAddressSelect} />
+                </div>
 
                 <div className="bg-white p-4 rounded shadow space-y-2 w-full">
                   <h3 className="text-lg font-semibold mb-2">
@@ -175,10 +188,7 @@ export default function CartPage() {
                         alt: "Mastercard",
                       },
                     ].map(({ src, alt }) => (
-                      <div
-                        key={alt}
-                        className="flex-1 py-3 transition"
-                      >
+                      <div key={alt} className="flex-1 py-3 transition">
                         <div className="relative w-full h-6">
                           <Image
                             src={src}

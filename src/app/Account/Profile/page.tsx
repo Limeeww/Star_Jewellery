@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 
 import { auth } from "@/firebase/firebaseConfig";
 import Navbar from "@/app/components/Navbar/Navbar";
@@ -29,18 +29,17 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { validationSchemaProfile } from "@/app/utils/validationSchemaProfile";
 import LinkButton from "../components/LinkButton";
 
-
 import {
   useRequireAuth,
   useProfileData,
   updateUserProfileWithChecks,
 } from "../../utils/auth";
-import { useNotification } from "@/app/utils/useNotification";
+import { useNotification } from "@/hooks/useNotification";
 
 export default function Profile() {
   const [user, loading, error] = useAuthState(auth);
   const { notification, notify, clearNotification } = useNotification();
-  const [profileData, setProfileData] = useProfileData(user);
+  const [profileData, setProfileData] = useProfileData(user ?? null);
 
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -54,7 +53,7 @@ export default function Profile() {
     control,
     watch,
     formState: { errors },
-  } = useForm<UserData>({
+  } = useForm<Partial<UserData>>({
     resolver: yupResolver(validationSchemaProfile),
     defaultValues: {
       firstName: "",
@@ -83,7 +82,7 @@ export default function Profile() {
   if (loading) return <Loading />;
   if (error) return <ErrorMessage message={error.message} />;
 
-  const onSubmit = async (formData: UserData) => {
+  const onSubmit = async (formData: Partial<UserData>) => {
     if (!user) return;
     const updatedData = await updateUserProfileWithChecks(user.uid, formData);
     if (updatedData) {
@@ -94,7 +93,7 @@ export default function Profile() {
       });
     }
   };
-  
+
   return (
     <>
       <Navbar isScrolled={true} isLoggedIn={!!user} />
@@ -104,8 +103,8 @@ export default function Profile() {
 
       <AccountLayout pathname="/Account/Profile">
         <WelcomeBlock
-          firstName={profileData?.firstName || ""}
-          lastName={profileData?.lastName || ""}
+          firstName={profileData?.firstName as string}
+          lastName={profileData?.lastName as string}
         />
 
         <div className="mt-4 space-y-2 text-sm text-gray-800">
@@ -163,28 +162,43 @@ export default function Profile() {
 
           <h2 className="text-base font-semibold mt-8">Optional Info</h2>
           <div className="space-y-4">
-            <SelectField
-              label="Gender"
-              id="gender"
-              register={register("gender")}
-              error={errors.gender}
-              options={[
-                { value: "Male", label: "Male" },
-                { value: "Female", label: "Female" },
-                { value: "Other", label: "Other" },
-              ]}
+            <Controller
+              name="gender"
+              control={control}
+              rules={{ required: "Gender is required" }}
+              render={({ field, fieldState }) => (
+                <SelectField
+                  label="Gender"
+                  id="gender"
+                  value={field.value || ""}
+                  onChange={field.onChange}
+                  error={fieldState.error?.message}
+                  options={[
+                    { value: "Male", label: "Male" },
+                    { value: "Female", label: "Female" },
+                    { value: "Other", label: "Other" },
+                  ]}
+                />
+              )}
             />
 
-            <SelectField
-              label="Relationship Status"
-              id="relationshipStatus"
-              register={register("relationshipStatus")}
-              error={undefined}
-              options={[
-                { value: "Single", label: "Single" },
-                { value: "Married", label: "Married" },
-                { value: "Engaged", label: "Engaged" },
-              ]}
+            <Controller
+              name="relationshipStatus"
+              control={control}
+              render={({ field, fieldState }) => (
+                <SelectField
+                  label="Relationship Status"
+                  id="relationshipStatus"
+                  value={field.value || ""}
+                  onChange={field.onChange}
+                  error={fieldState.error?.message}
+                  options={[
+                    { value: "Single", label: "Single" },
+                    { value: "Married", label: "Married" },
+                    { value: "Engaged", label: "Engaged" },
+                  ]}
+                />
+              )}
             />
 
             {relationshipStatus === "Married" && (

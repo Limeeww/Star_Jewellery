@@ -27,7 +27,8 @@ export default function CartItemComponent({
   onRemove,
 }: CartItemComponentProps) {
   const href = `/${item.slug}?variantID=${item.variantId}`;
-  const hasDiscount = item.originalPrice != null && item.originalPrice > item.price;
+  const hasDiscount =
+    item.originalPrice != null && item.originalPrice > item.price;
 
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [actionIsRemove, setActionIsRemove] = useState(false);
@@ -57,7 +58,7 @@ export default function CartItemComponent({
 
   return (
     <>
-      <div className="w-full flex-wrap bg-white p-4 shadow-md flex items-center gap-4">
+      <div className="w-full flex-wrap bg-white p-4 shadow-lg flex items-center gap-4">
         <Link href={href} className="flex-shrink-0">
           <div className="relative w-16 h-16">
             <Image
@@ -83,6 +84,12 @@ export default function CartItemComponent({
           )}
         </div>
 
+        <p className="text-xs text-gray-600 mt-1">
+          <span className="font-medium">Size:</span> {item.size} &nbsp;
+          <span className="font-medium">Insert:</span> {item.insert} &nbsp;
+          <span className="font-medium">Color:</span> {item.materialColor}
+        </p>
+
         <div className="flex items-center gap-2">
           <button
             onClick={handleDecrement}
@@ -107,11 +114,7 @@ export default function CartItemComponent({
         </button>
 
         <div className="ml-auto text-right">
-          {hasDiscount && (
-            <DiscountDisplay
-              discountedPrice={item.price}
-            />
-          )}
+          {hasDiscount && <DiscountDisplay discountedPrice={item.price} />}
         </div>
       </div>
 

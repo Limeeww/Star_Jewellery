@@ -2,7 +2,7 @@
 
 import React from "react";
 import { IoMdShare } from "react-icons/io";
-import { useNotification } from "../../utils/useNotification"; 
+import { useNotification } from "../../../hooks/useNotification";
 
 type ShareButtonProps = {
   title: string;

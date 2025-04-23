@@ -3,7 +3,7 @@
 import { ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { AiOutlineClose } from "react-icons/ai";
-import { useModalClose } from "@/app/utils/useModal";
+import { useModalClose } from "@/hooks/useModal";
 
 interface SideModalProps {
   isOpen: boolean;

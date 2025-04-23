@@ -3,7 +3,7 @@ import Link from "next/link";
 export default function Footer() {
   return (
     <footer
-      className="bg-white border-t border-gray-200 py-10 shadow-md"
+      className="text-center bg-white border-t border-gray-200 py-10 shadow-md"
       style={{ fontFamily: "var(--font-poppins)" }}
     >
       <div
@@ -24,7 +24,7 @@ export default function Footer() {
             </h2>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-sm md:mx-8 text-center">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-sm md:mx-8 mb-4">
             <div>
               <h3 className="font-semibold uppercase mb-2">
                 <Link href="/projects">Projects</Link>
