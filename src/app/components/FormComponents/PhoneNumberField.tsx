@@ -1,12 +1,12 @@
 import React from "react";
-import { Controller, Control, FieldError } from "react-hook-form";
+import { Controller, Control, FieldError, FieldValues } from "react-hook-form";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 
-interface PhoneNumberFieldProps {
+interface PhoneNumberFieldProps<TFieldValues extends FieldValues = FieldValues> {
   label: string;
   name: string;
-  control: Control<Record<string, unknown>>;
+  control: Control<TFieldValues>;
   defaultValue?: string;
   error?: FieldError;
 }

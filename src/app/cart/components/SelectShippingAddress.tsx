@@ -20,12 +20,13 @@ export default function SelectShippingAddress({ onSelect }: Props) {
     undefined
   );
 
-  useEffect(() => {
-    if (!loading && addresses.length) {
-      const def = addresses.findIndex((a) => a.preferredShippingAddress);
-      setSelectedIndex(def >= 0 ? def : 0);
-    }
-  }, [loading, addresses]);
+useEffect(() => {
+  if (!loading && addresses.length && selectedIndex === null) {
+    const def = addresses.findIndex(a => a.preferredShippingAddress);
+    setSelectedIndex(def >= 0 ? def : 0);
+  }
+// eslint-disable-next-line react-hooks/exhaustive-deps
+}, [loading, addresses.length, selectedIndex]);
 
   if (loading) return <p>Loading addresses…</p>;
 

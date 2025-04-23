@@ -30,7 +30,8 @@ import {
   removeItem,
 } from "@/app/utils/cartActions";
 import { useNotification } from "@/hooks/useNotification";
-import SelectShippingAddress, { Address } from "./components/SelectShippingAddress";
+import SelectShippingAddress from "@/app/cart/components/SelectShippingAddress";
+import { Address } from "@/app/types/userTypes";
 
 export default function CartPage() {
   const [user, loading] = useAuthState(auth);
