@@ -13,7 +13,7 @@ import {
   useAuthState,
 } from "react-firebase-hooks/auth";
 
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 import { UserData } from "../types/userTypes";
@@ -108,10 +108,10 @@ export default function SignUpPage() {
         await setDoc(doc(db, "users", userCredential.user.uid), finalUserData);
         router.push("/Account/Overview");
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       notify({
         type: "error",
-        message: err.message || "Failed to create account.",
+        message: err instanceof Error ? err.message : "Failed to create account.",
       });
     }
   };
@@ -281,30 +281,43 @@ export default function SignUpPage() {
 
           <h2 className="text-base font-semibold mt-8">Optional Info</h2>
           <div className="space-y-4">
-            <SelectField
-              label="Gender"
-              id="gender"
-              register={register("gender")}
-              error={errors.gender}
-              options={[
-                { value: "", label: "Select" },
-                { value: "Male", label: "Male" },
-                { value: "Female", label: "Female" },
-                { value: "Other", label: "Other" },
-              ]}
+            <Controller
+              name="gender"
+              control={control}
+              rules={{ required: "Gender is required" }}
+              render={({ field, fieldState }) => (
+                <SelectField
+                  label="Gender"
+                  id="gender"
+                  value={field.value || ""}
+                  onChange={field.onChange}
+                  error={fieldState.error?.message}
+                  options={[
+                    { value: "Male", label: "Male" },
+                    { value: "Female", label: "Female" },
+                    { value: "Other", label: "Other" },
+                  ]}
+                />
+              )}
             />
 
-            <SelectField
-              label="Relationship Status"
-              id="relationshipStatus"
-              register={register("relationshipStatus")}
-              error={errors.relationshipStatus}
-              options={[
-                { value: "", label: "Select" },
-                { value: "Single", label: "Single" },
-                { value: "Married", label: "Married" },
-                { value: "Engaged", label: "Engaged" },
-              ]}
+            <Controller
+              name="relationshipStatus"
+              control={control}
+              render={({ field, fieldState }) => (
+                <SelectField
+                  label="Relationship Status"
+                  id="relationshipStatus"
+                  value={field.value || ""}
+                  onChange={field.onChange}
+                  error={fieldState.error?.message}
+                  options={[
+                    { value: "Single", label: "Single" },
+                    { value: "Married", label: "Married" },
+                    { value: "Engaged", label: "Engaged" },
+                  ]}
+                />
+              )}
             />
 
             <DayInput

@@ -180,8 +180,14 @@ export default function Addresses() {
           <AddAddressModal
             isOpen={showAdressModal}
             onClose={() => setShowAddressModal(false)}
-            addressToEdit={addressToEdit}
-            addressIndex={editingIndex}
+            addressToEdit={addressToEdit ?? undefined}
+            addressIndex={editingIndex ?? undefined}
+            onSave={(updatedAddresses) => {
+              setProfileData((prev) => ({
+                ...prev,
+                addresses: updatedAddresses,
+              }));
+            }}
           />
           <ConfirmModal
             isOpen={showDeleteModal}

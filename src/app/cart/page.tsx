@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase/firebaseConfig";
 import { useForm } from "react-hook-form";
@@ -30,12 +30,19 @@ import {
   removeItem,
 } from "@/app/utils/cartActions";
 import { useNotification } from "@/hooks/useNotification";
+import SelectShippingAddress, { Address } from "./components/SelectShippingAddress";
 
 export default function CartPage() {
   const [user, loading] = useAuthState(auth);
   const isLoggedIn = !!user && !loading;
   const { notification, clearNotification } = useNotification();
   const cartItems = useCartItems(user ? user.uid : null);
+
+  const [shipAddress, setShipAddress] = useState<Address | null>(null);
+
+  const handleAddressSelect = (addr: Address) => {
+    setShipAddress(addr);
+  };
 
   const { register, watch } = useForm<GiftOptionsForm>({
     defaultValues: {
@@ -150,6 +157,12 @@ export default function CartPage() {
                   giftOptionsTotal={giftOptionsTotal}
                   total={total}
                 />
+                <div className="bg-white p-4 rounded shadow mt-6">
+                  <h3 className="text-lg font-semibold mb-2">
+                    Shipping Address
+                  </h3>
+                  <SelectShippingAddress onSelect={handleAddressSelect} />
+                </div>
 
                 <div className="bg-white p-4 rounded shadow space-y-2 w-full">
                   <h3 className="text-lg font-semibold mb-2">
