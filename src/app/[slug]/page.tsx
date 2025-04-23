@@ -67,7 +67,7 @@ const ProductPage = () => {
       description: product.description,
       variantId: displayedVariant.id,
       originalPrice: displayedVariant.price,
-      discountName: activeDiscount?.name,
+      discountName: activeDiscount?.name || "",
       imageUrl: displayedVariant.images?.[0] ?? "/placeholder.jpg",
       price: discountedPrice ?? displayedVariant.price,
       quantity: 1,
@@ -77,6 +77,7 @@ const ProductPage = () => {
     };
 
     try {
+      console.log("Adding to cart:", item);
       await addOrIncrementCartItem(user!.uid, item);
       setModalOpen(true);
     } catch (e) {
