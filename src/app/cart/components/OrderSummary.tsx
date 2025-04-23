@@ -30,13 +30,15 @@ export default function OrderSummary({
       <div className="flex justify-between">
         <p className="text-gray-600">Subtotal</p>
         <div className="font-semibold">
-          {shouldDisplayDiscount && (
+          {shouldDisplayDiscount ? (
             <DiscountDisplay
               originalPrice={originalPrice!}
               discountedPrice={subtotal}
               discountName="Order Discount"
               className="mb-4"
             />
+          ) : (
+            <p>{formatPrice(subtotal)} ₴</p>
           )}
         </div>
       </div>
