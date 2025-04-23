@@ -1,96 +1,42 @@
 "use client";
 
-import Navbar from "@/app/components/Navbar/Navbar";
-import type { Address } from "../../types/userTypes";
 import React, { useState } from "react";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "../../../firebase/firebaseConfig";
+import Navbar from "@/app/components/Navbar/Navbar";
 import Loading from "@/app/components/Loading/Loading";
-import WelcomeBlock from "../components/WelcomeBlock";
-import AccountLayout from "../components/AccountLayout";
 import Footer from "@/app/components/Footer/Footer";
-import { usePathname } from "next/navigation";
-import LinkButton from "../components/LinkButton";
-import AddAddressModal from "../components/Modals/AddAddressModal";
-import {
-  useRequireAuth,
-  useProfileData,
-  updateUserProfile,
-  notify,
-} from "../../utils/auth";
-import AddressCard from "../components/AddressCard";
+
 import ConfirmModal from "@/app/components/MessageHandling/ConfirmModal";
+import { usePathname } from "next/navigation";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "@/firebase/firebaseConfig";
+import { useRequireAuth, useProfileData } from "@/app/utils/auth";
+import { useAddresses } from "@/hooks/useAddresses";
+import AccountLayout from "../components/AccountLayout";
+import WelcomeBlock from "../components/WelcomeBlock";
+import LinkButton from "../components/LinkButton";
+import AddressCard from "../components/AddressCard";
+import AddAddressModal from "../components/Modals/AddAddressModal";
 
 export default function Addresses() {
-  const [showAdressModal, setShowAddressModal] = useState(false);
-  const [user, loading] = useAuthState(auth);
+  const pathname = usePathname();
+
+  const [user, loadingAuth] = useAuthState(auth);
+  useRequireAuth(user, loadingAuth);
+  const [profileData] = useProfileData(user ?? null);
+
+  const { addresses, loading, add, update, remove } = useAddresses();
 
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const [addressToEdit, setAddressToEdit] = useState<Address | null>(null);
+  const [showModal, setShowModal] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
 
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [removingIndex, setRemovingIndex] = useState<number | null>(null);
-
-  const pathname = usePathname();
-  const isLoggedIn = !loading && !!user;
-
-  useRequireAuth(user, loading);
-
-  const [profileData, setProfileData] = useProfileData(user ?? null);
-
-  if (loading) {
+  if (loadingAuth || loading) {
     return <Loading />;
   }
 
-  const handleEdit = (index: number) => {
-    if (!profileData || !(profileData as { addresses: Address[] }).addresses)
-      return;
-    setEditingIndex(index);
-    setAddressToEdit(
-      (profileData as { addresses: Address[] }).addresses[index]
-    );
-    setShowAddressModal(true);
-  };
-
-  const handleRemove = (index: number) => {
-    setRemovingIndex(index);
-    setShowDeleteModal(true);
-  };
-
-  const confirmDelete = async () => {
-    if (
-      removingIndex === null ||
-      !profileData ||
-      !profileData.addresses ||
-      !user
-    ) {
-      setShowDeleteModal(false);
-      return;
-    }
-
-    try {
-      const newAddresses = [...(profileData.addresses as Address[])];
-      newAddresses.splice(removingIndex, 1);
-
-      await updateUserProfile(user.uid, { addresses: newAddresses });
-
-      const updatedProfile = { ...profileData, addresses: newAddresses };
-      setProfileData(updatedProfile);
-    } catch (err) {
-      if (err instanceof Error) {
-        notify({ message: err.message, type: "error" });
-      } else {
-        notify({ message: "Failed to save address.", type: "error" });
-      }
-    }
-
-    setShowDeleteModal(false);
-    setRemovingIndex(null);
-  };
-
   return (
     <>
-      <Navbar isScrolled={true} isLoggedIn={isLoggedIn} />
+      <Navbar isScrolled isLoggedIn={!!user} />
       <AccountLayout pathname={pathname ?? ""} sideLinks={[]}>
         <WelcomeBlock
           firstName={
@@ -118,9 +64,7 @@ export default function Addresses() {
             address, and it will automatically appear during checkout.
           </p>
 
-          {(Array.isArray(profileData?.addresses)
-            ? profileData.addresses.length
-            : 0) === 0 ? (
+          {addresses.length === 0 ? (
             <div className="flex items-center justify-between mt-4 py-2">
               <p className="text-sm text-gray-800">
                 You haven&apos;t saved any addresses yet.
@@ -128,49 +72,44 @@ export default function Addresses() {
               <LinkButton
                 text="Add new address"
                 className="underline text-sm cursor-pointer text-gray-700 hover:text-black transition-colors"
-                showArrow={true}
+                showArrow
                 onClick={() => {
                   setEditingIndex(null);
-                  setAddressToEdit(null);
-                  setShowAddressModal(true);
+                  setShowModal(true);
                 }}
               />
             </div>
           ) : (
             <div className="mt-4">
-              <div className="flex flex items-center justify-between mt-4 py-2">
+              <div className="flex items-center justify-between mt-4 py-2">
                 <h3 className="text-sm font-medium mb-2">
-                  You have{" "}
-                  {Array.isArray(profileData?.addresses)
-                    ? (profileData.addresses as Address[]).length
-                    : 0}{" "}
-                  saved{" "}
-                  {Array.isArray(profileData?.addresses) &&
-                  (profileData.addresses as Address[]).length > 1
-                    ? "addresses"
-                    : "address"}
+                  You have {addresses.length} saved{" "}
+                  {addresses.length > 1 ? "addresses" : "address"}
                 </h3>
-                <div className="flex justify-end">
-                  <LinkButton
-                    text="Add new address"
-                    className="underline text-sm cursor-pointer text-gray-700 hover:text-black transition-colors"
-                    showArrow={true}
-                    onClick={() => {
-                      setEditingIndex(null);
-                      setAddressToEdit(null);
-                      setShowAddressModal(true);
-                    }}
-                  />
-                </div>
+                <LinkButton
+                  text="Add new address"
+                  className="underline text-sm cursor-pointer text-gray-700 hover:text-black transition-colors"
+                  showArrow
+                  onClick={() => {
+                    setEditingIndex(null);
+                    setShowModal(true);
+                  }}
+                />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {(profileData?.addresses as Address[]).map((address, index) => (
+                {addresses.map((address, idx) => (
                   <AddressCard
-                    key={index}
+                    key={idx}
                     address={address}
-                    onEdit={() => handleEdit(index)}
-                    onRemove={handleRemove}
-                    index={index}
+                    onEdit={() => {
+                      setEditingIndex(idx);
+                      setShowModal(true);
+                    }}
+                    onRemove={() => {
+                      setEditingIndex(idx);
+                      setShowDelete(true);
+                    }}
+                    index={0}
                   />
                 ))}
               </div>
@@ -178,29 +117,36 @@ export default function Addresses() {
           )}
 
           <AddAddressModal
-            isOpen={showAdressModal}
-            onClose={() => setShowAddressModal(false)}
-            addressToEdit={addressToEdit ?? undefined}
+            isOpen={showModal}
+            onClose={() => setShowModal(false)}
+            addressToEdit={
+              editingIndex !== null ? addresses[editingIndex] : undefined
+            }
             addressIndex={editingIndex ?? undefined}
-            onSave={(updatedAddresses) => {
-              setProfileData((prev) => ({
-                ...prev,
-                addresses: updatedAddresses,
-              }));
+            onSave={async (newAddresses) => {
+              if (editingIndex === null) {
+                await add(newAddresses[newAddresses.length - 1]);
+              } else {
+                await update(editingIndex, newAddresses[editingIndex]!);
+              }
+              setShowModal(false);
             }}
           />
+
           <ConfirmModal
-            isOpen={showDeleteModal}
+            isOpen={showDelete}
             title="Delete Address"
             message="Are you sure you want to delete this address?"
             cancelLabel="No, keep it"
             confirmLabel="Yes, delete"
-            onClose={() => setShowDeleteModal(false)}
-            onConfirm={confirmDelete}
+            onClose={() => setShowDelete(false)}
+            onConfirm={async () => {
+              if (editingIndex !== null) await remove(editingIndex);
+              setShowDelete(false);
+            }}
           />
         </div>
       </AccountLayout>
-
       <Footer />
     </>
   );

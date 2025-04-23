@@ -85,9 +85,10 @@ export default function ChangePasswordModal({
 
       reset();
       onClose();
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to update password.";
       notify({
-        message: err.message || "Failed to update password.",
+        message: errorMessage,
         type: "error",
       });
     }

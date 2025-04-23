@@ -15,7 +15,7 @@ export const getShippingCost = (subtotal: number): number =>
   subtotal > 100 ? 0 : 50;
 
 export const getGiftOptionsTotal = (giftOptions: GiftOptionsForm): number => {
-  const giftPackagingCost = giftOptions.giftPackaging ? 3.5 : 0;
+  const giftPackagingCost = giftOptions.giftPackaging ? 50 : 0;
   const giftMessageCost = giftOptions.giftMessage ? 0 : 0;
   const giftReceiptCost = giftOptions.giftReceipt ? 0 : 0;
 

@@ -6,7 +6,7 @@ import "react-phone-input-2/lib/style.css";
 interface PhoneNumberFieldProps {
   label: string;
   name: string;
-  control: Control<any>;
+  control: Control<Record<string, unknown>>;
   defaultValue?: string;
   error?: FieldError;
 }
@@ -31,7 +31,7 @@ function PhoneNumberField({
           <div>
             <PhoneInput
               country="de"
-              value={value}
+              value={value as string}
               onChange={onChange}
               enableSearch
               containerClass="w-full"

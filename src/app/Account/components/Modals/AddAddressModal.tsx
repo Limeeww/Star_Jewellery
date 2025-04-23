@@ -12,7 +12,7 @@ import SubmitButton from "@/app/components/FormComponents/SubmitButton";
 import Notification from "@/app/components/MessageHandling/Notification";
 import { useModalClose } from "@/hooks/useModal";
 import { useNotification } from "@/hooks/useNotification";
-import { useAddressModal } from "@/hooks/useAdressModal";
+import { useAddressModal } from "@/hooks/useAddressModal";
 import type { Address } from "@/app/types/userTypes";
 
 interface AddAddressModalProps {
