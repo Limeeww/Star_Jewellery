@@ -15,6 +15,23 @@ import { useNotification } from "@/hooks/useNotification";
 import { useAddressModal } from "@/hooks/useAddressModal";
 import type { Address } from "@/app/types/userTypes";
 
+const DEFAULT_VALUES: Partial<Address> = {
+  title: "Mr",
+  addressLabel: "",
+  firstName: "",
+  lastName: "",
+  street: "",
+  houseNumber: "",
+  additionalInfo: "",
+  city: "",
+  state: "",
+  zipCode: "",
+  country: "",
+  mobile: "",
+  preferredShippingAddress: false,
+  preferredBillingAddress: false,
+};
+
 interface AddAddressModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -42,24 +59,7 @@ export default function AddAddressModal({
     reset,
     control,
     formState: { errors },
-  } = useForm<Address>({
-    defaultValues: {
-      title: "Mr",
-      addressLabel: "",
-      firstName: "",
-      lastName: "",
-      street: "",
-      houseNumber: "",
-      additionalInfo: "",
-      city: "",
-      state: "",
-      zipCode: "",
-      country: "",
-      mobile: "",
-      preferredShippingAddress: false,
-      preferredBillingAddress: false,
-    },
-  });
+  } = useForm<Address>({ defaultValues: DEFAULT_VALUES });
 
   useEffect(() => {
     if (isOpen) {
@@ -71,6 +71,22 @@ export default function AddAddressModal({
         .catch((e) => notify({ message: e.message, type: "error" }));
     }
   }, [isOpen, addressToEdit, load, reset, notify]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      reset(DEFAULT_VALUES);
+    }
+  }, [isOpen, reset]);
+
+  useEffect(() => {
+    if (isOpen) {
+      if (addressToEdit) {
+        reset(addressToEdit);
+      } else {
+        reset(DEFAULT_VALUES);
+      }
+    }
+  }, [isOpen, addressToEdit, reset]);
 
   const onSubmit = async (data: Address) => {
     try {
