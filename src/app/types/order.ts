@@ -26,6 +26,5 @@ export interface Order {
   paymentInfo: PaymentInfo;
   shippingAddress: Address;
   discountsApplied?: Discount[];
-
   status: "pending" | "shipped" | "delivered" | "cancelled";
 }
