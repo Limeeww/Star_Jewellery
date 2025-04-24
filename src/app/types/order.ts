@@ -6,6 +6,7 @@ export interface GiftOptionsForm {
   giftPackaging: boolean;
   giftMessage: boolean;
   giftReceipt: boolean;
+  giftMessageText?: string;
 }
 
 export interface PaymentInfo {
@@ -25,5 +26,6 @@ export interface Order {
   paymentInfo: PaymentInfo;
   shippingAddress: Address;
   discountsApplied?: Discount[];
+
   status: "pending" | "shipped" | "delivered" | "cancelled";
 }

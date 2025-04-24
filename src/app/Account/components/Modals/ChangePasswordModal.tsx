@@ -15,8 +15,8 @@ import SubmitButton from "@/app/components/FormComponents/SubmitButton";
 import { IoCloseOutline } from "react-icons/io5";
 import PasswordStrengthChecker from "@/app/components/PasswordStrengthChecker/PasswordStrengthChecker";
 import Notification from "../../../components/MessageHandling/Notification";
-import { useNotification } from "@/app/utils/useNotification";
-import { useModalClose } from "@/app/utils/useModal";
+import { useNotification } from "@/hooks/useNotification";
+import { useModalClose } from "@/hooks/useModal";
 
 interface ChangePasswordForm {
   currentPassword: string;
@@ -85,9 +85,10 @@ export default function ChangePasswordModal({
 
       reset();
       onClose();
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to update password.";
       notify({
-        message: err.message || "Failed to update password.",
+        message: errorMessage,
         type: "error",
       });
     }

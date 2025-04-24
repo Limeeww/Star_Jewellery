@@ -24,7 +24,7 @@ export default function Overview() {
 
   useRequireAuth(user, loading);
 
-  const [profileData] = useProfileData(user);
+  const [profileData] = useProfileData(user ?? null);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { user: currentUser, role, loading: roleLoading } = useUserRole();
 
@@ -38,8 +38,8 @@ export default function Overview() {
 
       <AccountLayout pathname={pathname}>
         <WelcomeBlock
-          firstName={profileData?.firstName}
-          lastName={profileData?.lastName}
+          firstName={profileData?.firstName as string}
+          lastName={profileData?.lastName as string}
         />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -47,15 +47,15 @@ export default function Overview() {
             <div className="text-sm text-gray-600 space-y-1">
               <p>
                 <strong>Email:</strong>{" "}
-                {profileData?.email || "No email provided"}
+                {`${profileData?.email || "No email provided"}`}
               </p>
               <p>
                 <strong>Name:</strong>{" "}
-                {profileData?.firstName || "No first name provided"}
+                {profileData?.firstName ? profileData.firstName.toString() : "No first name provided"}
               </p>
               <p>
                 <strong>Last Name:</strong>{" "}
-                {profileData?.lastName || "No last name provided"}
+                {profileData?.lastName ? profileData.lastName.toString() : "No last name provided"}
               </p>
               <p>
                 <strong>Birth Date:</strong>{" "}
@@ -81,7 +81,7 @@ export default function Overview() {
           <ProfileCard
             title="MY ADDRESSES"
             description={
-              profileData?.addresses && profileData.addresses.length
+              Array.isArray(profileData?.addresses) && profileData.addresses.length
                 ? `You have ${profileData.addresses.length} saved addresses.`
                 : "No addresses saved. Please add your shipping or billing address."
             }

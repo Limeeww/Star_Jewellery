@@ -3,9 +3,9 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { formatPrice } from "@/app/utils/priceUtils";
 import ConfirmModal from "@/app/components/MessageHandling/ConfirmModal";
 import { CartItem } from "../../types/cartItem";
+import DiscountDisplay from "../DiscountDisplay/DiscountDisplay";
 
 interface CartItemComponentProps {
   item: CartItem & {
@@ -27,7 +27,8 @@ export default function CartItemComponent({
   onRemove,
 }: CartItemComponentProps) {
   const href = `/${item.slug}?variantID=${item.variantId}`;
-  const hasDiscount = item.originalPrice != null && item.originalPrice > item.price;
+  const hasDiscount =
+    item.originalPrice != null && item.originalPrice > item.price;
 
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [actionIsRemove, setActionIsRemove] = useState(false);
@@ -57,7 +58,7 @@ export default function CartItemComponent({
 
   return (
     <>
-      <div className="w-full flex-wrap bg-white p-4 shadow-md flex items-center gap-4">
+      <div className="w-full flex-wrap bg-white p-4 shadow-lg flex items-center gap-4">
         <Link href={href} className="flex-shrink-0">
           <div className="relative w-16 h-16">
             <Image
@@ -83,6 +84,12 @@ export default function CartItemComponent({
           )}
         </div>
 
+        <p className="text-xs text-gray-600 mt-1">
+          <span className="font-medium">Size:</span> {item.size} &nbsp;
+          <span className="font-medium">Insert:</span> {item.insert} &nbsp;
+          <span className="font-medium">Color:</span> {item.materialColor}
+        </p>
+
         <div className="flex items-center gap-2">
           <button
             onClick={handleDecrement}
@@ -107,23 +114,7 @@ export default function CartItemComponent({
         </button>
 
         <div className="ml-auto text-right">
-          {hasDiscount ? (
-            <div className="space-y-1">
-              <p className="text-sm text-gray-500 line-through">
-                {formatPrice(item.originalPrice! * item.quantity)} ₴
-              </p>
-              <p className="text-base font-bold text-red-600">
-                {formatPrice(item.price * item.quantity)} ₴
-              </p>
-              {item.discountName && (
-                <p className="text-xs text-red-500">{item.discountName}</p>
-              )}
-            </div>
-          ) : (
-            <p className="font-semibold text-sm md:text-base whitespace-nowrap">
-              {formatPrice(item.price * item.quantity)} ₴
-            </p>
-          )}
+          {hasDiscount && <DiscountDisplay discountedPrice={item.price} />}
         </div>
       </div>
 

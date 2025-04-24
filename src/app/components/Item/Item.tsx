@@ -3,74 +3,80 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Product } from "../../types/product";
+import { Product, ProductVariant } from "../../types/product";
 
-type ItemProps = {
-  product: Product;
+type LightProduct = {
+  id: number;
+  slug: string;
+  name: string;
+  image: string;
+  variantId: number;
 };
 
-export default function Item({ product }: ItemProps) {
-  const defaultVariant = product.variants[0];
+type Props = {
+  product: Product | LightProduct;
+  displayedVariant?: ProductVariant;
+};
 
-  const href = defaultVariant
-    ? `/${product.slug ?? `product/${product.id}`}?variantID=${
-        defaultVariant.id
-      }`
-    : product.slug
-    ? `/${product.slug}`
-    : `/product/${product.id}`;
+export default function Item({ product, displayedVariant }: Props) {
+  const variant: ProductVariant | undefined =
+    displayedVariant ??
+    ("variants" in product
+      ? product.variants?.[0]
+      : ({
+          id: product.variantId,
+          images: [product.image],
+          price: undefined,
+        } as unknown as ProductVariant));
+
+  const href = `/${product.slug}${variant ? `?variantID=${variant.id}` : ""}`;
+
+  const src =
+    variant?.images?.[0] ??
+    ("image" in product ? product.image : "/placeholder.jpg");
 
   return (
-    <Link
-      href={href}
-      className="
-        w-full
-        max-w-xs sm:max-w-sm md:max-w-none
+    <div className="p-2">
+      <Link
+        href={href}
+        className="
+        w-full max-w-xs sm:max-w-sm md:max-w-none
         border p-2 bg-white text-gray-800
         hover:shadow-lg transition-shadow duration-300
-        flex flex-col h-full
-        break-inside-avoid
+        flex flex-col h-full break-inside-avoid
       "
-    >
-      <div className="relative w-full pb-[100%] overflow-hidden">
-        <Image
-          src={defaultVariant?.images?.[0] ?? "/placeholder.jpg"}
-          alt={product.name}
-          fill
-          sizes="(max-width: 640px) 100vw, 300px"
-          className="
-            absolute inset-0
-            object-cover
-            transition-transform duration-300
-            hover:scale-105
+      >
+        <div className="relative w-full pb-[100%] overflow-hidden">
+          <Image
+            src={src}
+            alt={product.name}
+            fill
+            sizes="(max-width: 640px) 100vw, 300px"
+            className="
+            absolute inset-0 object-cover
+            transition-transform duration-300 hover:scale-105
           "
-        />
-      </div>
+          />
+        </div>
 
-      <div className="mt-2 flex flex-col flex-grow justify-between min-h-0">
-        <div>
+        <div className="mt-2 flex flex-col flex-grow justify-between min-h-0">
           <h3 className="text-base md:text-lg font-medium break-words">
-            {product.name}
+            {product.name}{" "}
+            <span className="text-sm text-gray-400">#{variant?.id}</span>
           </h3>
-          {product.description && (
-            <p className="text-sm text-gray-500 overflow-hidden text-ellipsis">
-              {product.description}
+          {variant?.price != null && (
+            <p
+              className="text-base md:text-lg mt-1"
+              style={{ fontFamily: "var(--font-poppins)" }}
+            >
+              ₴{" "}
+              <span className="font-semibold">
+                {variant.price.toLocaleString()}
+              </span>
             </p>
           )}
         </div>
-
-        {defaultVariant?.price != null && (
-          <p
-            className="text-base md:text-lg mt-1"
-            style={{ fontFamily: "var(--font-poppins)" }}
-          >
-            ₴{" "}
-            <span className="font-semibold">
-              {defaultVariant.price.toLocaleString()}
-            </span>
-          </p>
-        )}
-      </div>
-    </Link>
+      </Link>
+    </div>
   );
 }

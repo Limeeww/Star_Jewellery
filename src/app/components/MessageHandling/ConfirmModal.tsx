@@ -3,7 +3,7 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { IoCloseOutline } from "react-icons/io5";
-import { useModalClose } from "@/app/utils/useModal";
+import { useModalClose } from "@/hooks/useModal";
 
 interface ConfirmModalProps {
   isOpen: boolean;
