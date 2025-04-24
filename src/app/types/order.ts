@@ -17,7 +17,7 @@ export interface PaymentInfo {
 
 export interface Order {
   orderId: number;
-  userId: number;
+  userId: string;
   products: CartItem[];
   total: number;
   orderDate: Date;

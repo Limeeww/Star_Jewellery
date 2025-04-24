@@ -13,7 +13,7 @@ import CartItemComponent from "@/app/components/CartItem/CartItemComponent";
 import OrderSummary from "@/app/cart/components/OrderSummary";
 import RecentlyViewed from "@/app/components/RecentlyViewed/RecentlyViewed";
 import GiftOptions from "@/app/cart/components/GiftOptions";
-import { GiftOptionsForm } from "@/app/types/order";
+import { GiftOptionsForm, Order, PaymentInfo } from "@/app/types/order";
 import Notification from "@/app/components/MessageHandling/Notification";
 
 import {
@@ -32,11 +32,13 @@ import {
 import { useNotification } from "@/hooks/useNotification";
 import SelectShippingAddress from "@/app/cart/components/SelectShippingAddress";
 import { Address } from "@/app/types/userTypes";
+import { useRouter } from "next/router";
 
 export default function CartPage() {
   const [user, loading] = useAuthState(auth);
+  const router = useRouter();
   const isLoggedIn = !!user && !loading;
-  const { notification, clearNotification } = useNotification();
+  const { notification, notify, clearNotification } = useNotification();
   const cartItems = useCartItems(user ? user.uid : null);
 
   const [shipAddress, setShipAddress] = useState<Address | null>(null);
@@ -71,6 +73,38 @@ export default function CartPage() {
     0
   );
 
+  const handleProceed = () => {
+    if (!user) return;
+    if (!shipAddress) {
+      notify({ type: "warning", message: "Please select a shipping address" });
+      return;
+    }
+
+    const now = new Date();
+    const paymentInfo: PaymentInfo = {
+      method: "credit_card",
+      transactionId: "",
+      paid: false,
+    };
+    const order: Order = {
+      orderId: Date.now(),
+      userId: user.uid,
+      products: cartItems,
+      total,
+      orderDate: now,
+      updatedAt: now,
+      giftOptions: giftOptionsValues,
+      paymentInfo,
+      shippingAddress: shipAddress,
+      discountsApplied: [],
+      status: "pending",
+    };
+
+    localStorage.setItem("currentOrder", JSON.stringify(order));
+
+    router.push("/checkout");
+  };
+
   if (!isLoggedIn) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -82,10 +116,15 @@ export default function CartPage() {
   return (
     <>
       <Navbar isScrolled={true} isLoggedIn={isLoggedIn} />
-      {notification && (
-        <Notification {...notification} onClose={clearNotification} />
-      )}
 
+      {notification && (
+        <Notification
+          message={notification.message}
+          type={notification.type}
+          duration={notification.duration}
+          onClose={clearNotification}
+        />
+      )}
       <main
         className="min-h-screen bg-gray-50 p-4 text-gray-800 mt-10"
         style={{ fontFamily: "var(--font-poppins)" }}
@@ -157,6 +196,7 @@ export default function CartPage() {
                   shipping={shipping}
                   giftOptionsTotal={giftOptionsTotal}
                   total={total}
+                  onClick={handleProceed}
                 />
                 <div className="bg-white p-4 rounded shadow mt-6">
                   <h3 className="text-lg font-semibold mb-2">

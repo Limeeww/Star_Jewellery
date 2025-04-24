@@ -1,9 +1,9 @@
 "use client";
 
 import React from "react";
-import LinkButtonForm from "@/app/components/FormComponents/LinkButtonForm";
 import DiscountDisplay from "@/app/components/DiscountDisplay/DiscountDisplay";
 import { formatPrice } from "@/app/utils/priceUtils";
+import ActionButton from "@/app/components/FormComponents/ActionButton";
 
 interface OrderSummaryProps {
   originalPrice?: number;
@@ -11,6 +11,7 @@ interface OrderSummaryProps {
   shipping: number;
   giftOptionsTotal: number;
   total: number;
+  onClick?: () => void;
 }
 
 export default function OrderSummary({
@@ -19,6 +20,7 @@ export default function OrderSummary({
   shipping,
   giftOptionsTotal,
   total,
+  onClick,
 }: OrderSummaryProps) {
   const shouldDisplayDiscount =
     originalPrice != null && originalPrice > subtotal;
@@ -64,11 +66,10 @@ export default function OrderSummary({
         <p className="font-semibold">{formatPrice(total)} ₴</p>
       </div>
 
-      <LinkButtonForm
-        label="Proceed to Checkout"
-        href="/checkout"
-        showArrow
+      <ActionButton
+        text="Proceed to Checkout"
         className="mt-4"
+        onClick={onClick || (() => {})}
       />
     </div>
   );

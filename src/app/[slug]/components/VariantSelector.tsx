@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import SelectField from "../../components/FormComponents/SelectField";
 import SubmitButton from "../../components/FormComponents/SubmitButton";
 import { AiOutlineShoppingCart } from "react-icons/ai";
@@ -33,7 +33,7 @@ export default function VariantSelector({
   onColorChange,
 }: Props) {
   const {
-    register,
+    control,
     handleSubmit,
     formState: { errors },
   } = useForm<FormValues>({
@@ -47,48 +47,72 @@ export default function VariantSelector({
   return (
     <form onSubmit={handleSubmit(onAddToCart)} className="space-y-6">
       <div className="flex space-x-4">
-        <SelectField
-          label="Available Sizes"
-          id="size"
-          register={register("size", { required: "Size is required" })}
-          error={errors.size}
-          options={sizeOptions}
-          placeholder="Select size"
-          className="w-1/2"
+        <Controller
+          name="size"
+          control={control}
+          rules={{ required: "Size is required" }}
+          render={({ field, fieldState }) => (
+            <SelectField
+              label="Available Sizes"
+              id="size"
+              value={field.value}
+              onChange={field.onChange}
+              options={sizeOptions}
+              placeholder="Select size"
+              className="w-1/2"
+              error={fieldState.error?.message}
+            />
+          )}
         />
 
-        <SelectField
-          label="Inserts"
-          id="inserts"
-          register={register("inserts", {
-            required: true,
-            onChange: (e) => onInsertChange?.(e.target.value),
-          })}
-          error={errors.inserts}
-          options={insertOptions}
-          placeholder="Select insert"
-          className="w-1/2"
+        <Controller
+          name="inserts"
+          control={control}
+          rules={{ required: "Insert is required" }}
+          render={({ field, fieldState }) => (
+            <SelectField
+              label="Inserts"
+              id="inserts"
+              value={field.value}
+              onChange={(val) => {
+                field.onChange(val);
+                onInsertChange?.(val);
+              }}
+              options={insertOptions}
+              placeholder="Select insert"
+              className="w-1/2"
+              error={fieldState.error?.message}
+            />
+          )}
         />
       </div>
 
-      <SelectField
-        label="Material Color"
-        id="materialColor"
-        register={register("materialColor", {
-          required: true,
-          onChange: (e) => onColorChange?.(e.target.value),
-        })}
-        error={errors.materialColor}
-        options={materialColorOptions}
-        placeholder="Select Material Color"
-        className="w-full"
+      <Controller
+        name="materialColor"
+        control={control}
+        rules={{ required: "Color is required" }}
+        render={({ field, fieldState }) => (
+          <SelectField
+            label="Material Color"
+            id="materialColor"
+            value={field.value}
+            onChange={(val) => {
+              field.onChange(val);
+              onColorChange?.(val);
+            }}
+            options={materialColorOptions}
+            placeholder="Select Material Color"
+            className="w-full"
+            error={fieldState.error?.message}
+          />
+        )}
       />
 
       <SubmitButton
         label={
           <>
-            <AiOutlineShoppingCart className="inline mr-2 text-lg" /> Add to
-            basket
+            <AiOutlineShoppingCart className="inline mr-2 text-lg" />
+            Add to basket
           </>
         }
         isLoading={false}
