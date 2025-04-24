@@ -9,7 +9,6 @@ import SelectField from "@/app/components/FormComponents/SelectField";
 import CheckboxField from "@/app/components/FormComponents/CheckboxField";
 import PhoneNumberField from "@/app/components/FormComponents/PhoneNumberField";
 import SubmitButton from "@/app/components/FormComponents/SubmitButton";
-import Notification from "@/app/components/MessageHandling/Notification";
 import { useModalClose } from "@/hooks/useModal";
 import { useNotification } from "@/hooks/useNotification";
 import { useAddressModal } from "@/hooks/useAddressModal";
@@ -48,7 +47,7 @@ export default function AddAddressModal({
   onSave,
 }: AddAddressModalProps) {
   const { modalRef, handleOutsideClick } = useModalClose(onClose);
-  const { notification, notify, clearNotification } = useNotification();
+  const { notify } = useNotification();
   const { load, prepare, save } = useAddressModal(onSave);
 
   const [existing, setExisting] = useState<Address[]>([]);
@@ -122,15 +121,6 @@ export default function AddAddressModal({
             ref={modalRef}
             onClick={(e) => e.stopPropagation()}
           >
-            {notification && (
-              <Notification
-                message={notification.message}
-                type={notification.type}
-                duration={notification.duration}
-                onClose={clearNotification}
-              />
-            )}
-
             <button
               onClick={onClose}
               className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"

@@ -16,6 +16,8 @@ import WelcomeBlock from "../components/WelcomeBlock";
 import LinkButton from "../components/LinkButton";
 import AddressCard from "../components/AddressCard";
 import AddAddressModal from "../components/Modals/AddAddressModal";
+import Notification from "@/app/components/MessageHandling/Notification";
+import { useNotification } from "@/hooks/useNotification";
 
 export default function Addresses() {
   const pathname = usePathname();
@@ -23,7 +25,7 @@ export default function Addresses() {
   const [user, loadingAuth] = useAuthState(auth);
   useRequireAuth(user, loadingAuth);
   const [profileData] = useProfileData(user ?? null);
-
+  const { notification, notify, clearNotification } = useNotification();
   const { addresses, loading, add, update, remove } = useAddresses();
 
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
@@ -47,6 +49,15 @@ export default function Addresses() {
             (profileData as { firstName?: string; lastName?: string })?.lastName
           }
         />
+
+        {notification && (
+          <Notification
+            message={notification.message}
+            type={notification.type}
+            duration={notification.duration}
+            onClose={clearNotification}
+          />
+        )}
 
         <div
           className="mt-6 space-y-4 text-sm text-gray-800"
@@ -124,12 +135,20 @@ export default function Addresses() {
             }
             addressIndex={editingIndex ?? undefined}
             onSave={async (newAddresses) => {
-              if (editingIndex === null) {
-                await add(newAddresses[newAddresses.length - 1]);
-              } else {
-                await update(editingIndex, newAddresses[editingIndex]!);
+              try {
+                if (editingIndex === null) {
+                  await add(newAddresses[newAddresses.length - 1]);
+                  notify({ type: "success", message: "Address added!" });
+                } else {
+                  await update(editingIndex, newAddresses[editingIndex]!);
+                  notify({ type: "success", message: "Address updated!" });
+                }
+                setShowModal(false);
+              } catch (e) {
+                const errorMessage =
+                  e instanceof Error ? e.message : "Save failed";
+                notify({ type: "error", message: errorMessage });
               }
-              setShowModal(false);
             }}
           />
 
@@ -141,7 +160,19 @@ export default function Addresses() {
             confirmLabel="Yes, delete"
             onClose={() => setShowDelete(false)}
             onConfirm={async () => {
-              if (editingIndex !== null) await remove(editingIndex);
+              try {
+                if (editingIndex !== null) {
+                  await remove(editingIndex);
+                  notify({ type: "success", message: "Address removed!" });
+                }
+              } catch (e) {
+                const errorMessage =
+                  e instanceof Error ? e.message : "Save failed";
+                notify({
+                  type: "error",
+                  message: errorMessage || "Delete failed",
+                });
+              }
               setShowDelete(false);
             }}
           />
