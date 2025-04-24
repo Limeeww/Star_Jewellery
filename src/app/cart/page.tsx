@@ -32,7 +32,7 @@ import {
 import { useNotification } from "@/hooks/useNotification";
 import SelectShippingAddress from "@/app/cart/components/SelectShippingAddress";
 import { Address } from "@/app/types/userTypes";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation"
 
 export default function CartPage() {
   const [user, loading] = useAuthState(auth);
