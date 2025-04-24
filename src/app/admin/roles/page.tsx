@@ -9,12 +9,13 @@ import { UserItem } from "../../types/userTypes";
 import AccountLayout from "../../Account/components/AccountLayout";
 import Navbar from "../../components/Navbar/Navbar";
 import ActionButton from "@/app/components/FormComponents/ActionButton";
+import Footer from "@/app/components/Footer/Footer";
 
 export default function AdminRolesPage() {
   const pathname = usePathname();
   const [users, setUsers] = useState<UserItem[]>([]);
   const [updatingUid, setUpdatingUid] = useState<string | null>(null);
-  const { user, role, loading } = useUserRole(); // получаем всё из хука
+  const { user, role, loading } = useUserRole();
   const router = useRouter();
 
   const isLoggedIn = !loading && !!user;
@@ -124,6 +125,7 @@ export default function AdminRolesPage() {
             ))}
         </ul>
       </AccountLayout>
+      <Footer />
     </>
   );
 }
