@@ -1,6 +1,9 @@
 "use client";
 
 import { ProductVariant } from "@/app/types/product";
+import QuantitySizeForm from "./QuantitySizeForm";
+import VariantImagesForm from "./VariantImagesForm";
+
 import {
   MATERIALS,
   INSERTS,
@@ -30,17 +33,6 @@ export default function EditProductVariantsForm({ variants, onChange }: Props) {
     onChange(updatedVariants);
   };
 
-  const handleQuantitySizeChange = (
-    variantIndex: number,
-    sizeIndex: number,
-    field: "size" | "quantity",
-    value: number
-  ) => {
-    const updatedVariants = [...variants];
-    updatedVariants[variantIndex].quantitySize[sizeIndex][field] = value;
-    onChange(updatedVariants);
-  };
-
   return (
     <div className="space-y-6">
       <h3 className="text-lg font-semibold">Product Variants</h3>
@@ -51,12 +43,12 @@ export default function EditProductVariantsForm({ variants, onChange }: Props) {
           className="border p-4 rounded space-y-2 bg-gray-50"
         >
           <h4 className="font-medium text-gray-700">Variant #{variant.id}</h4>
-
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium">Price (€)</label>
               <input
                 type="number"
+                min={1}
                 value={variant.price}
                 onChange={(e) =>
                   handleVariantChange(
@@ -73,6 +65,8 @@ export default function EditProductVariantsForm({ variants, onChange }: Props) {
               <label className="block text-sm font-medium">Weight (g)</label>
               <input
                 type="number"
+                min={0.1}
+                step={0.1}
                 value={variant.weight}
                 onChange={(e) =>
                   handleVariantChange(
@@ -183,51 +177,25 @@ export default function EditProductVariantsForm({ variants, onChange }: Props) {
               </select>
             </div>
           </div>
-
-          <div>
-            <h5 className="text-sm font-semibold mt-4 mb-1">
-              Sizes & Quantities
-            </h5>
-            {variant.quantitySize.map((qs, sizeIndex) => (
-              <div key={sizeIndex} className="flex gap-4 items-center">
-                <div>
-                  <label className="block text-xs text-gray-600">Size</label>
-                  <input
-                    type="number"
-                    value={qs.size}
-                    onChange={(e) =>
-                      handleQuantitySizeChange(
-                        index,
-                        sizeIndex,
-                        "size",
-                        parseInt(e.target.value)
-                      )
-                    }
-                    className="border p-1 rounded w-20"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs text-gray-600">
-                    Quantity
-                  </label>
-                  <input
-                    type="number"
-                    value={qs.quantity}
-                    onChange={(e) =>
-                      handleQuantitySizeChange(
-                        index,
-                        sizeIndex,
-                        "quantity",
-                        parseInt(e.target.value)
-                      )
-                    }
-                    className="border p-1 rounded w-20"
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
+          <QuantitySizeForm
+            quantitySize={variant.quantitySize}
+            onChange={(newQuantitySize) => {
+              const updatedVariants = [...variants];
+              updatedVariants[index] = {
+                ...updatedVariants[index],
+                quantitySize: newQuantitySize,
+              };
+              onChange(updatedVariants);
+            }}
+          />
+          <VariantImagesForm
+            images={variant.images ?? []}
+            onChange={(newImages) => {
+              const updated = [...variants];
+              updated[index] = { ...updated[index], images: newImages };
+              onChange(updated);
+            }}
+          />
         </div>
       ))}
     </div>

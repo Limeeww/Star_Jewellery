@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { Product, Category } from "@/app/types/product";
 import LinkButtonForm from "@/app/components/FormComponents/LinkButtonForm";
-import EditProductVariantsForm from "@/app/components/FormComponents/EditProductVariantsForm";
+import EditProductVariantsForm from "@/app/components/FormComponents/ProductForm/EditProductVariantsForm";
 
 interface ProductFormProps {
   product: Product;
   onSave: (updatedProduct: Product) => void;
 }
 
-export default function ProductForm({ product, onSave }: ProductFormProps) {
+export default function EditProductForm({ product, onSave }: ProductFormProps) {
   const [formData, setFormData] = useState<Product>(product);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
@@ -40,6 +40,7 @@ export default function ProductForm({ product, onSave }: ProductFormProps) {
   };
 
   const handleSubmit = (e: React.FormEvent) => {
+    console.log("SUBMIT", formData);
     e.preventDefault();
     onSave(formData);
   };

@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useUserRole } from "@/hooks/useUserRole";
 import { Product } from "@/app/types/product";
 import Loading from "@/app/components/Loading/Loading";
-import ProductForm from "@/app/components/FormComponents/EditProductForm";
+import EditProductForm from "@/app/components/FormComponents/ProductForm/EditProductForm";
 import Footer from "@/app/components/Footer/Footer";
 import Navbar from "@/app/components/Navbar/Navbar";
 
@@ -69,7 +69,7 @@ export default function EditProductPage() {
       <Navbar isScrolled={true} isLoggedIn={isLoggedIn} />
       <div className="p-6">
         <h2 className="text-xl font-semibold mb-4">Edit Product</h2>
-        <ProductForm product={product} onSave={handleSave} />
+        <EditProductForm product={product} onSave={handleSave} />
       </div>
       <Footer />
     </>
