@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { Address } from "@/app/types/userTypes";
+import ActionButton from "@/app/components/FormComponents/ActionButton";
 
 interface AddressCardProps {
   address: Address;
@@ -21,7 +22,7 @@ export default function AddressCard({
         {address.addressLabel || "Address"}
       </h3>
 
-      <div className="flex-grow mb-2">
+      <div className="flex-grow mb-4">
         <div className="my-6">
           {address.preferredShippingAddress && (
             <p className="text-sm text-gray-600">Default shipping address</p>
@@ -54,18 +55,16 @@ export default function AddressCard({
       </div>
 
       <div className="flex gap-2 mt-auto">
-        <button
+        <ActionButton
+          text="Change"
           onClick={() => onEdit(index)}
           className="px-4 py-2 bg-gray-100 hover:bg-gray-800 hover:text-white border border-gray-800 w-full"
-        >
-          Change
-        </button>
-        <button
+        />
+        <ActionButton
+          text="Remove"
           onClick={() => onRemove(index)}
           className="px-4 py-2 text-white bg-gray-800 hover:bg-gray-100 hover:text-black border border-gray-800 w-full"
-        >
-          Remove
-        </button>
+        />
       </div>
     </div>
   );

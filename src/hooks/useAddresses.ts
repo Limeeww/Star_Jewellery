@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useEffect, useCallback } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "@/firebase/firebaseConfig";
@@ -52,25 +50,55 @@ export function useAddresses() {
     [user, notify]
   );
 
+  const prepare = useCallback(
+    (list: Address[], addr: Address, idx?: number) => {
+      const newList = [...list];
+      if (newList.length === 0) {
+        addr.preferredShippingAddress = true;
+        addr.preferredBillingAddress = true;
+      } else {
+        if (addr.preferredShippingAddress) {
+          newList.forEach((a, i) => {
+            if (i !== idx) a.preferredShippingAddress = false;
+          });
+        }
+        if (addr.preferredBillingAddress) {
+          newList.forEach((a, i) => {
+            if (i !== idx) a.preferredBillingAddress = false;
+          });
+        }
+      }
+      if (idx != null) {
+        newList[idx] = addr;
+      } else {
+        newList.push(addr);
+      }
+      return newList;
+    },
+    []
+  );
+
   const add = useCallback(
-    (addr: Address) => save([...addresses, addr]),
-    [addresses, save]
+    (addr: Address) => {
+      const newList = prepare(addresses, addr);
+      return save(newList);
+    },
+    [addresses, prepare, save]
   );
 
   const update = useCallback(
     (idx: number, addr: Address) => {
-      const list = [...addresses];
-      list[idx] = addr;
-      return save(list);
+      const newList = prepare(addresses, addr, idx);
+      return save(newList);
     },
-    [addresses, save]
+    [addresses, prepare, save]
   );
 
   const remove = useCallback(
     (idx: number) => {
-      const list = [...addresses];
-      list.splice(idx, 1);
-      return save(list);
+      const newList = [...addresses];
+      newList.splice(idx, 1);
+      return save(newList);
     },
     [addresses, save]
   );

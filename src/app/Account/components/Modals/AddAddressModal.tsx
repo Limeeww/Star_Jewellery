@@ -9,11 +9,27 @@ import SelectField from "@/app/components/FormComponents/SelectField";
 import CheckboxField from "@/app/components/FormComponents/CheckboxField";
 import PhoneNumberField from "@/app/components/FormComponents/PhoneNumberField";
 import SubmitButton from "@/app/components/FormComponents/SubmitButton";
-import Notification from "@/app/components/MessageHandling/Notification";
 import { useModalClose } from "@/hooks/useModal";
 import { useNotification } from "@/hooks/useNotification";
 import { useAddressModal } from "@/hooks/useAddressModal";
 import type { Address } from "@/app/types/userTypes";
+
+const DEFAULT_VALUES: Partial<Address> = {
+  title: "Mr",
+  addressLabel: "",
+  firstName: "",
+  lastName: "",
+  street: "",
+  houseNumber: "",
+  additionalInfo: "",
+  city: "",
+  state: "",
+  zipCode: "",
+  country: "",
+  mobile: "",
+  preferredShippingAddress: false,
+  preferredBillingAddress: false,
+};
 
 interface AddAddressModalProps {
   isOpen: boolean;
@@ -31,7 +47,7 @@ export default function AddAddressModal({
   onSave,
 }: AddAddressModalProps) {
   const { modalRef, handleOutsideClick } = useModalClose(onClose);
-  const { notification, notify, clearNotification } = useNotification();
+  const { notify } = useNotification();
   const { load, prepare, save } = useAddressModal(onSave);
 
   const [existing, setExisting] = useState<Address[]>([]);
@@ -42,24 +58,7 @@ export default function AddAddressModal({
     reset,
     control,
     formState: { errors },
-  } = useForm<Address>({
-    defaultValues: {
-      title: "Mr",
-      addressLabel: "",
-      firstName: "",
-      lastName: "",
-      street: "",
-      houseNumber: "",
-      additionalInfo: "",
-      city: "",
-      state: "",
-      zipCode: "",
-      country: "",
-      mobile: "",
-      preferredShippingAddress: false,
-      preferredBillingAddress: false,
-    },
-  });
+  } = useForm<Address>({ defaultValues: DEFAULT_VALUES });
 
   useEffect(() => {
     if (isOpen) {
@@ -71,6 +70,22 @@ export default function AddAddressModal({
         .catch((e) => notify({ message: e.message, type: "error" }));
     }
   }, [isOpen, addressToEdit, load, reset, notify]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      reset(DEFAULT_VALUES);
+    }
+  }, [isOpen, reset]);
+
+  useEffect(() => {
+    if (isOpen) {
+      if (addressToEdit) {
+        reset(addressToEdit);
+      } else {
+        reset(DEFAULT_VALUES);
+      }
+    }
+  }, [isOpen, addressToEdit, reset]);
 
   const onSubmit = async (data: Address) => {
     try {
@@ -106,15 +121,6 @@ export default function AddAddressModal({
             ref={modalRef}
             onClick={(e) => e.stopPropagation()}
           >
-            {notification && (
-              <Notification
-                message={notification.message}
-                type={notification.type}
-                duration={notification.duration}
-                onClose={clearNotification}
-              />
-            )}
-
             <button
               onClick={onClose}
               className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
