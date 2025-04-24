@@ -1,5 +1,6 @@
 import { Timestamp } from "firebase/firestore";
 import { CartItem } from "./cartItem";
+import { Order } from "./order";
 
 export interface Address {
   title?: "Mr" | "Mrs";
@@ -16,14 +17,6 @@ export interface Address {
   mobile?: string;
   preferredShippingAddress?: boolean;
   preferredBillingAddress?: boolean;
-}
-
-export interface Order {
-  orderId: string;
-  items: string[];
-  totalPrice: number;
-  status: "pending" | "shipped" | "delivered" | "cancelled";
-  orderDate: string;
 }
 
 export interface UserData {
