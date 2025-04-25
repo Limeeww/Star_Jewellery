@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState } from "react";
 import Navbar from "@/app/components/Navbar/Navbar";
 import Loading from "@/app/components/Loading/Loading";
@@ -11,11 +10,11 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase/firebaseConfig";
 import { useRequireAuth, useProfileData } from "@/app/utils/auth";
 import { useAddresses } from "@/hooks/useAddresses";
-import AccountLayout from "../components/AccountLayout";
-import WelcomeBlock from "../components/WelcomeBlock";
-import LinkButton from "../components/LinkButton";
-import AddressCard from "../components/AddressCard";
-import AddAddressModal from "../components/Modals/AddAddressModal";
+import AccountLayout from "@/app/Account/components/AccountLayout";
+import WelcomeBlock from "@/app/Account/components/WelcomeBlock";
+import LinkButton from "@/app/Account/components/LinkButton";
+import AddressCard from "@/app/Account/components/AddressCard";
+import AddAddressModal from "@/app/Account/components/Modals/AddAddressModal";
 import Notification from "@/app/components/MessageHandling/Notification";
 import { useNotification } from "@/hooks/useNotification";
 
