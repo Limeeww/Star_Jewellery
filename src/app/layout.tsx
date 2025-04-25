@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Poppins, Playfair_Display } from "next/font/google";
-import "./globals.css";
+import './globals.css'
 import { CartProvider } from "./contexts/CartContent";
 
 const poppins = Poppins({

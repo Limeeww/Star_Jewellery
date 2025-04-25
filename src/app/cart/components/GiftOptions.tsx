@@ -24,7 +24,7 @@ export default function GiftOptions({ register, watch }: GiftOptionsProps) {
           id="giftPackaging"
           register={register("giftPackaging")}
         />
-        <p className="text-sm font-semibold">₴50</p>
+        <p className="text-sm font-semibold">50 ₴</p>
       </div>
 
       <div className="flex items-center justify-between mb-3">

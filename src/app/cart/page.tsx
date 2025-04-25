@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState } from "react";
+import React from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase/firebaseConfig";
 import { useForm } from "react-hook-form";
@@ -30,22 +30,14 @@ import {
   removeItem,
 } from "@/app/utils/cartActions";
 import { useNotification } from "@/hooks/useNotification";
-import SelectShippingAddress from "@/app/cart/components/SelectShippingAddress";
-import { Address } from "@/app/types/userTypes";
 import { useRouter } from "next/navigation"
 
 export default function CartPage() {
   const [user, loading] = useAuthState(auth);
   const router = useRouter();
   const isLoggedIn = !!user && !loading;
-  const { notification, notify, clearNotification } = useNotification();
+  const { notification, clearNotification } = useNotification();
   const cartItems = useCartItems(user ? user.uid : null);
-
-  const [shipAddress, setShipAddress] = useState<Address | null>(null);
-
-  const handleAddressSelect = (addr: Address) => {
-    setShipAddress(addr);
-  };
 
   const { register, watch } = useForm<GiftOptionsForm>({
     defaultValues: {
@@ -75,10 +67,7 @@ export default function CartPage() {
 
   const handleProceed = () => {
     if (!user) return;
-    if (!shipAddress) {
-      notify({ type: "warning", message: "Please select a shipping address" });
-      return;
-    }
+
 
     const now = new Date();
     const paymentInfo: PaymentInfo = {
@@ -86,7 +75,7 @@ export default function CartPage() {
       transactionId: "",
       paid: false,
     };
-    const order: Order = {
+    const order: Partial<Order> = {
       orderId: Date.now(),
       userId: user.uid,
       products: cartItems,
@@ -95,7 +84,6 @@ export default function CartPage() {
       updatedAt: now,
       giftOptions: giftOptionsValues,
       paymentInfo,
-      shippingAddress: shipAddress,
       discountsApplied: [],
       status: "pending",
     };
@@ -189,7 +177,7 @@ export default function CartPage() {
                 <GiftOptions register={register} watch={watch} />
               </div>
 
-              <div className="col-span-full lg:col-span-1 space-y-6">
+              <div className="col-span-full lg:col-span-1 space-y-8">
                 <OrderSummary
                   originalPrice={originalPriceSum}
                   subtotal={subtotal}
@@ -198,14 +186,8 @@ export default function CartPage() {
                   total={total}
                   onClick={handleProceed}
                 />
-                <div className="bg-white p-4 rounded shadow mt-6">
-                  <h3 className="text-lg font-semibold mb-2">
-                    Shipping Address
-                  </h3>
-                  <SelectShippingAddress onSelect={handleAddressSelect} />
-                </div>
 
-                <div className="bg-white p-4 rounded shadow space-y-2 w-full">
+                <div className="bg-white p-4 rounded shadow space-y-4 w-full">
                   <h3 className="text-lg font-semibold mb-2">
                     Payment Methods
                   </h3>

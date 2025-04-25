@@ -9,12 +9,13 @@ import type { Address } from "@/app/types/userTypes";
 export function useAddresses() {
   const [user, loadingAuth] = useAuthState(auth);
   const { notify } = useNotification();
-  const [addresses, setAddresses] = useState<Address[]>([]);
-  const [loading, setLoading] = useState(true);
-
   useRequireAuth(user, loadingAuth);
 
-  const load = useCallback(async () => {
+  const [addresses, setAddresses] = useState<Address[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+
+  const loadAddresses = useCallback(async () => {
     if (!user) {
       setAddresses([]);
       setLoading(false);
@@ -25,7 +26,8 @@ export function useAddresses() {
       const snap = await getDoc(doc(db, "users", user.uid));
       if (snap.exists()) {
         const data = snap.data() as { addresses?: Address[] };
-        setAddresses(data.addresses ?? []);
+        const list = data.addresses || [];
+        setAddresses(list);
       } else {
         setAddresses([]);
       }
@@ -37,7 +39,18 @@ export function useAddresses() {
     }
   }, [user, notify]);
 
-  const save = useCallback(
+  useEffect(() => {
+    loadAddresses();
+  }, [loadAddresses]);
+
+  useEffect(() => {
+    if (!loading && addresses.length && selectedIndex === null) {
+      const defIdx = addresses.findIndex((a) => a.preferredShippingAddress);
+      setSelectedIndex(defIdx >= 0 ? defIdx : 0);
+    }
+  }, [loading, addresses, selectedIndex]);
+
+  const saveAddresses = useCallback(
     async (newList: Address[]) => {
       if (!user) return;
       try {
@@ -50,7 +63,7 @@ export function useAddresses() {
     [user, notify]
   );
 
-  const prepare = useCallback(
+  const prepareList = useCallback(
     (list: Address[], addr: Address, idx?: number) => {
       const newList = [...list];
       if (newList.length === 0) {
@@ -58,21 +71,14 @@ export function useAddresses() {
         addr.preferredBillingAddress = true;
       } else {
         if (addr.preferredShippingAddress) {
-          newList.forEach((a, i) => {
-            if (i !== idx) a.preferredShippingAddress = false;
-          });
+          newList.forEach((a, i) => { if (i !== idx) a.preferredShippingAddress = false; });
         }
         if (addr.preferredBillingAddress) {
-          newList.forEach((a, i) => {
-            if (i !== idx) a.preferredBillingAddress = false;
-          });
+          newList.forEach((a, i) => { if (i !== idx) a.preferredBillingAddress = false; });
         }
       }
-      if (idx != null) {
-        newList[idx] = addr;
-      } else {
-        newList.push(addr);
-      }
+      if (idx != null) newList[idx] = addr;
+      else newList.push(addr);
       return newList;
     },
     []
@@ -80,32 +86,31 @@ export function useAddresses() {
 
   const add = useCallback(
     (addr: Address) => {
-      const newList = prepare(addresses, addr);
-      return save(newList);
+      const newList = prepareList(addresses, addr);
+      return saveAddresses(newList);
     },
-    [addresses, prepare, save]
+    [addresses, prepareList, saveAddresses]
   );
 
   const update = useCallback(
     (idx: number, addr: Address) => {
-      const newList = prepare(addresses, addr, idx);
-      return save(newList);
+      const newList = prepareList(addresses, addr, idx);
+      return saveAddresses(newList);
     },
-    [addresses, prepare, save]
+    [addresses, prepareList, saveAddresses]
   );
 
   const remove = useCallback(
     (idx: number) => {
       const newList = [...addresses];
       newList.splice(idx, 1);
-      return save(newList);
+      return saveAddresses(newList);
     },
-    [addresses, save]
+    [addresses, saveAddresses]
   );
 
-  useEffect(() => {
-    load();
-  }, [load]);
+  // Selection
+  const selectAddress = (idx: number) => setSelectedIndex(idx);
 
   return {
     addresses,
@@ -113,5 +118,7 @@ export function useAddresses() {
     add,
     update,
     remove,
+    selectedIndex,
+    selectAddress,
   };
 }

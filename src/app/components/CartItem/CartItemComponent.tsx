@@ -58,7 +58,7 @@ export default function CartItemComponent({
 
   return (
     <>
-      <div className="w-full flex-wrap bg-white p-4 shadow-lg flex items-center gap-4">
+      <div className="w-full rounded flex-wrap bg-white p-4 shadow-lg flex items-center gap-4">
         <Link href={href} className="flex-shrink-0">
           <div className="relative w-16 h-16">
             <Image

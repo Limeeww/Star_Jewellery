@@ -2,36 +2,51 @@
 
 import React, { useState, useEffect } from "react";
 import { useAddresses } from "@/hooks/useAddresses";
-import ActionButton from "@/app/components/FormComponents/ActionButton";
 import LinkButton from "@/app/Account/components/LinkButton";
 import AddAddressModal from "@/app/Account/components/Modals/AddAddressModal";
 import type { Address } from "@/app/types/userTypes";
+import AddressCard from "@/app/Account/components/AddressCard";
+import ConfirmModal from "@/app/components/MessageHandling/ConfirmModal";
+import { useNotification } from "@/hooks/useNotification";
+import Notification from "@/app/components/MessageHandling/Notification";
 
 interface Props {
   onSelect?: (address: Address) => void;
+  addresses: Address[];
+  loading?: boolean;
 }
 
-export default function SelectShippingAddress({ onSelect }: Props) {
-  const { addresses, loading, add, update } = useAddresses();
+export default function SelectShippingAddress({ onSelect, addresses, loading }: Props) {
+  const { add, update, remove } = useAddresses();
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [addressToEdit, setAddressToEdit] = useState<Address | undefined>(
     undefined
   );
+  const { notification, notify, clearNotification } = useNotification();
 
-useEffect(() => {
-  if (!loading && addresses.length && selectedIndex === null) {
-    const def = addresses.findIndex(a => a.preferredShippingAddress);
-    setSelectedIndex(def >= 0 ? def : 0);
-  }
-// eslint-disable-next-line react-hooks/exhaustive-deps
-}, [loading, addresses.length, selectedIndex]);
+  useEffect(() => {
+    if (!loading && addresses.length && selectedIndex === null) {
+      const def = addresses.findIndex((a) => a.preferredShippingAddress);
+      setSelectedIndex(def >= 0 ? def : 0);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, addresses.length, selectedIndex]);
 
   if (loading) return <p>Loading addresses…</p>;
 
   return (
     <>
+      {notification && (
+        <Notification
+          message={notification.message}
+          type={notification.type}
+          duration={notification.duration}
+          onClose={clearNotification}
+        />
+      )}
       {addresses.length === 0 ? (
         <div className="space-y-4">
           <p>There are no addresses yet. Please add one.</p>
@@ -56,59 +71,25 @@ useEffect(() => {
             {addresses.map((a, idx) => {
               const isSelected = idx === selectedIndex;
               return (
-                <div
+                <AddressCard
                   key={idx}
-                  className={`border rounded-lg p-4 flex flex-col justify-between ${
-                    isSelected
-                      ? "border-gray-500 bg-gray-50"
-                      : "border-gray-200"
-                  }`}
-                >
-                  <div>
-                    <h4 className="font-semibold text-gray-800 mb-2">
-                      {a.addressLabel}
-                    </h4>
-                    <div className="text-sm text-gray-700 space-y-1">
-                      <div>
-                        {a.title} {a.firstName} {a.lastName}
-                      </div>
-                      <div>
-                        {a.street}, {a.houseNumber}
-                        {a.additionalInfo && `, ${a.additionalInfo}`}
-                      </div>
-                      <div>
-                        {a.city}, {a.state} {a.zipCode}
-                      </div>
-                      <div>{a.country}</div>
-                      <div>+{a.mobile}</div>
-                    </div>
-                  </div>
-
-                  <div className="mt-4 flex gap-2">
-                    <ActionButton
-                      text={isSelected ? "Selected" : "Select Address"}
-                      onClick={() => {
-                        setSelectedIndex(idx);
-                        onSelect?.(a);
-                      }}
-                      className={`text-sm font-medium px-3 py-1 rounded flex-1 transition-colors ${
-                        isSelected
-                          ? "bg-gray-200 text-gray-600 cursor-default"
-                          : "bg-gray-900 text-white hover:bg-gray-700"
-                      }`}
-                      disabled={isSelected}
-                    />
-                    <ActionButton
-                      text="Edit Address"
-                      onClick={() => {
-                        setEditingIndex(idx);
-                        setAddressToEdit(a);
-                        setShowModal(true);
-                      }}
-                      className="text-sm font-medium px-3 py-1 rounded flex-1 bg-gray-900 text-white hover:bg-gray-700 transition"
-                    />
-                  </div>
-                </div>
+                  address={a}
+                  isSelected={isSelected}
+                  showDeleteIcon={addresses.length > 1}
+                  onSelect={() => {
+                    setSelectedIndex(idx);
+                    onSelect?.(a);
+                  }}
+                  onEdit={() => {
+                    setEditingIndex(idx);
+                    setAddressToEdit(a);
+                    setShowModal(true);
+                  }}
+                  onRemove={() => {
+                    setEditingIndex(idx);
+                    setShowDelete(true);
+                  }}
+                />
               );
             })}
           </div>
@@ -124,6 +105,30 @@ useEffect(() => {
           />
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={showDelete}
+        title="Delete Address"
+        message="Are you sure you want to delete this address?"
+        cancelLabel="No, keep it"
+        confirmLabel="Yes, delete"
+        onClose={() => setShowDelete(false)}
+        onConfirm={async () => {
+          try {
+            if (editingIndex !== null) {
+              await remove(editingIndex);
+              notify({ type: "success", message: "Address removed!" });
+            }
+          } catch (e) {
+            const errorMessage = e instanceof Error ? e.message : "Save failed";
+            notify({
+              type: "error",
+              message: errorMessage || "Delete failed",
+            });
+          }
+          setShowDelete(false);
+        }}
+      />
 
       <AddAddressModal
         isOpen={showModal}

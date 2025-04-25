@@ -26,13 +26,19 @@ export default function Addresses() {
   useRequireAuth(user, loadingAuth);
   const [profileData] = useProfileData(user ?? null);
   const { notification, notify, clearNotification } = useNotification();
-  const { addresses, loading, add, update, remove } = useAddresses();
+  const {
+    addresses,
+    add,
+    update,
+    remove,
+    loading: loadingAddrs,
+  } = useAddresses();
 
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
 
-  if (loadingAuth || loading) {
+  if (loadingAuth) {
     return <Loading />;
   }
 
@@ -75,10 +81,12 @@ export default function Addresses() {
             address, and it will automatically appear during checkout.
           </p>
 
-          {addresses.length === 0 ? (
+          {loadingAddrs ? (
+            <p>Loading addresses…</p>
+          ) : addresses.length === 0 ? (
             <div className="flex items-center justify-between mt-4 py-2">
               <p className="text-sm text-gray-800">
-                You haven&apos;t saved any addresses yet.
+                You have no saved addresses. Please add one in your profile.
               </p>
               <LinkButton
                 text="Add new address"
@@ -120,7 +128,6 @@ export default function Addresses() {
                       setEditingIndex(idx);
                       setShowDelete(true);
                     }}
-                    index={0}
                   />
                 ))}
               </div>
