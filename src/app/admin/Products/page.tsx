@@ -11,6 +11,7 @@ import Image from "next/image";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import LinkButton from "@/app/Account/components/LinkButton";
+import Footer from "@/app/components/Footer/Footer";
 
 export default function AdminProductsPage() {
   const pathname = usePathname();
@@ -32,7 +33,7 @@ export default function AdminProductsPage() {
 
   const fetchProducts = async () => {
     try {
-      const res = await fetch("/api/products");
+      const res = await fetch("/api/products/products");
       const data = await res.json();
       setProducts(data.products);
     } catch (error) {
@@ -253,13 +254,14 @@ export default function AdminProductsPage() {
                 className="w-full bg-black text-white text-md font-medium px-4 py-2 hover:bg-gray-800 transition-colors"
                 showArrow={false}
                 onClick={() =>
-                  router.push(`/Admin/Products/Edit/${product.slug}`)
+                  router.push(`/Admin/Products/Edit/${product.id}`)
                 }
               />
             </li>
           ))}
         </ul>
       </AccountLayout>
+      <Footer />
     </>
   );
 }

@@ -15,7 +15,8 @@ export interface Discount {
 export interface Category {
   id: number;
   name: string;
-  //TO DO add fields
+  image: string;
+  parentCategory: number | null;
 }
 
 export interface ProductVariant {
