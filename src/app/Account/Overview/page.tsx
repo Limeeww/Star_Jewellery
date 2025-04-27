@@ -52,11 +52,15 @@ export default function Overview() {
               </p>
               <p>
                 <strong>Name:</strong>{" "}
-                {profileData?.firstName ? profileData.firstName.toString() : "No first name provided"}
+                {profileData?.firstName
+                  ? profileData.firstName.toString()
+                  : "No first name provided"}
               </p>
               <p>
                 <strong>Last Name:</strong>{" "}
-                {profileData?.lastName ? profileData.lastName.toString() : "No last name provided"}
+                {profileData?.lastName
+                  ? profileData.lastName.toString()
+                  : "No last name provided"}
               </p>
               <p>
                 <strong>Birth Date:</strong>{" "}
@@ -82,11 +86,23 @@ export default function Overview() {
           <ProfileCard
             title="MY ADDRESSES"
             description={
-              Array.isArray(profileData?.addresses) && profileData.addresses.length
+              Array.isArray(profileData?.addresses) &&
+              profileData.addresses.length
                 ? `You have ${profileData.addresses.length} saved addresses.`
                 : "No addresses saved. Please add your shipping or billing address."
             }
             linkHref="/Account/Addresses"
+          />
+
+          <ProfileCard
+            title="MY PAYMENT METHODS"
+            description={
+              Array.isArray(profileData?.paymentMethods) &&
+              profileData.paymentMethods.length
+                ? `You have ${profileData.paymentMethods.length} saved payment methods.`
+                : "No payment methods saved. Please add your credit card or PayPal account."
+            }
+            linkHref="/Account/PaymentMethods"
           />
 
           <ProfileCard

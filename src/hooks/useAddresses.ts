@@ -1,9 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { auth, db } from "@/firebase/firebaseConfig";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { useNotification } from "@/hooks/useNotification";
-import { useRequireAuth } from "@/hooks/index";
+import { auth } from "@/firebase/firebaseConfig";
+import { useNotification, useRequireAuth } from "@/hooks";
+import { fetchUserData, updateUserProfile } from "@/utils/firebase";
 import type { Address } from "@/types/userTypes";
 
 export function useAddresses() {
@@ -21,16 +20,11 @@ export function useAddresses() {
       setLoading(false);
       return;
     }
+
     setLoading(true);
     try {
-      const snap = await getDoc(doc(db, "users", user.uid));
-      if (snap.exists()) {
-        const data = snap.data() as { addresses?: Address[] };
-        const list = data.addresses || [];
-        setAddresses(list);
-      } else {
-        setAddresses([]);
-      }
+      const data = await fetchUserData(user.uid);
+      setAddresses(data?.addresses ?? []);
     } catch {
       notify({ type: "error", message: "Failed to load addresses" });
       setAddresses([]);
@@ -54,7 +48,7 @@ export function useAddresses() {
     async (newList: Address[]) => {
       if (!user) return;
       try {
-        await updateDoc(doc(db, "users", user.uid), { addresses: newList });
+        await updateUserProfile(user.uid, { addresses: newList });
         setAddresses(newList);
       } catch {
         notify({ type: "error", message: "Failed to save addresses" });
@@ -106,15 +100,15 @@ export function useAddresses() {
 
   const remove = useCallback(
     (idx: number) => {
-      const newList = [...addresses];
-      newList.splice(idx, 1);
+      const newList = addresses.filter((_, i) => i !== idx);
       return saveAddresses(newList);
     },
     [addresses, saveAddresses]
   );
 
-  // Selection
-  const selectAddress = (idx: number) => setSelectedIndex(idx);
+  const selectAddress = useCallback((idx: number) => {
+    setSelectedIndex(idx);
+  }, []);
 
   return {
     addresses,

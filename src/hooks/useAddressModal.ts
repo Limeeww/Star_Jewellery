@@ -1,47 +1,101 @@
+import { useState, useEffect, useCallback } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { useCallback } from "react";
-import { auth, db } from "@/firebase/firebaseConfig";
-import { updateDoc, doc, getDoc } from "firebase/firestore";
-import type { Address } from "@/types/userTypes";
+import { auth } from "@/firebase/firebaseConfig";
+import { useNotification, useRequireAuth } from "@/hooks";
+import { fetchUserData, updateUserProfile } from "@/utils/firebase";
+import type { PaymentInfo } from "@/types/order";
 
-export function useAddressModal(onSave: (addrs: Address[]) => void) {
-  const [user] = useAuthState(auth);
+export function usePaymentMethods() {
+  const [user, loadingAuth] = useAuthState(auth);
+  const { notify } = useNotification();
+  useRequireAuth(user ?? null, loadingAuth);
 
-  const save = useCallback(
-    async (addresses: Address[]) => {
-      if (!user) throw new Error("Not authenticated");
-      const userRef = doc(db, "users", user.uid);
-      await updateDoc(userRef, { addresses });
-      onSave(addresses);
-    },
-    [user, onSave]
-  );
+  const [paymentMethods, setPaymentMethods] = useState<PaymentInfo[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const load = useCallback(async (): Promise<Address[]> => {
-    if (!user) return [];
-    const snap = await getDoc(doc(db, "users", user.uid));
-    if (!snap.exists()) return [];
-    return snap.data().addresses || [];
-  }, [user]);
+  const loadMethods = useCallback(async () => {
+    if (!user) {
+      setPaymentMethods([]);
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    try {
+      const data = await fetchUserData(user.uid);
+      setPaymentMethods(data?.paymentMethods ?? []);
+    } catch {
+      notify({ type: "error", message: "Failed to load payment methods" });
+      setPaymentMethods([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [user, notify]);
 
-  const prepare = useCallback(
-    (existing: Address[], data: Address, idx?: number) => {
-      const addrs = [...existing];
-      if (addrs.length === 0) {
-        data.preferredShippingAddress = true;
-        data.preferredBillingAddress = true;
-      } else {
-        if (data.preferredShippingAddress)
-          addrs.forEach((a) => (a.preferredShippingAddress = false));
-        if (data.preferredBillingAddress)
-          addrs.forEach((a) => (a.preferredBillingAddress = false));
+  useEffect(() => {
+    loadMethods();
+  }, [loadMethods]);
+
+  const saveMethods = useCallback(
+    async (newList: PaymentInfo[]) => {
+      if (!user) return;
+      try {
+        await updateUserProfile(user.uid, { paymentMethods: newList });
+        setPaymentMethods(newList);
+      } catch {
+        notify({ type: "error", message: "Failed to save payment methods" });
       }
-      if (idx != null) addrs[idx] = data;
-      else addrs.push(data);
-      return addrs;
     },
-    []
+    [user, notify]
   );
 
-  return { load, prepare, save };
+  const add = useCallback(
+    async (method: PaymentInfo) => {
+      const list = paymentMethods.map(m => ({ ...m, isDefault: false }));
+      list.push({ ...method, isDefault: method.isDefault ?? false });
+      await saveMethods(list);
+    },
+    [paymentMethods, saveMethods]
+  );
+
+  const update = useCallback(
+    async (idx: number, pm: PaymentInfo) => {
+      if (pm.method === "credit_card" && pm.isDefault) {
+        const userData = await fetchUserData(user!.uid);
+        const customerId = userData?.stripeCustomerId;
+        await fetch("/api/stripe/set-default-payment-method", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ customerId, paymentMethodId: pm.cardToken }),
+        });
+      }
+      const list = [...paymentMethods];
+      list[idx] = pm;
+      return saveMethods(list);
+    },
+    [user, paymentMethods, saveMethods]
+  );
+
+  const remove = useCallback(
+    async (idx: number) => {
+      const pm = paymentMethods[idx];
+      if (pm.method === "credit_card") {
+        await fetch("/api/stripe/detach-payment-method", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ paymentMethodId: pm.cardToken }),
+        });
+      }
+      const list = paymentMethods.filter((_, i) => i !== idx);
+      await saveMethods(list);
+    },
+    [paymentMethods, saveMethods]
+  );
+
+  return {
+    paymentMethods,
+    loading: loadingAuth || loading,
+    add,
+    update,
+    remove,
+  };
 }
