@@ -1,110 +1,146 @@
-import { useState, useEffect, useCallback } from "react";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "@/firebase/firebaseConfig";
-import { useNotification, useRequireAuth } from "@/hooks";
-import { fetchUserData, updateUserProfile } from "@/utils/firebase";
-import type { PaymentInfo } from "@/types/order";
+import { useState, useEffect, useMemo } from "react";
+import {
+  useParams,
+  useSearchParams,
+  useRouter,
+  usePathname,
+} from "next/navigation";
+import { Timestamp } from "firebase/firestore";
+
+import { Product, ProductVariant, Discount } from "@/types/product";
+import { Collection } from "@/types/collection";
+
+import { useNotification } from "@/hooks/useNotification";
+import {
+  fetchProductBySlug,
+  fetchCollectionById,
+  fetchActiveDiscounts,
+  findByVariantAttributes,
+} from "@/utils/product";
+import { pushRecent, RecentEntry } from "@/utils";
 
 
-export function usePaymentMethods() {
-  const [user, loadingAuth] = useAuthState(auth);
-  const { notify } = useNotification();
-  useRequireAuth(user ?? null, loadingAuth);
-
-  const [paymentMethods, setPaymentMethods] = useState<PaymentInfo[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const loadMethods = useCallback(async () => {
-    if (!user) {
-      setPaymentMethods([]);
-      setLoading(false);
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const data = await fetchUserData(user.uid);
-      setPaymentMethods(data?.paymentMethods ?? []);
-    } catch {
-      notify({ type: "error", message: "Failed to load payment methods" });
-      setPaymentMethods([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [user, notify]);
-
+export function useProductPage() {
+  const { slug } = useParams<{ slug: string }>() ?? {};
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  function replaceVariantInUrl(id: number) {
+    const params = new URLSearchParams(searchParams?.toString() || "");
+    params.set("variantID", String(id));
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  }
+  const { notify, notification, clearNotification } = useNotification();
+  const [product, setProduct] = useState<Product | null>(null);
+  const [collection, setCollection] = useState<Collection | null>(null);
+  const [activeDiscount, setActiveDiscount] = useState<Discount | null>(null);
+  const initialIdFromUrl = searchParams?.get("variantID");
+  const [currentVariantId, setCurrentVariantId] = useState<number | null>(
+    initialIdFromUrl ? Number(initialIdFromUrl) : null
+  );
   useEffect(() => {
-    loadMethods();
-  }, [loadMethods]);
-
-  const saveMethods = useCallback(
-    async (newList: PaymentInfo[]) => {
-      if (!user) return;
-
-      try {
-        await updateUserProfile(user.uid, { paymentMethods: newList });
-        setPaymentMethods(newList);
-      } catch {
-        notify({ type: "error", message: "Failed to save payment methods" });
+    if (!slug) return;
+    (async () => {
+      const p = await fetchProductBySlug(slug);
+      if (!p) {
+        notify({ type: "warning", message: "Product not found" });
+        return;
       }
-    },
-    [user, notify]
-  );
-
-  const add = useCallback(
-    async (method: PaymentInfo) => {
-      const list = paymentMethods.map((m) => ({ ...m, isDefault: false }));
-      list.push({ ...method, isDefault: method.isDefault ?? false });
-      await saveMethods(list);
-    },
-    [paymentMethods, saveMethods]
-  );
-
-  const update = useCallback(
-    async (idx: number, pm: PaymentInfo) => {
-      if (pm.method === "credit_card" && pm.isDefault) {
-        const userData = await fetchUserData(user!.uid);
-        const customerId = userData?.stripeCustomerId;
-        await fetch("/api/stripe/set-default-payment-method", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            customerId,
-            paymentMethodId: pm.cardToken,
-          }),
-        });
+      setProduct(p);
+      if (p.categoryId != null) {
+        const col = await fetchCollectionById(p.categoryId);
+        if (col) {
+          setCollection(col);
+        }
       }
-
-      const list = [...paymentMethods];
-      list[idx] = pm;
-      return saveMethods(list);
-    },
-    [user, paymentMethods, saveMethods]
-  );
-
-  const remove = useCallback(
-    async (idx: number) => {
-      const pm = paymentMethods[idx];
-
-      if (pm.method === "credit_card") {
-        await fetch("/api/stripe/detach-payment-method", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ paymentMethodId: pm.cardToken }),
-        });
-      }
-
-      const list = paymentMethods.filter((_, i) => i !== idx);
-      await saveMethods(list);
-    },
-    [paymentMethods, saveMethods]
-  );
-
+      const d = await fetchActiveDiscounts(p.id);
+      setActiveDiscount(d[0] ?? null);
+      if (!initialIdFromUrl) setCurrentVariantId(p.variants[0].id);
+    })();
+  }, [slug]); // eslint-disable-line react-hooks/exhaustive-deps
+  const displayedVariant = useMemo<ProductVariant | undefined>(() => {
+    if (!product || currentVariantId == null) return undefined;
+    return product.variants.find((v) => v.id === currentVariantId);
+  }, [product, currentVariantId]);
+  useEffect(() => {
+    if (!product) return;
+    const urlId = searchParams?.get("variantID");
+    if (!urlId) return;
+    const num = Number(urlId);
+    if (num !== currentVariantId) setCurrentVariantId(num);
+  }, [searchParams, product, currentVariantId]);
+  useEffect(() => {
+    if (!product || !displayedVariant) return;
+    const entry: RecentEntry = {
+      id: product.id,
+      slug: product.slug ?? "",
+      name: product.name,
+      image: displayedVariant.images?.[0] ?? "/placeholder.jpg",
+      variantId: displayedVariant.id,
+      date: Timestamp.now().toDate(),
+    };
+    pushRecent(entry);
+  }, [product, displayedVariant]);
+  const sizeOptions = useMemo(() => {
+    if (!product) return [];
+    const map = new Map<number, { size: number; quantity: number }>();
+    product.variants.forEach((v) =>
+      v.quantitySize?.forEach((q) => {
+        if (!map.has(q.size)) map.set(q.size, q);
+      })
+    );
+    return Array.from(map.values()).map((q) => ({
+      value: String(q.size),
+      label: `Size ${q.size} (${q.quantity} available)`,
+    }));
+  }, [product]);
+  const insertOptions = useMemo(() => {
+    if (!product) return [];
+    return Array.from(new Set(product.variants.map((v) => v.insert))).map(
+      (i) => ({ value: i, label: i })
+    );
+  }, [product]);
+  const materialColorOptions = useMemo(() => {
+    if (!product) return [];
+    return Array.from(
+      new Set(product.variants.map((v) => v.materialColor.trim()))
+    ).map((c) => ({ value: c, label: c }));
+  }, [product]);
+  const handleInsertChange = (val: string) => {
+    if (!product) return;
+    const v = findByVariantAttributes(
+      product.variants,
+      val,
+      displayedVariant?.materialColor ?? ""
+    );
+    if (v && v.id !== currentVariantId) {
+      setCurrentVariantId(v.id);
+      replaceVariantInUrl(v.id);
+    }
+  };
+  const handleColorChange = (val: string) => {
+    if (!product) return;
+    const v = findByVariantAttributes(
+      product.variants,
+      displayedVariant?.insert ?? "",
+      val
+    );
+    if (v && v.id !== currentVariantId) {
+      setCurrentVariantId(v.id);
+      replaceVariantInUrl(v.id);
+    }
+  };
   return {
-    paymentMethods,
-    loading: loadingAuth || loading,
-    add,
-    update,
-    remove,
+    product,
+    collection,
+    activeDiscount,
+    displayedVariant,
+    notification,
+    clearNotification,
+    sizeOptions,
+    insertOptions,
+    materialColorOptions,
+    handleInsertChange,
+    handleColorChange,
   };
 }

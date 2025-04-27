@@ -1,3 +1,4 @@
+// PaymentMethodCard.tsx
 "use client";
 
 import React from "react";
@@ -6,21 +7,19 @@ import type { PaymentInfo } from "@/types/order";
 
 interface PaymentMethodCardProps {
   paymentMethod: PaymentInfo;
-  onEdit?: () => void;
+  isDefault?: boolean;
+  onSetDefault?: () => void;
+  onRemove?: () => void;
   showDeleteIcon?: boolean;
-  onDelete?: () => void;
   className?: string;
 }
 
-/**
- * Card component to display a saved payment method.
- * Styles largely mirror AddressCard.
- */
 export default function PaymentMethodCard({
   paymentMethod,
-  onEdit,
+  isDefault = false,
+  onSetDefault,
+  onRemove,
   showDeleteIcon = false,
-  onDelete,
   className = "",
 }: PaymentMethodCardProps) {
   return (
@@ -28,14 +27,14 @@ export default function PaymentMethodCard({
       className={`
         relative
         border rounded-lg p-4 flex flex-col justify-between
-        border-gray-200
+        ${isDefault ? "border-gray-500 bg-gray-50" : "border-gray-200"}
         ${className}
       `}
     >
-      {showDeleteIcon && onDelete && (
+      {showDeleteIcon && onRemove && (
         <button
           type="button"
-          onClick={onDelete}
+          onClick={onRemove}
           className="absolute top-3 right-2 p-1 text-gray-400 hover:text-red-600 transition"
           aria-label="Delete payment method"
         >
@@ -87,17 +86,23 @@ export default function PaymentMethodCard({
       </div>
 
       <div className="mt-4 flex gap-2">
-        {onEdit && (
+        {onSetDefault && (
           <ActionButton
-            text="Edit"
-            onClick={onEdit}
-            className="text-sm font-medium px-3 py-1 rounded flex-1 bg-gray-900 text-white hover:bg-gray-700 transition"
+            text={isDefault ? "Default" : "Set as Default"}
+            onClick={onSetDefault}
+            disabled={isDefault}
+            className={`text-sm font-medium px-3 py-1 rounded flex-1 transition-colors ${
+              isDefault
+                ? "bg-gray-200 text-gray-600 cursor-default"
+                : "bg-gray-900 text-white hover:bg-gray-700"
+            }`}
           />
         )}
-        {!showDeleteIcon && onDelete && (
+
+        {!showDeleteIcon && onRemove && (
           <ActionButton
             text="Remove"
-            onClick={onDelete}
+            onClick={onRemove}
             className="text-sm font-medium px-3 py-1 rounded flex-1 bg-red-600 text-white hover:bg-red-700 transition"
           />
         )}

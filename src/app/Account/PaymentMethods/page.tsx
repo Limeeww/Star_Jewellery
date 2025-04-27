@@ -43,6 +43,32 @@ export default function PaymentMethods() {
     return <Loading />;
   }
 
+  const handleSetDefault = async (idx: number) => {
+    const updated = paymentMethods.map((pm, i) => ({
+      ...pm,
+      isDefault: i === idx,
+    }));
+    await update(idx, { ...updated[idx], isDefault: true });
+  };
+
+  const handleRemoveConfirm = async () => {
+    try {
+      if (editingIndex !== null) {
+        await remove(editingIndex);
+        notify({
+          type: "success",
+          message: "Payment method removed!",
+        });
+      }
+    } catch (e) {
+      notify({
+        type: "error",
+        message: (e as Error).message || "Delete failed",
+      });
+    }
+    setShowDelete(false);
+  };
+
   return (
     <>
       <Navbar isScrolled isLoggedIn={!!user} />
@@ -113,15 +139,13 @@ export default function PaymentMethods() {
                 />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {paymentMethods.map((pm: PaymentInfo, idx: number) => (
+                {paymentMethods.map((pm, idx) => (
                   <PaymentMethodCard
                     key={pm.id}
                     paymentMethod={pm}
-                    onEdit={() => {
-                      setEditingIndex(idx);
-                      setShowModal(true);
-                    }}
-                    onDelete={() => {
+                    isDefault={pm.isDefault}
+                    onSetDefault={() => handleSetDefault(idx)}
+                    onRemove={() => {
                       setEditingIndex(idx);
                       setShowDelete(true);
                     }}
@@ -167,23 +191,7 @@ export default function PaymentMethods() {
             cancelLabel="No, keep it"
             confirmLabel="Yes, delete"
             onClose={() => setShowDelete(false)}
-            onConfirm={async () => {
-              try {
-                if (editingIndex !== null) {
-                  await remove(editingIndex);
-                  notify({
-                    type: "success",
-                    message: "Payment method removed!",
-                  });
-                }
-              } catch (e) {
-                notify({
-                  type: "error",
-                  message: (e as Error).message || "Delete failed",
-                });
-              }
-              setShowDelete(false);
-            }}
+            onConfirm={handleRemoveConfirm}
           />
         </div>
       </AccountLayout>
