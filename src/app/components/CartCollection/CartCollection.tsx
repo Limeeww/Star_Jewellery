@@ -3,7 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Collection } from "../../types/collection";
+import { Collection } from "../../../types/collection";
 
 type CartCollectionProps = {
   collection: Collection;

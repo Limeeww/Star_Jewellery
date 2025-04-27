@@ -1,10 +1,10 @@
 "use client";
 
 import React, { createContext, useContext, ReactNode } from "react";
-import { useCartItems } from "../utils/cartUtils";
+import { useCartItems } from "@/utils/cartUtils";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../../firebase/firebaseConfig";
-import { CartItem } from "../types/cartItem";
+import { CartItem } from "../../types/cartItem";
 
 interface CartContextType {
   cartItemCount: number;
@@ -19,9 +19,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const cartItemCount = cartItems?.length || 0;
 
   return (
-      <CartContext.Provider value={{ cartItemCount, cartItems }}>
-        {children}
-      </CartContext.Provider>
+    <CartContext.Provider value={{ cartItemCount, cartItems }}>
+      {children}
+    </CartContext.Provider>
   );
 }
 

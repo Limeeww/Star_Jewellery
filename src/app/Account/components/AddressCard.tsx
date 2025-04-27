@@ -2,7 +2,7 @@
 
 import React from "react";
 import ActionButton from "@/app/components/FormComponents/ActionButton";
-import type { Address } from "@/app/types/userTypes";
+import type { Address } from "@/types/userTypes";
 
 interface AddressCardProps {
   address: Address;

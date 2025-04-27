@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { QuantitySize } from "@/app/types/product";
+import { QuantitySize } from "@/types/product";
 
 interface Props {
   quantitySize: QuantitySize[];

@@ -3,13 +3,13 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "@/firebase/firebaseConfig";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { useNotification } from "@/hooks/useNotification";
-import { useRequireAuth } from "@/app/utils/auth";
-import type { Address } from "@/app/types/userTypes";
+import { useRequireAuth } from "@/hooks/index";
+import type { Address } from "@/types/userTypes";
 
 export function useAddresses() {
   const [user, loadingAuth] = useAuthState(auth);
   const { notify } = useNotification();
-  useRequireAuth(user, loadingAuth);
+  useRequireAuth(user ?? null, loadingAuth);
 
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [loading, setLoading] = useState(true);
@@ -71,10 +71,14 @@ export function useAddresses() {
         addr.preferredBillingAddress = true;
       } else {
         if (addr.preferredShippingAddress) {
-          newList.forEach((a, i) => { if (i !== idx) a.preferredShippingAddress = false; });
+          newList.forEach((a, i) => {
+            if (i !== idx) a.preferredShippingAddress = false;
+          });
         }
         if (addr.preferredBillingAddress) {
-          newList.forEach((a, i) => { if (i !== idx) a.preferredBillingAddress = false; });
+          newList.forEach((a, i) => {
+            if (i !== idx) a.preferredBillingAddress = false;
+          });
         }
       }
       if (idx != null) newList[idx] = addr;

@@ -6,9 +6,9 @@ import Footer from "@/app/components/Footer/Footer";
 import OrderSummary from "@/app/cart/components/OrderSummary";
 import Notification from "@/app/components/MessageHandling/Notification";
 import { useNotification } from "@/hooks/useNotification";
-import type { Order, PaymentInfo } from "@/app/types/order";
-import SelectShippingAddress from "@/app/cart/components/SelectShippingAddress";
-import { Address } from "@/app/types/userTypes";
+import type { Order, PaymentInfo } from "@/types/order";
+import SelectShippingAddress from "@/app/checkout/components/SelectShippingAddress";
+import { Address } from "@/types/userTypes";
 import Navbar from "../components/Navbar/Navbar";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase/firebaseConfig";
@@ -127,10 +127,6 @@ export default function CheckoutPage() {
 
                 {loadingAddrs ? (
                   <p>Loading addresses…</p>
-                ) : addresses.length === 0 ? (
-                  <p className="text-gray-600">
-                    You have no saved addresses. Please add one in your profile.
-                  </p>
                 ) : (
                   <SelectShippingAddress
                     loading={loadingAddrs}

@@ -12,7 +12,7 @@ import SubmitButton from "@/app/components/FormComponents/SubmitButton";
 import { useModalClose } from "@/hooks/useModal";
 import { useNotification } from "@/hooks/useNotification";
 import { useAddressModal } from "@/hooks/useAddressModal";
-import type { Address } from "@/app/types/userTypes";
+import type { Address } from "@/types/userTypes";
 
 const DEFAULT_VALUES: Partial<Address> = {
   title: "Mr",

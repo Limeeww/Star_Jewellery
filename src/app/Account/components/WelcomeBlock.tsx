@@ -1,5 +1,5 @@
 import React, { JSX } from "react";
-import { signOutUser } from "@/app/utils/auth";
+import { signOutUser } from "@/utils/index";
 import { useRouter } from "next/navigation";
 
 interface WelcomeBlockProps {

@@ -7,8 +7,8 @@ import {
 } from "next/navigation";
 import { Timestamp } from "firebase/firestore";
 
-import { Product, ProductVariant, Discount } from "@/app/types/product";
-import { Collection } from "@/app/types/collection";
+import { Product, ProductVariant, Discount } from "@/types/product";
+import { Collection } from "@/types/collection";
 
 import { useNotification } from "@/hooks/useNotification";
 import {
@@ -16,8 +16,9 @@ import {
   fetchCollectionById,
   fetchActiveDiscounts,
   findByVariantAttributes,
-} from "@/app/utils/product";
-import { pushRecent, RecentEntry } from "@/app/utils/recentlyViewed";
+  pushRecent,
+  RecentEntry,
+} from "@/utils/index";
 
 export function useProductPage() {
   const { slug } = useParams<{ slug: string }>() ?? {};

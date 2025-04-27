@@ -2,7 +2,7 @@
 
 import React from "react";
 import { UseFormRegister, UseFormWatch } from "react-hook-form";
-import { GiftOptionsForm } from "@/app/types/order";
+import { GiftOptionsForm } from "@/types/order";
 import CheckboxField from "@/app/components/FormComponents/CheckboxField";
 import TextareaToggle from "@/app/components/FormComponents/TextareaToggle";
 

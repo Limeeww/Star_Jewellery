@@ -1,9 +1,8 @@
-import { CartItem } from "../types/cartItem";
-import { GiftOptionsForm } from "../types/order";
+import { CartItem } from "@/types/cartItem";
+import { GiftOptionsForm } from "@/types/order";
 import { useState, useEffect } from "react";
 import { doc, onSnapshot } from "firebase/firestore";
-import { db } from "../../firebase/firebaseConfig";
-
+import { db } from "@/firebase/firebaseConfig";
 
 export const getTotalCount = (cartItems: CartItem[]): number =>
   cartItems.reduce((acc, item) => acc + item.quantity, 0);

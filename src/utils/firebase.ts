@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { auth, db } from "../../firebase/firebaseConfig";
+import { auth, db } from "@/firebase/firebaseConfig";
 import {
   collection,
   doc,
@@ -11,8 +11,8 @@ import {
   Timestamp,
   where,
 } from "firebase/firestore";
-import Notification from "../components/MessageHandling/Notification";
-import { onAuthStateChanged, User, UserProfile } from "firebase/auth";
+import Notification from "@/app/components/MessageHandling/Notification";
+import { UserProfile } from "firebase/auth";
 
 export type NotificationType = "success" | "info" | "warning" | "error";
 
@@ -123,21 +123,6 @@ export const updateUserProfileWithChecks = async (
 };
 
 /**
- * Hook to require authentication. Redirects to "/" if no user.
- */
-export function useRequireAuth(
-  user: User | null | undefined,
-  loading: boolean
-) {
-  const router = useRouter();
-  useEffect(() => {
-    if (!loading && !user) {
-      router.push("/");
-    }
-  }, [user, loading, router]);
-}
-
-/**
  * Hook to fetch and manage profile data.
  */
 export function useProfileData(user: { uid: string } | null) {
@@ -163,18 +148,3 @@ export const isEmailTaken = async (email: string): Promise<boolean> => {
   const querySnapshot = await getDocs(q);
   return !querySnapshot.empty;
 };
-
-/**
- * Hook to sync the current user's email into their Firestore document.
- */
-export function useSyncUserEmail() {
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        const userRef = doc(db, "users", user.uid);
-        await setDoc(userRef, { email: user.email }, { merge: true });
-      }
-    });
-    return () => unsubscribe();
-  }, []);
-}

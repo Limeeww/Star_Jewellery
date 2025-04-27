@@ -2,10 +2,10 @@
 
 import React from "react";
 import { useForm, Controller } from "react-hook-form";
-import SelectField from "../../components/FormComponents/SelectField";
-import SubmitButton from "../../components/FormComponents/SubmitButton";
+import SelectField from "@/app/components/FormComponents/SelectField";
+import SubmitButton from "@/app/components/FormComponents/SubmitButton";
 import { AiOutlineShoppingCart } from "react-icons/ai";
-import { ProductVariant } from "../../types/product";
+import { ProductVariant } from "@/types/product";
 
 export interface FormValues {
   size: string;

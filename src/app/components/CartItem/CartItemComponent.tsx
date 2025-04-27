@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import ConfirmModal from "@/app/components/MessageHandling/ConfirmModal";
-import { CartItem } from "../../types/cartItem";
+import { CartItem } from "@/types/cartItem";
 import DiscountDisplay from "../DiscountDisplay/DiscountDisplay";
 
 interface CartItemComponentProps {

@@ -6,7 +6,7 @@ import { useUserRole } from "@/hooks/useUserRole";
 import Navbar from "@/app/components/Navbar/Navbar";
 import AccountLayout from "@/app/Account/components/AccountLayout";
 import Loading from "@/app/components/Loading/Loading";
-import { Product } from "@/app/types/product";
+import { Product } from "@/types/product";
 import Image from "next/image";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";

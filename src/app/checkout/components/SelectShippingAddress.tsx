@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useAddresses } from "@/hooks/useAddresses";
 import LinkButton from "@/app/Account/components/LinkButton";
 import AddAddressModal from "@/app/Account/components/Modals/AddAddressModal";
-import type { Address } from "@/app/types/userTypes";
+import type { Address } from "@/types/userTypes";
 import AddressCard from "@/app/Account/components/AddressCard";
 import ConfirmModal from "@/app/components/MessageHandling/ConfirmModal";
 import { useNotification } from "@/hooks/useNotification";
@@ -16,7 +16,11 @@ interface Props {
   loading?: boolean;
 }
 
-export default function SelectShippingAddress({ onSelect, addresses, loading }: Props) {
+export default function SelectShippingAddress({
+  onSelect,
+  addresses,
+  loading,
+}: Props) {
   const { add, update, remove } = useAddresses();
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [showModal, setShowModal] = useState(false);
@@ -75,7 +79,7 @@ export default function SelectShippingAddress({ onSelect, addresses, loading }: 
                   key={idx}
                   address={a}
                   isSelected={isSelected}
-                  showDeleteIcon={addresses.length > 1}
+                  showDeleteIcon={true}
                   onSelect={() => {
                     setSelectedIndex(idx);
                     onSelect?.(a);

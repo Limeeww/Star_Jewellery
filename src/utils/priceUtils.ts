@@ -1,4 +1,4 @@
-import { Discount, ProductVariant } from "../types/product";
+import { Discount, ProductVariant } from "@/types/product";
 
 export const calculateDiscountedPrice = (
   variant: ProductVariant,

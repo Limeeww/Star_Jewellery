@@ -8,7 +8,8 @@ import ConfirmModal from "@/app/components/MessageHandling/ConfirmModal";
 import { usePathname } from "next/navigation";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase/firebaseConfig";
-import { useRequireAuth, useProfileData } from "@/app/utils/auth";
+import {useRequireAuth} from "@/hooks/index";
+import { useProfileData } from "@/utils/index";
 import { useAddresses } from "@/hooks/useAddresses";
 import AccountLayout from "@/app/Account/components/AccountLayout";
 import WelcomeBlock from "@/app/Account/components/WelcomeBlock";
@@ -22,7 +23,7 @@ export default function Addresses() {
   const pathname = usePathname();
 
   const [user, loadingAuth] = useAuthState(auth);
-  useRequireAuth(user, loadingAuth);
+  useRequireAuth(user ?? null, loadingAuth);
   const [profileData] = useProfileData(user ?? null);
   const { notification, notify, clearNotification } = useNotification();
   const {

@@ -3,37 +3,38 @@
 import { useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 
-import { auth } from "../../firebase/firebaseConfig";
+import { auth } from "@/firebase/firebaseConfig";
 
 import VariantSelector from "./components/VariantSelector";
 import ProductImageSlider from "./components/ProductImageBlock";
 import SideCartModal from "./components/SideCartModal";
-import Footer from "../components/Footer/Footer";
-import Notification from "../components/MessageHandling/Notification";
+import Footer from "@/app/components/Footer/Footer";
+import Notification from "@/app/components/MessageHandling/Notification";
 
-import { useProductPage } from "../../hooks/useProductPage";
-import { useRequireAuth } from "../utils/auth";
-import { useCartItems } from "../utils/cartUtils";
+import { useProductPage } from "@/hooks/useProductPage";
+import { useRequireAuth } from "@/hooks/index";
 import {
   addOrIncrementCartItem,
   decrementQuantity,
   incrementQuantity,
   removeItem,
-} from "../utils/cartActions";
-import { calculateDiscountedPrice, formatPrice } from "../utils/priceUtils";
-import { CartItem } from "../types/cartItem";
+  calculateDiscountedPrice,
+  formatPrice,
+  useCartItems,
+} from "@/utils/index";
+import { CartItem } from "@/types/cartItem";
 import { FormValues } from "./components/VariantSelector";
-import Loading from "../components/Loading/Loading";
-import Navbar from "../components/Navbar/Navbar";
+import Loading from "@/app/components/Loading/Loading";
+import Navbar from "@/app/components/Navbar/Navbar";
 import MainFeaturesList from "./components/MainFeatureList";
 import InfoBlocks from "./components/InfoItem";
-import ShareButton from "../components/ShareButton/ShareButton";
+import ShareButton from "@/app/components/ShareButton/ShareButton";
 import AboutCollection from "./components/AboutCollection";
-import SimilarProducts from "../components/SimilarProducts/SimilarProducts";
+import SimilarProducts from "@/app/components/SimilarProducts/SimilarProducts";
 
 const ProductPage = () => {
   const [user, authLoading] = useAuthState(auth);
-  useRequireAuth(user, authLoading);
+  useRequireAuth(user ?? null, authLoading);
 
   const {
     product,

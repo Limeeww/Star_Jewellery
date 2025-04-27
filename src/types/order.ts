@@ -1,6 +1,7 @@
 import { Discount } from "./product";
 import { Address } from "./userTypes";
 import { CartItem } from "./cartItem";
+import { PaymentMethod } from "@stripe/stripe-js";
 
 export interface GiftOptionsForm {
   giftPackaging: boolean;
@@ -10,19 +11,19 @@ export interface GiftOptionsForm {
 }
 
 interface BasePaymentInfo {
+  id: string;
   method: "credit_card" | "paypal" | "klarna";
   transactionId: string; // transaction ID from payment provider
   paid: boolean;
-
+  isDefault?: boolean;
   billingAddress: Address;
+  createdAt: Date;
 }
-
 
 export interface CreditCardPaymentInfo extends BasePaymentInfo {
   method: "credit_card";
   // Token maybe implemented later
-  cardToken: string;
-
+  cardToken: PaymentMethod | string;
   // write only last 4 digits of the card number
   cardNumberMasked: string;
   cardHolderName: string;

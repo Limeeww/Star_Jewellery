@@ -16,21 +16,21 @@ import {
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
-import { UserData } from "../types/userTypes";
-import { validationSchema } from "../utils/validationSchema";
+import { UserData } from "@/types/userTypes";
+import { validationSchema } from "@/utils/validationSchema";
 
-import TextField from "../components/FormComponents/TextField";
-import PasswordField from "../components/FormComponents/PasswordField";
-import PhoneNumberField from "../components/FormComponents/PhoneNumberField";
-import SelectField from "../components/FormComponents/SelectField";
-import CheckboxField from "../components/FormComponents/CheckboxField";
-import DayInput from "../components/FormComponents/DayInput";
+import TextField from "@/app/components/FormComponents/TextField";
+import PasswordField from "@/app/components/FormComponents/PasswordField";
+import PhoneNumberField from "@/app/components/FormComponents/PhoneNumberField";
+import SelectField from "@/app/components/FormComponents/SelectField";
+import CheckboxField from "@/app/components/FormComponents/CheckboxField";
+import DayInput from "@/app/components/FormComponents/DayInput";
 
-import Loading from "../components/Loading/Loading";
-import SubmitButton from "../components/FormComponents/SubmitButton";
+import Loading from "@/app/components/Loading/Loading";
+import SubmitButton from "@/app/components/FormComponents/SubmitButton";
 
-import Notification from "../components/MessageHandling/Notification";
-import { useNotification } from "../../hooks/useNotification";
+import Notification from "@/app/components/MessageHandling/Notification";
+import { useNotification } from "@/hooks/useNotification";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -90,28 +90,44 @@ export default function SignUpPage() {
         data.email,
         data.password
       );
+      if (!userCredential?.user) throw new Error("Registration failed");
 
-      if (userCredential && userCredential.user) {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { password, confirmPassword, ...userData } = data;
+      const uid = userCredential.user.uid;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { password, confirmPassword, ...userData } = data;
 
-        const finalUserData = {
-          ...userData,
-          createdAt: new Date(),
-          wishList: userData.wishList || [],
-          orders: userData.orders || [],
-          addresses: userData.addresses || [],
-          bonuses: userData.bonuses || "0",
-          cartItems: userData.cartItems || [],
-          role: "user",
-        };
-        await setDoc(doc(db, "users", userCredential.user.uid), finalUserData);
-        router.push("/Account/Overview");
-      }
+      const resp = await fetch("/api/stripe/create-customer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          uid,
+          email: data.email,
+          name: `${data.firstName} ${data.lastName}`,
+        }),
+      });
+      if (!resp.ok) throw new Error("Failed to create Stripe customer");
+      const { customerId } = await resp.json();
+
+      const finalUserData = {
+        ...userData,
+        stripeCustomerId: customerId,
+        createdAt: new Date(),
+        wishList: userData.wishList || [],
+        orders: userData.orders || [],
+        addresses: userData.addresses || [],
+        bonuses: userData.bonuses || "0",
+        cartItems: userData.cartItems || [],
+        role: "user",
+      };
+
+      await setDoc(doc(db, "users", uid), finalUserData);
+
+      router.push("/Account/Overview");
     } catch (err: unknown) {
       notify({
         type: "error",
-        message: err instanceof Error ? err.message : "Failed to create account.",
+        message:
+          err instanceof Error ? err.message : "Failed to create account.",
       });
     }
   };

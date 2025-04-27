@@ -2,9 +2,9 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import CartCollection from "../components/CartCollection/CartCollection"
-import { Collection } from "../types/collection";
-import { fetchCollections } from "../utils/collection"; 
+import CartCollection from "../components/CartCollection/CartCollection";
+import { Collection } from "@/types/collection";
+import { fetchCollections } from "@/utils/collection";
 
 export default function CollectionsSection() {
   const [collections, setCollections] = useState<Collection[]>([]);
@@ -12,7 +12,7 @@ export default function CollectionsSection() {
   useEffect(() => {
     async function loadCollections() {
       try {
-        const cols = await fetchCollections(4); 
+        const cols = await fetchCollections(4);
         setCollections(cols);
       } catch (error) {
         console.error("Error fetching collections:", error);
@@ -41,7 +41,9 @@ export default function CollectionsSection() {
               <CartCollection key={collection.id} collection={collection} />
             ))
           ) : (
-            <p className="col-span-full text-center text-gray-500">No collections available.</p>
+            <p className="col-span-full text-center text-gray-500">
+              No collections available.
+            </p>
           )}
         </div>
 

@@ -2,7 +2,7 @@
 
 import React from "react";
 import DiscountDisplay from "@/app/components/DiscountDisplay/DiscountDisplay";
-import { formatPrice } from "@/app/utils/priceUtils";
+import { formatPrice } from "@/utils/index";
 import ActionButton from "@/app/components/FormComponents/ActionButton";
 
 interface OrderSummaryProps {

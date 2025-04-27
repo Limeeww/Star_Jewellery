@@ -13,7 +13,7 @@ import CartItemComponent from "@/app/components/CartItem/CartItemComponent";
 import OrderSummary from "@/app/cart/components/OrderSummary";
 import RecentlyViewed from "@/app/components/RecentlyViewed/RecentlyViewed";
 import GiftOptions from "@/app/cart/components/GiftOptions";
-import { GiftOptionsForm, Order, PaymentInfo } from "@/app/types/order";
+import { GiftOptionsForm, Order, PaymentInfo } from "@/types/order";
 import Notification from "@/app/components/MessageHandling/Notification";
 
 import {
@@ -23,14 +23,12 @@ import {
   getGiftOptionsTotal,
   getTotal,
   useCartItems,
-} from "@/app/utils/cartUtils";
-import {
   incrementQuantity,
   decrementQuantity,
   removeItem,
-} from "@/app/utils/cartActions";
+} from "@/utils/index";
 import { useNotification } from "@/hooks/useNotification";
-import { useRouter } from "next/navigation"
+import { useRouter } from "next/navigation";
 
 export default function CartPage() {
   const [user, loading] = useAuthState(auth);
@@ -67,7 +65,6 @@ export default function CartPage() {
 
   const handleProceed = () => {
     if (!user) return;
-
 
     const now = new Date();
     const paymentInfo: PaymentInfo = {
