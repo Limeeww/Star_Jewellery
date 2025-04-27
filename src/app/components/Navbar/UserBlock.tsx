@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { LuLogOut, LuUserRound } from "react-icons/lu";
 import { useRouter } from "next/navigation";
-import { signOutUser } from "@/app/utils/auth";
+import { signOutUser } from "@/utils/index";
 
 type UserBlockProps = {
   isScrolled: boolean;

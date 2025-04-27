@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { formatPrice } from "@/app/utils/priceUtils";
+import { formatPrice } from "@/utils/priceUtils";
 
 interface DiscountDisplayProps {
   originalPrice?: number;

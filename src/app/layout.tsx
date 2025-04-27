@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Poppins, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "./contexts/CartContent";
+import StripeProvider from "./components/StripeProvider";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -28,7 +29,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${poppins.variable} ${playfair.variable} antialiased`}>
-        <CartProvider>{children}</CartProvider>
+        <StripeProvider>
+          <CartProvider>{children}</CartProvider>
+        </StripeProvider>
       </body>
     </html>
   );

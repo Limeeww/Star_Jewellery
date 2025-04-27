@@ -1,20 +1,21 @@
 "use client";
 
 import React from "react";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "../../../firebase/firebaseConfig";
 import { usePathname } from "next/navigation";
-import Navbar from "../../components/Navbar/Navbar";
-import Footer from "../../components/Footer/Footer";
-import Loading from "../../components/Loading/Loading";
+import { useAuthState } from "react-firebase-hooks/auth";
 
-import { useProfileData, useRequireAuth } from "@/app/utils/auth";
+import { auth } from "@/firebase/firebaseConfig";
+import { useUserRole } from "@/hooks/useUserRole";
+
+import { useRequireAuth } from "@/hooks/index";
+import { useProfileData } from "@/utils/index";
+
+import Navbar from "@/app/components/Navbar/Navbar";
+import Footer from "@/app/components/Footer/Footer";
+import Loading from "@/app/components/Loading/Loading";
+import AccountLayout from "@/app/Account/components/AccountLayout";
+import ProfileCard from "@/app/Account/components/ProfileCard";
 import WelcomeBlock from "@/app/Account/components/WelcomeBlock";
-import AccountLayout from "../components/AccountLayout";
-
-import ProfileCard from "../components/ProfileCard";
-
-import { useUserRole } from "../../../hooks/useUserRole";
 
 export default function Overview() {
   const [user, loading] = useAuthState(auth);
@@ -22,7 +23,7 @@ export default function Overview() {
 
   const isLoggedIn = !loading && !!user;
 
-  useRequireAuth(user, loading);
+  useRequireAuth(user ?? null, loading);
 
   const [profileData] = useProfileData(user ?? null);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -51,11 +52,15 @@ export default function Overview() {
               </p>
               <p>
                 <strong>Name:</strong>{" "}
-                {profileData?.firstName ? profileData.firstName.toString() : "No first name provided"}
+                {profileData?.firstName
+                  ? profileData.firstName.toString()
+                  : "No first name provided"}
               </p>
               <p>
                 <strong>Last Name:</strong>{" "}
-                {profileData?.lastName ? profileData.lastName.toString() : "No last name provided"}
+                {profileData?.lastName
+                  ? profileData.lastName.toString()
+                  : "No last name provided"}
               </p>
               <p>
                 <strong>Birth Date:</strong>{" "}
@@ -81,11 +86,23 @@ export default function Overview() {
           <ProfileCard
             title="MY ADDRESSES"
             description={
-              Array.isArray(profileData?.addresses) && profileData.addresses.length
+              Array.isArray(profileData?.addresses) &&
+              profileData.addresses.length
                 ? `You have ${profileData.addresses.length} saved addresses.`
                 : "No addresses saved. Please add your shipping or billing address."
             }
             linkHref="/Account/Addresses"
+          />
+
+          <ProfileCard
+            title="MY PAYMENT METHODS"
+            description={
+              Array.isArray(profileData?.paymentMethods) &&
+              profileData.paymentMethods.length
+                ? `You have ${profileData.paymentMethods.length} saved payment methods.`
+                : "No payment methods saved. Please add your credit card or PayPal account."
+            }
+            linkHref="/Account/PaymentMethods"
           />
 
           <ProfileCard

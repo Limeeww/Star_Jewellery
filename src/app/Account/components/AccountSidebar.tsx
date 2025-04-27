@@ -11,22 +11,20 @@ interface AccountSidebarProps {
   pathname: string | null;
 }
 
-const SIDE_LINKS = [
+const COMMON_LINKS = [
   { label: "Overview", href: "/Account/Overview" },
   { label: "My Profile", href: "/Account/Profile" },
   { label: "My Orders", href: "/Account/Orders" },
   { label: "My Addresses", href: "/Account/Addresses" },
   { label: "My Wish List", href: "/Account/Wishlist" },
   { label: "My Bonuses", href: "/Account/Bonuses" },
+  { label: "My Payment Methods", href: "/Account/PaymentMethods" },
 ];
 
+const SIDE_LINKS = [...COMMON_LINKS];
+
 const ADMIN_LINKS = [
-  { label: "Overview", href: "/Account/Overview" },
-  { label: "My Profile", href: "/Account/Profile" },
-  { label: "My Orders", href: "/Account/Orders" },
-  { label: "My Addresses", href: "/Account/Addresses" },
-  { label: "My Wish List", href: "/Account/Wishlist" },
-  { label: "My Bonuses", href: "/Account/Bonuses" },
+  ...COMMON_LINKS,
   { label: "Manage User Roles", href: "/Admin/Roles" },
   { label: "Manage Products", href: "/Admin/Products" },
 ];

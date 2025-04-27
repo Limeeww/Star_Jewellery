@@ -2,7 +2,7 @@
 
 import React from "react";
 import DiscountDisplay from "@/app/components/DiscountDisplay/DiscountDisplay";
-import { formatPrice } from "@/app/utils/priceUtils";
+import { formatPrice } from "@/utils/index";
 import ActionButton from "@/app/components/FormComponents/ActionButton";
 
 interface OrderSummaryProps {
@@ -12,6 +12,8 @@ interface OrderSummaryProps {
   giftOptionsTotal: number;
   total: number;
   onClick?: () => void;
+  disabled?: boolean;
+  buttonText?: string;
 }
 
 export default function OrderSummary({
@@ -21,6 +23,8 @@ export default function OrderSummary({
   giftOptionsTotal,
   total,
   onClick,
+  disabled = false,
+  buttonText = "Proceed to Checkout",
 }: OrderSummaryProps) {
   const shouldDisplayDiscount =
     originalPrice != null && originalPrice > subtotal;
@@ -67,9 +71,14 @@ export default function OrderSummary({
       </div>
 
       <ActionButton
-        text="Proceed to Checkout"
-        className="mt-4"
+        text={buttonText}
+        disabled={disabled}
         onClick={onClick || (() => {})}
+        className={`w-full px-6 py-1 rounded text-white transition mt-4 ${
+          disabled
+            ? "bg-gray-400 cursor-default"
+            : "bg-black hover:bg-gray-800"
+        }`}
       />
     </div>
   );

@@ -12,28 +12,26 @@ import Loading from "@/app/components/Loading/Loading";
 import AccountLayout from "../components/AccountLayout";
 import WelcomeBlock from "../components/WelcomeBlock";
 
-import { UserData } from "@/app/types/userTypes";
+import { UserData } from "@/types/userTypes";
 
-import TextField from "../../components/FormComponents/TextField";
-import DayInput from "../../components/FormComponents/DayInput";
-import SelectField from "../../components/FormComponents/SelectField";
-import SubmitButton from "../../components/FormComponents/SubmitButton";
+import TextField from "@/app/components/FormComponents/TextField";
+import DayInput from "@/app/components/FormComponents/DayInput";
+import SelectField from "@/app/components/FormComponents/SelectField";
+import SubmitButton from "@/app/components/FormComponents/SubmitButton";
 
-import Notification from "../../components/MessageHandling/Notification";
-import ChangeEmailModal from "../components/Modals/ChangeEmailModal";
-import ChangePasswordModal from "../components/Modals/ChangePasswordModal";
+import Notification from "@/app/components/MessageHandling/Notification";
+import ChangeEmailModal from "@/app/Account/components/Modals/ChangeEmailModal";
+import ChangePasswordModal from "@/app/Account/components/Modals/ChangePasswordModal";
 import ErrorMessage from "@/app/components/MessageHandling/ErrorMessagePage";
 import PhoneNumberField from "@/app/components/FormComponents/PhoneNumberField";
 import CheckboxField from "@/app/components/FormComponents/CheckboxField";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { validationSchemaProfile } from "@/app/utils/validationSchemaProfile";
+import { validationSchemaProfile } from "@/utils/index";
 import LinkButton from "../components/LinkButton";
 
-import {
-  useRequireAuth,
-  useProfileData,
-  updateUserProfileWithChecks,
-} from "../../utils/auth";
+import { useProfileData, updateUserProfileWithChecks } from "@/utils/index";
+
+import { useRequireAuth } from "@/hooks/index";
 import { useNotification } from "@/hooks/useNotification";
 
 export default function Profile() {
@@ -44,7 +42,7 @@ export default function Profile() {
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
 
-  useRequireAuth(user, loading);
+  useRequireAuth(user ?? null, loading);
 
   const {
     register,

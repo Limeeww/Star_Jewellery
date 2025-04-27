@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { adminDB } from "../../../lib/firebaseAdmin";
-import { Product } from "@/app/types/product";
+import { Product } from "@/types/product";
 
 export default async function handler(
   req: NextApiRequest,

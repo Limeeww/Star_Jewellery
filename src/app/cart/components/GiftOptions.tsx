@@ -2,7 +2,7 @@
 
 import React from "react";
 import { UseFormRegister, UseFormWatch } from "react-hook-form";
-import { GiftOptionsForm } from "@/app/types/order";
+import { GiftOptionsForm } from "@/types/order";
 import CheckboxField from "@/app/components/FormComponents/CheckboxField";
 import TextareaToggle from "@/app/components/FormComponents/TextareaToggle";
 
@@ -24,7 +24,7 @@ export default function GiftOptions({ register, watch }: GiftOptionsProps) {
           id="giftPackaging"
           register={register("giftPackaging")}
         />
-        <p className="text-sm font-semibold">₴50</p>
+        <p className="text-sm font-semibold">50 ₴</p>
       </div>
 
       <div className="flex items-center justify-between mb-3">

@@ -7,9 +7,9 @@ import {
   doc,
   where,
 } from "firebase/firestore";
-import { db } from "../../firebase/firebaseConfig";
-import { Discount, Product, ProductVariant } from "../types/product";
-import { Collection } from "../types/collection";
+import { db } from "@/firebase/firebaseConfig";
+import { Discount, Product, ProductVariant } from "@/types/product";
+import { Collection } from "@/types/collection";
 
 const norm = (s: string) => s.trim().toLowerCase();
 

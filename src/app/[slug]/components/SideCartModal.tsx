@@ -1,10 +1,10 @@
 "use client";
 
 import React from "react";
-import SideModal from "../../components/SideModal/SideModal";
-import CartItemComponent from "../../components/CartItem/CartItemComponent";
-import LinkButtonForm from "../../components/FormComponents/LinkButtonForm";
-import { CartItem } from "../../types/cartItem";
+import SideModal from "@/app/components/SideModal/SideModal";
+import CartItemComponent from "@/app/components/CartItem/CartItemComponent";
+import LinkButtonForm from "@/app/components/FormComponents/LinkButtonForm";
+import { CartItem } from "@/types/cartItem";
 
 interface Props {
   isOpen: boolean;
@@ -26,7 +26,9 @@ export default function SideCartModal({
   return (
     <SideModal isOpen={isOpen} onClose={onClose}>
       <div className="p-4 h-full flex flex-col max-h-screen overflow-y-auto">
-        <h2 className="text-2xl font-semibold mb-4">Product successfully added to cart!</h2>
+        <h2 className="text-2xl font-semibold mb-4">
+          Product successfully added to cart!
+        </h2>
 
         {items.length > 0 ? (
           items.map((it) => (

@@ -8,8 +8,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import Item from "../Item/Item";
-import { Product } from "../../types/product";
-import { fetchProducts } from "@/app/utils/product";
+import { Product } from "@/types/product";
+import { fetchProducts } from "@/utils/product";
 
 type SearchOverlayProps = {
   open: boolean;
