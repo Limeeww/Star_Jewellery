@@ -32,6 +32,12 @@ export default function EditProductVariantsForm({ variants, onChange }: Props) {
     };
     onChange(updatedVariants);
   };
+  const handleDeleteVariant = (index: number) => {
+    if (confirm("Are you sure you want to delete this variant?")) {
+      const updatedVariants = variants.filter((_, i) => i !== index);
+      onChange(updatedVariants);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -196,6 +202,14 @@ export default function EditProductVariantsForm({ variants, onChange }: Props) {
               onChange(updated);
             }}
           />
+          {/* кнопка удаления варианта */}
+          <button
+            type="button"
+            onClick={() => handleDeleteVariant(index)}
+            className="text-red-500 hover:underline text-sm"
+          >
+            Delete Variant
+          </button>
         </div>
       ))}
     </div>

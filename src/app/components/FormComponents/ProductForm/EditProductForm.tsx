@@ -6,9 +6,14 @@ import EditProductVariantsForm from "@/app/components/FormComponents/ProductForm
 interface ProductFormProps {
   product: Product;
   onSave: (updatedProduct: Product) => void;
+  onDelete?: (productId: number) => void;
 }
 
-export default function EditProductForm({ product, onSave }: ProductFormProps) {
+export default function EditProductForm({
+  product,
+  onSave,
+  onDelete,
+}: ProductFormProps) {
   const [formData, setFormData] = useState<Product>(product);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
@@ -43,6 +48,12 @@ export default function EditProductForm({ product, onSave }: ProductFormProps) {
     console.log("SUBMIT", formData);
     e.preventDefault();
     onSave(formData);
+  };
+
+  const handleDeleteProduct = () => {
+    if (confirm("Are you sure you want to delete this product?")) {
+      onDelete?.(formData.id);
+    }
   };
 
   return (
@@ -142,6 +153,14 @@ export default function EditProductForm({ product, onSave }: ProductFormProps) {
             className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded"
           >
             Save
+          </button>
+
+          <button
+            type="button"
+            onClick={handleDeleteProduct}
+            className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded"
+          >
+            Delete Product
           </button>
         </div>
       </form>
