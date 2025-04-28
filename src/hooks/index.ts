@@ -8,3 +8,4 @@ export * from "./useSyncUserEmail";
 export * from "./useUserRole";
 export * from "./useAddressModal";
 export * from "./usePaymentMethods";
+export * from "./useSetupIntent";

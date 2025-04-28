@@ -14,6 +14,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase/firebaseConfig";
 import { useAddresses } from "@/hooks/useAddresses";
 import Loading from "../components/Loading/Loading";
+import SelectPaymentMethod from "./components/SelectPaymentMethod";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -108,19 +109,10 @@ export default function CheckoutPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="col-span-1 lg:col-span-2 space-y-6">
-              <OrderSummary
-                originalPrice={order.products.reduce(
-                  (sum, i) => sum + (i.originalPrice ?? i.price) * i.quantity,
-                  0
-                )}
-                subtotal={order.products.reduce(
-                  (sum, i) => sum + i.price * i.quantity,
-                  0
-                )}
-                shipping={shipAddress ? 0 : 0}
-                giftOptionsTotal={order.giftOptions.giftPackaging ? 5 : 0}
-                total={order.total}
-              />
+              <div className="bg-white p-4 rounded shadow">
+                <h3 className="text-lg font-semibold mb-2">Payment Method</h3>
+                <SelectPaymentMethod />
+              </div>
 
               <div className="bg-white p-4 rounded shadow">
                 <h3 className="text-lg font-semibold mb-2">Shipping Address</h3>
