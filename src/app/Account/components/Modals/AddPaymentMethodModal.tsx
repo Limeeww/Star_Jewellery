@@ -22,6 +22,7 @@ interface AddPaymentMethodModalProps {
   onClose: () => void;
   paymentInfoToEdit?: PaymentInfo;
   paymentInfoIndex?: number;
+  paymentMethodToEdit?: PaymentInfo;
   onSave: (methods: PaymentInfo[]) => void;
 }
 
@@ -58,8 +59,10 @@ export default function AddPaymentMethodModal({
     formState: { isSubmitting },
   } = useForm<FormValues>({ defaultValues: DEFAULT_VALUES });
 
-
-
+  const preferredAddr = useMemo(
+    () => addresses.find((a) => a.preferredBillingAddress) ?? null,
+    [addresses]
+  );
 
   const { clientSecret, loading: loadingSecret } = useSetupIntent(isOpen);
 
@@ -67,7 +70,7 @@ export default function AddPaymentMethodModal({
   const onSubmit = useCallback(
     async (data: FormValues) => {
       if (!stripe || !elements) {
-        notify({ type: "error", message: "Stripe не загружен" });
+        notify({ type: "error", message: "Stripe was not loaded" });
         return;
       }
 
@@ -140,7 +143,7 @@ export default function AddPaymentMethodModal({
       <Controller
         name="billingAddress"
         control={control}
-        rules={{ required: "Выберите адрес" }}
+        rules={{ required: "Choose the address" }}
         render={({ field, fieldState }) =>
           loadingAddrs ? (
             <p>Loading addresses…</p>
@@ -148,7 +151,7 @@ export default function AddPaymentMethodModal({
             <SelectField
               label="Billing Address"
               id="billingAddress"
-              value={field.value?.addressLabel || ""}
+              value={preferredAddr?.addressLabel ?? ""}
               onChange={(lbl) => {
                 const addr = addresses.find((a) => a.addressLabel === lbl);
                 field.onChange(addr!);
@@ -163,7 +166,7 @@ export default function AddPaymentMethodModal({
         }
       />
     ),
-    [control, loadingAddrs, addresses]
+    [control, loadingAddrs, preferredAddr?.addressLabel, addresses]
   );
 
   return (
@@ -174,9 +177,7 @@ export default function AddPaymentMethodModal({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          onClick={
-            handleOutsideClick
-          }
+          onClick={handleOutsideClick}
         >
           <motion.div
             className="bg-white p-6 rounded-md shadow-md w-full max-w-lg relative"

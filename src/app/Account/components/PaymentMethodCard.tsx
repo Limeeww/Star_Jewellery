@@ -7,9 +7,12 @@ import type { PaymentInfo } from "@/types/order";
 interface PaymentMethodCardProps {
   paymentMethod: PaymentInfo;
   isDefault?: boolean;
+  isChosed?: boolean;
   onSetDefault?: () => void;
   onRemove?: () => void;
+  onSelect?: () => void;
   showDeleteIcon?: boolean;
+  showSelectButton?: boolean;
   className?: string;
 }
 
@@ -18,7 +21,10 @@ export default function PaymentMethodCard({
   isDefault = false,
   onSetDefault,
   onRemove,
+  onSelect,
+  isChosed = false,
   showDeleteIcon = false,
+  showSelectButton = false,
   className = "",
 }: PaymentMethodCardProps) {
   return (
@@ -104,6 +110,17 @@ export default function PaymentMethodCard({
             text="Remove"
             onClick={onRemove}
             className="text-sm font-medium px-3 py-1 rounded flex-1 bg-red-700 text-white hover:bg-red-700 transition"
+          />
+        )}
+        {showSelectButton && onSelect && (
+          <ActionButton
+            text={isChosed ? "Selected" : "Select"}
+            onClick={onSelect}
+            className={`text-sm font-medium px-3 py-1 rounded flex-1 ${
+              isChosed
+                ? "bg-gray-200 text-gray-600 cursor-default"
+                : "bg-gray-900 text-white hover:bg-gray-700"
+            }`}
           />
         )}
       </div>

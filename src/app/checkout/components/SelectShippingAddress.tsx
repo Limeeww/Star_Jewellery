@@ -11,7 +11,7 @@ import { useNotification } from "@/hooks/useNotification";
 import Notification from "@/app/components/MessageHandling/Notification";
 
 interface Props {
-  onSelect?: (address: Address) => void;
+  onSelect?: (address: Address, index: number) => void;
   addresses: Address[];
   loading?: boolean;
 }
@@ -82,7 +82,7 @@ export default function SelectShippingAddress({
                   showDeleteIcon={true}
                   onSelect={() => {
                     setSelectedIndex(idx);
-                    onSelect?.(a);
+                    onSelect?.(a, idx);
                   }}
                   onEdit={() => {
                     setEditingIndex(idx);

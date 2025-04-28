@@ -28,7 +28,7 @@ export default function AddressCard({
       className={`
       relative             
       border rounded-lg p-4 flex flex-col justify-between
-      ${isSelected ? "border-gray-500 bg-gray-50" : "border-gray-200"}
+      ${isSelected ? "border-gray-500" : "border-gray-200"}
       ${className}
     `}
     >

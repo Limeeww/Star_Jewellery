@@ -1,30 +1,47 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { usePaymentMethods } from "@/hooks/usePaymentMethods";
 import LinkButton from "@/app/Account/components/LinkButton";
 import AddPaymentMethodModal from "@/app/Account/components/Modals/AddPaymentMethodModal";
-import type { PaymentInfo } from "@/types/order";
 import PaymentMethodCard from "@/app/Account/components/PaymentMethodCard";
 import ConfirmModal from "@/app/components/MessageHandling/ConfirmModal";
-import { useNotification } from "@/hooks/useNotification";
 import Notification from "@/app/components/MessageHandling/Notification";
+import { useNotification } from "@/hooks/useNotification";
+import type { PaymentInfo } from "@/types/order";
 
-export default function SelectPaymentMethod() {
-  const { paymentMethods, loading, add, update, remove } = usePaymentMethods();
-  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+interface SelectPaymentMethodProps {
+  paymentMethods: PaymentInfo[];
+  loading: boolean;
+  add: (method: PaymentInfo) => Promise<void>;
+  update: (idx: number, pm: PaymentInfo) => Promise<void>;
+  remove: (idx: number) => Promise<void>;
+  selectedIndex: number | null;
+  onSelect: (pm: PaymentInfo, idx: number) => void;
+}
+
+export default function SelectPaymentMethod({
+  paymentMethods,
+  loading,
+  add,
+  update,
+  remove,
+  selectedIndex,
+  onSelect,
+}: SelectPaymentMethodProps) {
+  const { notification, notify, clearNotification } = useNotification();
+
   const [showModal, setShowModal] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const [deletingIndex, setDeletingIndex] = useState<number | null>(null);
-  const { notification, notify, clearNotification } = useNotification();
 
-  
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+
   useEffect(() => {
     if (!loading && paymentMethods.length > 0 && selectedIndex === null) {
       const def = paymentMethods.findIndex((pm) => pm.isDefault);
-      setSelectedIndex(def >= 0 ? def : 0);
+      onSelect(paymentMethods[def >= 0 ? def : 0], def >= 0 ? def : 0);
     }
-  }, [loading, paymentMethods, selectedIndex]);
+  }, [loading, onSelect, selectedIndex, paymentMethods]);
 
   const handleSetDefault = useCallback(
     async (idx: number) => {
@@ -33,9 +50,9 @@ export default function SelectPaymentMethod() {
         await update(prev, { ...paymentMethods[prev], isDefault: false });
       }
       await update(idx, { ...paymentMethods[idx], isDefault: true });
-      setSelectedIndex(idx);
+      onSelect(paymentMethods[idx], idx);
     },
-    [paymentMethods, update]
+    [paymentMethods, update, onSelect]
   );
 
   const handleDeleteConfirm = useCallback(async () => {
@@ -44,13 +61,17 @@ export default function SelectPaymentMethod() {
       await remove(deletingIndex);
       notify({ type: "success", message: "Payment method removed!" });
       if (selectedIndex === deletingIndex) {
-        setSelectedIndex(null);
+        onSelect(null as unknown as PaymentInfo, null as unknown as number);
       }
     } catch (e) {
-      notify({ type: "error", message: (e as Error).message || "Delete failed" });
+      notify({
+        type: "error",
+        message: (e as Error).message || "Delete failed",
+      });
+    } finally {
+      setShowDelete(false);
     }
-    setShowDelete(false);
-  }, [deletingIndex, remove, notify, selectedIndex]);
+  }, [deletingIndex, remove, notify, selectedIndex, onSelect]);
 
   if (loading) return <p>Loading payment methods…</p>;
 
@@ -72,7 +93,10 @@ export default function SelectPaymentMethod() {
             text="Add new payment method"
             className="underline text-sm cursor-pointer text-gray-700 hover:text-black transition-colors"
             showArrow
-            onClick={() => setShowModal(true)}
+            onClick={() => {
+              setEditingIndex(null);
+              setShowModal(true);
+            }}
           />
         </div>
       ) : (
@@ -86,22 +110,28 @@ export default function SelectPaymentMethod() {
               <PaymentMethodCard
                 key={pm.id}
                 paymentMethod={pm}
-                showDeleteIcon={true}
-                isDefault={idx === selectedIndex}
+                isDefault={pm.isDefault}
+                isChosed={idx === selectedIndex}
+                showDeleteIcon
+                showSelectButton
+                onSelect={() => onSelect(pm, idx)}
                 onSetDefault={() => handleSetDefault(idx)}
                 onRemove={() => {
                   setDeletingIndex(idx);
                   setShowDelete(true);
                 }}
-
               />
             ))}
           </div>
+
           <LinkButton
             text="Add new payment method"
             className="underline text-sm mt-4 cursor-pointer text-gray-700 hover:text-black transition-colors"
             showArrow
-            onClick={() => setShowModal(true)}
+            onClick={() => {
+              setEditingIndex(null);
+              setShowModal(true);
+            }}
           />
         </div>
       )}
@@ -119,15 +149,27 @@ export default function SelectPaymentMethod() {
       <AddPaymentMethodModal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
-        onSave={async (newMethods: PaymentInfo[]) => {
+        paymentMethodToEdit={
+          editingIndex !== null ? paymentMethods[editingIndex] : undefined
+        }
+        onSave={async (newMethods) => {
           try {
-            const last = newMethods[newMethods.length - 1];
-            await add(last);
-            notify({ type: "success", message: "Payment method added!" });
+            if (editingIndex === null) {
+              const last = newMethods[newMethods.length - 1];
+              await add(last);
+              notify({ type: "success", message: "Payment method added!" });
+            } else {
+              await update(editingIndex, newMethods[editingIndex]!);
+              notify({ type: "success", message: "Payment method updated!" });
+            }
           } catch (e) {
-            notify({ type: "error", message: (e as Error).message || "Save failed" });
+            notify({
+              type: "error",
+              message: (e as Error).message || "Save failed",
+            });
+          } finally {
+            setShowModal(false);
           }
-          setShowModal(false);
         }}
       />
     </>
