@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Product, ProductVariant } from "../../types/product";
+import { Product, ProductVariant } from "../../../types/product";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import InfoItem from "@/app/components/InfoItem/InfoItem";
-import { Collection } from "@/app/types/collection";
+import { Collection } from "@/types/collection";
 
 interface Props {
   product: Product;

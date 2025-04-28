@@ -13,8 +13,9 @@ import { auth } from "@/firebase/firebaseConfig";
 import { IoCloseOutline } from "react-icons/io5";
 import TextField from "@/app/components/FormComponents/TextField";
 import SubmitButton from "@/app/components/FormComponents/SubmitButton";
-import Notification from "../../../components/MessageHandling/Notification";
-import { isEmailTaken, useSyncUserEmail } from "@/app/utils/auth";
+import Notification from "@/app/components/MessageHandling/Notification";
+import { useSyncUserEmail } from "@/hooks/index";
+import { isEmailTaken } from "@/utils/index";
 import { useModalClose } from "@/hooks/useModal";
 import { useNotification } from "@/hooks/useNotification";
 
@@ -80,11 +81,18 @@ export default function ChangeEmailModal({
 
       reset();
       onClose();
-    } catch (err: any) {
-      notify({
-        message: err.message || "Failed to update email.",
-        type: "error",
-      });
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        notify({
+          message: err.message,
+          type: "error",
+        });
+      } else {
+        notify({
+          message: "Failed to update email.",
+          type: "error",
+        });
+      }
     }
   };
 

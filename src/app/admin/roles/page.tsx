@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useUserRole } from "../../../hooks/useUserRole";
 import { useRouter } from "next/navigation";
 import Loading from "@/app/components/Loading/Loading";
-import { UserItem } from "../../types/userTypes";
+import { UserItem } from "../../../types/userTypes";
 import AccountLayout from "../../Account/components/AccountLayout";
 import Navbar from "../../components/Navbar/Navbar";
 import ActionButton from "@/app/components/FormComponents/ActionButton";

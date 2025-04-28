@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useUserRole } from "@/hooks/useUserRole";
-import { Product } from "@/app/types/product";
+import { Product } from "@/types/product";
 import Loading from "@/app/components/Loading/Loading";
 import EditProductForm from "@/app/components/FormComponents/ProductForm/EditProductForm";
 import Footer from "@/app/components/Footer/Footer";

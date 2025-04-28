@@ -7,7 +7,7 @@ import {
   AiOutlineSend,
   AiOutlineCreditCard,
 } from "react-icons/ai";
-import SideModal from "../../components/SideModal/SideModal"; 
+import SideModal from "@/app/components/SideModal/SideModal"; 
 import { ReactNode } from "react";
 import { IoIosArrowForward } from "react-icons/io";
 interface InfoItem {

@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import ConfirmModal from "@/app/components/MessageHandling/ConfirmModal";
-import { CartItem } from "../../types/cartItem";
+import { CartItem } from "@/types/cartItem";
 import DiscountDisplay from "../DiscountDisplay/DiscountDisplay";
 
 interface CartItemComponentProps {
@@ -58,7 +58,7 @@ export default function CartItemComponent({
 
   return (
     <>
-      <div className="w-full flex-wrap bg-white p-4 shadow-lg flex items-center gap-4">
+      <div className="w-full rounded flex-wrap bg-white p-4 shadow-lg flex items-center gap-4">
         <Link href={href} className="flex-shrink-0">
           <div className="relative w-16 h-16">
             <Image

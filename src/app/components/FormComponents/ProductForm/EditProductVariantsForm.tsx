@@ -1,6 +1,6 @@
 "use client";
 
-import { ProductVariant } from "@/app/types/product";
+import { ProductVariant } from "@/types/product";
 import QuantitySizeForm from "./QuantitySizeForm";
 import VariantImagesForm from "./VariantImagesForm";
 
@@ -12,7 +12,7 @@ import {
   PURITIES,
   Material,
   Insert,
-} from "@/app/types/productOprtions";
+} from "@/types/productOprtions";
 
 interface Props {
   variants: ProductVariant[];

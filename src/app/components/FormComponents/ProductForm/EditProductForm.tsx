@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Product, Category } from "@/app/types/product";
+import { Product, Category } from "@/types/product";
 import LinkButtonForm from "@/app/components/FormComponents/LinkButtonForm";
 import EditProductVariantsForm from "@/app/components/FormComponents/ProductForm/EditProductVariantsForm";
 

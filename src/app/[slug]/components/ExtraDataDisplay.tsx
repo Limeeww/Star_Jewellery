@@ -2,10 +2,9 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { db } from "../../../firebase/firebaseConfig"; 
+import { db } from "@/firebase/firebaseConfig";
 import { collection, query, getDocs } from "firebase/firestore";
-import { Product } from "../../types/product"; 
-
+import { Product } from "@/types/product";
 
 // DO NOT USE THIS COMPONENT IN THE APP, IT IS FOR TESTING PURPOSES ONLY
 const ProductItem = ({ product }: { product: Product }) => {
@@ -16,7 +15,7 @@ const ProductItem = ({ product }: { product: Product }) => {
       <div className="flex flex-col md:flex-row items-center">
         <div className="w-full md:w-1/3">
           <Image
-            src={product.imageUrl}
+            src={product.}
             alt={product.name}
             width={500}
             height={300}
@@ -112,7 +111,10 @@ const ProductsDisplay = () => {
         const querySnapshot = await getDocs(q);
         const fetchedProducts: Product[] = [];
         querySnapshot.forEach((doc) => {
-          fetchedProducts.push({ id: doc.id, ...doc.data() } as unknown as Product);
+          fetchedProducts.push({
+            id: doc.id,
+            ...doc.data(),
+          } as unknown as Product);
         });
         setProducts(fetchedProducts);
       } catch (error) {

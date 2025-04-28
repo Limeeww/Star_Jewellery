@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import EmblaCarousel from "../../components/EmblaCarousel/EmblaCarousel";
+import EmblaCarousel from "@/app/components/EmblaCarousel/EmblaCarousel";
 import Item from "../Item/Item";
-import { Product } from "../../types/product";
-import { fetchProducts } from "../../utils/product";
+import { Product } from "@/types/product";
+import { fetchProducts } from "@/utils/product";
 import { EmblaOptionsType } from "embla-carousel";
 
 const SimilarProducts = () => {

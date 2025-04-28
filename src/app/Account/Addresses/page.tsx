@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState } from "react";
 import Navbar from "@/app/components/Navbar/Navbar";
 import Loading from "@/app/components/Loading/Loading";
@@ -9,13 +8,14 @@ import ConfirmModal from "@/app/components/MessageHandling/ConfirmModal";
 import { usePathname } from "next/navigation";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase/firebaseConfig";
-import { useRequireAuth, useProfileData } from "@/app/utils/auth";
+import {useRequireAuth} from "@/hooks/index";
+import { useProfileData } from "@/utils/index";
 import { useAddresses } from "@/hooks/useAddresses";
-import AccountLayout from "../components/AccountLayout";
-import WelcomeBlock from "../components/WelcomeBlock";
-import LinkButton from "../components/LinkButton";
-import AddressCard from "../components/AddressCard";
-import AddAddressModal from "../components/Modals/AddAddressModal";
+import AccountLayout from "@/app/Account/components/AccountLayout";
+import WelcomeBlock from "@/app/Account/components/WelcomeBlock";
+import LinkButton from "@/app/Account/components/LinkButton";
+import AddressCard from "@/app/Account/components/AddressCard";
+import AddAddressModal from "@/app/Account/components/Modals/AddAddressModal";
 import Notification from "@/app/components/MessageHandling/Notification";
 import { useNotification } from "@/hooks/useNotification";
 
@@ -23,16 +23,22 @@ export default function Addresses() {
   const pathname = usePathname();
 
   const [user, loadingAuth] = useAuthState(auth);
-  useRequireAuth(user, loadingAuth);
+  useRequireAuth(user ?? null, loadingAuth);
   const [profileData] = useProfileData(user ?? null);
   const { notification, notify, clearNotification } = useNotification();
-  const { addresses, loading, add, update, remove } = useAddresses();
+  const {
+    addresses,
+    add,
+    update,
+    remove,
+    loading: loadingAddrs,
+  } = useAddresses();
 
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
 
-  if (loadingAuth || loading) {
+  if (loadingAuth) {
     return <Loading />;
   }
 
@@ -75,10 +81,12 @@ export default function Addresses() {
             address, and it will automatically appear during checkout.
           </p>
 
-          {addresses.length === 0 ? (
+          {loadingAddrs ? (
+            <p>Loading addresses…</p>
+          ) : addresses.length === 0 ? (
             <div className="flex items-center justify-between mt-4 py-2">
               <p className="text-sm text-gray-800">
-                You haven&apos;t saved any addresses yet.
+                You have no saved addresses. Please add one in your profile.
               </p>
               <LinkButton
                 text="Add new address"
@@ -120,7 +128,6 @@ export default function Addresses() {
                       setEditingIndex(idx);
                       setShowDelete(true);
                     }}
-                    index={0}
                   />
                 ))}
               </div>

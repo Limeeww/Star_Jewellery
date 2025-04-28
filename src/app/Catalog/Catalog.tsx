@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Item from "../components/Item/Item";
 import { EmblaOptionsType } from "embla-carousel";
-import { Product } from "../types/product";
-import { fetchProducts } from "../utils/product";
+import { Product } from "../../types/product";
+import { fetchProducts } from "@/utils/product";
 import EmblaCarousel from "../components/EmblaCarousel/EmblaCarousel";
 
 const OPTIONS: EmblaOptionsType = { dragFree: true };

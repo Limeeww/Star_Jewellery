@@ -8,8 +8,8 @@ import {
   incrementQuantity,
   decrementQuantity,
   removeItem,
-} from "../../utils/cartActions";
-import { CartItem } from "../../types/cartItem";
+} from "@/utils/index";
+import { CartItem } from "@/types/cartItem";
 import { User } from "firebase/auth";
 
 interface CartSideModalProps {

@@ -3,8 +3,8 @@
 import { useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { Product } from "@/app/types/product";
-import { Collection } from "@/app/types/collection";
+import { Product } from "@/types/product";
+import { Collection } from "@/types/collection";
 
 interface AboutCollectionProps {
   firebaseProduct: Product;
@@ -15,7 +15,9 @@ export default function AboutCollection({
   firebaseProduct,
   collection,
 }: AboutCollectionProps) {
-  const [activeTab, setActiveTab] = useState<"collection" | "product">("collection");
+  const [activeTab, setActiveTab] = useState<"collection" | "product">(
+    "collection"
+  );
 
   const displayedText =
     activeTab === "collection"
