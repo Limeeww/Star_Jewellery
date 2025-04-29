@@ -10,3 +10,4 @@ export * from "./useSetupIntent";
 export * from "./useLocalOrder";
 export * from "./useClearCart";
 export * from "./useSubmitOrder";
+export * from "./useCart";
