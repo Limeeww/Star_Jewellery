@@ -4,6 +4,13 @@ import { useState, useEffect } from "react";
 import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
 
+export const FREE_SHIPPING_THRESHOLD = 100;
+export const SHIPPING_FLAT_RATE = 50;
+
+export const GIFT_PACKAGING_COST = 50;
+export const GIFT_MESSAGE_COST = 0;
+export const GIFT_RECEIPT_COST = 0;
+
 export const getTotalCount = (cartItems: CartItem[]): number =>
   cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
@@ -11,18 +18,21 @@ export const getSubtotal = (cartItems: CartItem[]): number =>
   cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
 export const getShippingCost = (subtotal: number): number =>
-  subtotal > 100 ? 0 : 50;
+  subtotal > FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FLAT_RATE;
 
 export const getGiftOptionsTotal = (giftOptions: GiftOptionsForm): number => {
-  const giftPackagingCost = giftOptions.giftPackaging ? 50 : 0;
-  const giftMessageCost = giftOptions.giftMessage ? 0 : 0;
-  const giftReceiptCost = giftOptions.giftReceipt ? 0 : 0;
+  const giftPackagingCost = giftOptions.giftPackaging ? GIFT_PACKAGING_COST : 0;
+  const giftMessageCost = giftOptions.giftMessage ? GIFT_MESSAGE_COST : 0;
+  const giftReceiptCost = giftOptions.giftReceipt ? GIFT_RECEIPT_COST : 0;
 
-  const giftOptionsTotal =
-    giftPackagingCost + giftMessageCost + giftReceiptCost;
-
-  return giftOptionsTotal;
+  return giftPackagingCost + giftMessageCost + giftReceiptCost;
 };
+
+export function calculateOriginalPriceSum(cartItems: CartItem[]): number {
+  return cartItems.reduce((total, item) => {
+    return total + (item.originalPrice ?? item.price) * item.quantity;
+  }, 0);
+}
 
 export const getTotal = (
   subtotal: number,
@@ -53,3 +63,5 @@ export const useCartItems = (userId: string | null): CartItem[] => {
 
   return cartItems;
 };
+
+

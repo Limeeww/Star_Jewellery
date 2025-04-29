@@ -151,7 +151,7 @@ export default function AddPaymentMethodModal({
             <SelectField
               label="Billing Address"
               id="billingAddress"
-              value={preferredAddr?.addressLabel ?? ""}
+              value={field.value?.addressLabel ?? ""}
               onChange={(lbl) => {
                 const addr = addresses.find((a) => a.addressLabel === lbl);
                 field.onChange(addr!);
