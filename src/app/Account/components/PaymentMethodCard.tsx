@@ -1,4 +1,3 @@
-// PaymentMethodCard.tsx
 "use client";
 
 import React from "react";
@@ -8,9 +7,12 @@ import type { PaymentInfo } from "@/types/order";
 interface PaymentMethodCardProps {
   paymentMethod: PaymentInfo;
   isDefault?: boolean;
+  isChosed?: boolean;
   onSetDefault?: () => void;
   onRemove?: () => void;
+  onSelect?: () => void;
   showDeleteIcon?: boolean;
+  showSelectButton?: boolean;
   className?: string;
 }
 
@@ -19,7 +21,10 @@ export default function PaymentMethodCard({
   isDefault = false,
   onSetDefault,
   onRemove,
+  onSelect,
+  isChosed = false,
   showDeleteIcon = false,
+  showSelectButton = false,
   className = "",
 }: PaymentMethodCardProps) {
   return (
@@ -27,7 +32,7 @@ export default function PaymentMethodCard({
       className={`
         relative
         border rounded-lg p-4 flex flex-col justify-between
-        ${isDefault ? "border-gray-500 bg-gray-50" : "border-gray-200"}
+        ${isDefault ? "border-gray-500" : "border-gray-200"}
         ${className}
       `}
     >
@@ -57,7 +62,8 @@ export default function PaymentMethodCard({
         {paymentMethod.method === "credit_card" && (
           <>
             <h4 className="font-semibold text-gray-800 mb-2">
-              {paymentMethod.cardBrand}
+              {paymentMethod.cardBrand.charAt(0).toUpperCase() +
+                paymentMethod.cardBrand.slice(1)}
             </h4>
             <div className="text-sm text-gray-700 space-y-1">
               <div>{paymentMethod.cardNumberMasked}</div>
@@ -103,7 +109,18 @@ export default function PaymentMethodCard({
           <ActionButton
             text="Remove"
             onClick={onRemove}
-            className="text-sm font-medium px-3 py-1 rounded flex-1 bg-red-600 text-white hover:bg-red-700 transition"
+            className="text-sm font-medium px-3 py-1 rounded flex-1 bg-red-700 text-white hover:bg-red-700 transition"
+          />
+        )}
+        {showSelectButton && onSelect && (
+          <ActionButton
+            text={isChosed ? "Selected" : "Select"}
+            onClick={onSelect}
+            className={`text-sm font-medium px-3 py-1 rounded flex-1 ${
+              isChosed
+                ? "bg-gray-200 text-gray-600 cursor-default"
+                : "bg-gray-900 text-white hover:bg-gray-700"
+            }`}
           />
         )}
       </div>

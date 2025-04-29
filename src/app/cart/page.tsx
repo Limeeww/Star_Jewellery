@@ -14,7 +14,6 @@ import OrderSummary from "@/app/cart/components/OrderSummary";
 import RecentlyViewed from "@/app/components/RecentlyViewed/RecentlyViewed";
 import GiftOptions from "@/app/cart/components/GiftOptions";
 import { GiftOptionsForm, Order, PaymentInfo } from "@/types/order";
-import Notification from "@/app/components/MessageHandling/Notification";
 
 import {
   getTotalCount,
@@ -26,15 +25,14 @@ import {
   incrementQuantity,
   decrementQuantity,
   removeItem,
+  calculateOriginalPriceSum,
 } from "@/utils/index";
-import { useNotification } from "@/hooks/useNotification";
 import { useRouter } from "next/navigation";
 
 export default function CartPage() {
   const [user, loading] = useAuthState(auth);
   const router = useRouter();
   const isLoggedIn = !!user && !loading;
-  const { notification, clearNotification } = useNotification();
   const cartItems = useCartItems(user ? user.uid : null);
 
   const { register, watch } = useForm<GiftOptionsForm>({
@@ -58,10 +56,7 @@ export default function CartPage() {
   const giftOptionsTotal = getGiftOptionsTotal(giftOptionsValues);
   const total = getTotal(subtotal, shipping, giftOptionsTotal);
 
-  const originalPriceSum = cartItems.reduce(
-    (sum, item) => sum + (item.originalPrice ?? item.price) * item.quantity,
-    0
-  );
+  const originalPriceSum = calculateOriginalPriceSum(cartItems);
 
   const handleProceed = () => {
     if (!user) return;
@@ -102,14 +97,6 @@ export default function CartPage() {
     <>
       <Navbar isScrolled={true} isLoggedIn={isLoggedIn} />
 
-      {notification && (
-        <Notification
-          message={notification.message}
-          type={notification.type}
-          duration={notification.duration}
-          onClose={clearNotification}
-        />
-      )}
       <main
         className="min-h-screen bg-gray-50 p-4 text-gray-800 mt-10"
         style={{ fontFamily: "var(--font-poppins)" }}

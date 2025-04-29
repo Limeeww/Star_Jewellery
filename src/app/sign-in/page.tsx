@@ -18,10 +18,8 @@ import TextField from "../components/FormComponents/TextField";
 import PasswordField from "../components/FormComponents/PasswordField";
 import SubmitButton from "../components/FormComponents/SubmitButton";
 
-import { signInValidationSchema } from "../utils/signInValidationSchema";
+import { signInValidationSchema } from "@/utils/signInValidationSchema";
 
-// Импортируем Notification (пример)
-// Если у вас другой компонент, например ErrorMessage, адаптируйте под него
 import Notification from "../components/MessageHandling/Notification";
 
 interface SignInFormData {
@@ -78,15 +76,16 @@ export default function SignInPage() {
   const onSubmit = async (data: SignInFormData) => {
     try {
       await signInWithEmailAndPassword(data.email, data.password);
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to sign in with email/password.";
       setNotification({
-        message: err.message || "Failed to sign in with email/password.",
+        message: errorMessage,
         type: "error",
       });
     }
   };
 
-  // Если идёт загрузка
   if (loadingGoogle || loadingEmail) {
     return <Loading />;
   }

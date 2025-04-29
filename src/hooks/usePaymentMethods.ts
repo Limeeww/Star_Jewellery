@@ -7,9 +7,6 @@ import { fetchUserData } from "@/utils/firebase";
 import { useRequireAuth } from "@/hooks/index";
 import type { PaymentInfo } from "@/types/order";
 
-/**
- * Hook to manage user's saved payment methods.
- */
 export function usePaymentMethods() {
   const [user, loadingAuth] = useAuthState(auth);
   const { notify } = useNotification();
@@ -17,8 +14,8 @@ export function usePaymentMethods() {
 
   const [paymentMethods, setPaymentMethods] = useState<PaymentInfo[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
-  // Load methods from Firestore
   const loadMethods = useCallback(async () => {
     if (!user) {
       setPaymentMethods([]);
@@ -46,6 +43,13 @@ export function usePaymentMethods() {
     loadMethods();
   }, [loadMethods]);
 
+  useEffect(() => {
+    if (!loading && paymentMethods.length && selectedIndex === null) {
+      const defIdx = paymentMethods.findIndex((pm) => pm.isDefault);
+      setSelectedIndex(defIdx >= 0 ? defIdx : 0);
+    }
+  }, [loading, paymentMethods, selectedIndex]);
+
   const saveMethods = useCallback(
     async (newList: PaymentInfo[]) => {
       if (!user) return;
@@ -63,6 +67,7 @@ export function usePaymentMethods() {
 
   const add = useCallback(
     async (method: PaymentInfo) => {
+      // reset defaults, then push new
       const newList = paymentMethods.map((m) => ({ ...m, isDefault: false }));
       newList.push({ ...method, isDefault: method.isDefault ?? false });
       await saveMethods(newList);
@@ -72,44 +77,51 @@ export function usePaymentMethods() {
 
   const update = useCallback(
     async (idx: number, pm: PaymentInfo) => {
-      if (pm.method === "credit_card") {
-        if (pm.isDefault) {
-          const userSnap = await fetchUserData(user!.uid);
-          const customerId = userSnap!.data()?.stripeCustomerId;
-          await fetch("/api/stripe/set-default-payment-method", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ customerId, paymentMethodId: pm.cardToken }),
-          });
-        }
+      let newList: PaymentInfo[];
+      if (pm.isDefault) {
+        newList = paymentMethods.map((m, i) => ({
+          ...m,
+          isDefault: i === idx,
+        }));
+      } else {
+        newList = [...paymentMethods];
+        newList[idx] = pm;
       }
-      const newList = [...paymentMethods];
-      newList[idx] = pm;
+
+      if (pm.method === "credit_card" && pm.isDefault) {
+        const userData = await fetchUserData(user!.uid);
+        const customerId = userData?.stripeCustomerId;
+        await fetch("/api/stripe/set-default-payment-method", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ customerId, paymentMethodId: pm.cardToken }),
+        });
+      }
+
       return saveMethods(newList);
     },
     [user, paymentMethods, saveMethods]
   );
-
   const remove = useCallback(
     async (idx: number) => {
       const pm = paymentMethods[idx];
-
       if (pm.method === "credit_card") {
-        const paymentMethodId = pm.cardToken;
-
         await fetch("/api/stripe/detach-payment-method", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ paymentMethodId }),
+          body: JSON.stringify({ paymentMethodId: pm.cardToken }),
         });
       }
-
       const newList = paymentMethods.filter((_, i) => i !== idx);
       await saveMethods(newList);
-      console.log("Removed", newList);
     },
     [paymentMethods, saveMethods]
   );
+
+  // new select callback
+  const selectPayment = useCallback((idx: number) => {
+    setSelectedIndex(idx);
+  }, []);
 
   return {
     paymentMethods,
@@ -117,5 +129,7 @@ export function usePaymentMethods() {
     add,
     update,
     remove,
+    selectedIndex,
+    selectPayment,
   };
 }
