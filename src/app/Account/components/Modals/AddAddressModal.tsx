@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useEffect } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { useForm, Controller } from "react-hook-form";
 import { IoCloseOutline } from "react-icons/io5";
 import TextField from "@/app/components/FormComponents/TextField";
@@ -12,9 +12,8 @@ import SubmitButton from "@/app/components/FormComponents/SubmitButton";
 import { useModalClose } from "@/hooks/useModal";
 import { useNotification } from "@/hooks/useNotification";
 import type { Address } from "@/types/userTypes";
-import { useAddressModal } from "@/hooks/index";
 
-const DEFAULT_VALUES: Partial<Address> = {
+const DEFAULT_VALUES: Address = {
   title: "Mr",
   addressLabel: "",
   firstName: "",
@@ -36,7 +35,8 @@ interface AddAddressModalProps {
   onClose: () => void;
   addressToEdit?: Address;
   addressIndex?: number;
-  onSave: (updated: Address[]) => void;
+  onUpdate: (index: number, address: Address) => Promise<void>;
+  onAdd: (address: Address) => Promise<void>;
 }
 
 export default function AddAddressModal({
@@ -44,62 +44,43 @@ export default function AddAddressModal({
   onClose,
   addressToEdit,
   addressIndex,
-  onSave,
+  onUpdate,
+  onAdd,
 }: AddAddressModalProps) {
   const { modalRef, handleOutsideClick } = useModalClose(onClose);
   const { notify } = useNotification();
-  const { load, prepare, save } = useAddressModal(onSave);
-
-  const [existing, setExisting] = useState<Address[]>([]);
 
   const {
     register,
     handleSubmit,
     reset,
     control,
-    formState: { errors },
-  } = useForm<Address>({ defaultValues: DEFAULT_VALUES });
+    formState: { errors, isSubmitting },
+  } = useForm<Address>({
+    defaultValues: addressToEdit || DEFAULT_VALUES,
+  });
 
   useEffect(() => {
     if (isOpen) {
-      load()
-        .then((addrs) => {
-          setExisting(addrs);
-          if (addressToEdit) reset(addressToEdit);
-        })
-        .catch((e) => notify({ message: e.message, type: "error" }));
-    }
-  }, [isOpen, addressToEdit, load, reset, notify]);
-
-  useEffect(() => {
-    if (!isOpen) {
-      reset(DEFAULT_VALUES);
-    }
-  }, [isOpen, reset]);
-
-  useEffect(() => {
-    if (isOpen) {
-      if (addressToEdit) {
-        reset(addressToEdit);
-      } else {
-        reset(DEFAULT_VALUES);
-      }
+      reset(addressToEdit || DEFAULT_VALUES);
     }
   }, [isOpen, addressToEdit, reset]);
 
   const onSubmit = async (data: Address) => {
     try {
-      const updated = prepare(existing, data, addressIndex);
-      await save(updated);
-      notify({ message: "Address saved!", type: "success", duration: 2000 });
-      onClose();
-      reset();
-    } catch (err) {
-      if (err instanceof Error) {
-        notify({ message: err.message, type: "error" });
+      if (addressIndex != null) {
+        await onUpdate(addressIndex, data);
+        notify({ type: "success", message: "Address updated!" });
       } else {
-        notify({ message: "Save failed", type: "error" });
+        await onAdd(data);
+        notify({ type: "success", message: "Address added!" });
       }
+      onClose();
+    } catch (e) {
+      notify({
+        type: "error",
+        message: e instanceof Error ? e.message : "Save failed",
+      });
     }
   };
 
@@ -114,12 +95,12 @@ export default function AddAddressModal({
           onClick={handleOutsideClick}
         >
           <motion.div
-            className="bg-white p-6 m-0 rounded-md shadow-md w-full max-w-md relative h-full md:h-auto"
+            ref={modalRef}
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white p-6 rounded-md shadow-md w-full max-w-md relative"
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.8, opacity: 0 }}
-            ref={modalRef}
-            onClick={(e) => e.stopPropagation()}
           >
             <button
               onClick={onClose}
@@ -132,17 +113,19 @@ export default function AddAddressModal({
               {addressToEdit ? "Edit Address" : "Add New Address"}
             </h2>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className="space-y-4 text-sm"
+            >
               <Controller
                 name="title"
                 control={control}
-                render={({ field, fieldState }) => (
+                render={({ field }) => (
                   <SelectField
                     label="Title"
                     id="title"
                     value={field.value || ""}
                     onChange={field.onChange}
-                    error={fieldState.error?.message}
                     options={[
                       { value: "Mr", label: "Mr" },
                       { value: "Mrs", label: "Mrs" },
@@ -213,7 +196,9 @@ export default function AddAddressModal({
                 <TextField
                   label="City"
                   id="city"
-                  register={register("city", { required: "City is required" })}
+                  register={register("city", {
+                    required: "City is required",
+                  })}
                   error={errors.city}
                   className="flex-1"
                 />
@@ -267,7 +252,10 @@ export default function AddAddressModal({
                 />
               </div>
 
-              <SubmitButton label="CONFIRM" />
+              <SubmitButton
+                label={addressToEdit ? "Update Address" : "Add Address"}
+                isLoading={isSubmitting}
+              />
             </form>
           </motion.div>
         </motion.div>

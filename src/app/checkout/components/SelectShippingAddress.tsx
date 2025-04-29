@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useAddresses } from "@/hooks/useAddresses";
+import React, { useState } from "react";
 import LinkButton from "@/app/Account/components/LinkButton";
 import AddAddressModal from "@/app/Account/components/Modals/AddAddressModal";
 import type { Address } from "@/types/userTypes";
@@ -11,33 +10,29 @@ import { useNotification } from "@/hooks/useNotification";
 import Notification from "@/app/components/MessageHandling/Notification";
 
 interface Props {
-  onSelect?: (address: Address) => void;
   addresses: Address[];
   loading?: boolean;
+  selectedIndex: number | null;
+  onSelect?: (address: Address, index: number) => void;
+  onAdd: (address: Address) => Promise<void>;
+  onUpdate: (index: number, address: Address) => Promise<void>;
+  onRemove: (index: number) => Promise<void>;
 }
 
 export default function SelectShippingAddress({
-  onSelect,
   addresses,
   loading,
+  selectedIndex,
+  onSelect,
+  onAdd,
+  onUpdate,
+  onRemove,
 }: Props) {
-  const { add, update, remove } = useAddresses();
-  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [showModal, setShowModal] = useState(false);
-  const [showDelete, setShowDelete] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const [addressToEdit, setAddressToEdit] = useState<Address | undefined>(
-    undefined
-  );
+  const [addressToEdit, setAddressToEdit] = useState<Address | undefined>();
+  const [showDelete, setShowDelete] = useState(false);
   const { notification, notify, clearNotification } = useNotification();
-
-  useEffect(() => {
-    if (!loading && addresses.length && selectedIndex === null) {
-      const def = addresses.findIndex((a) => a.preferredShippingAddress);
-      setSelectedIndex(def >= 0 ? def : 0);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading, addresses.length, selectedIndex]);
 
   if (loading) return <p>Loading addresses…</p>;
 
@@ -81,8 +76,7 @@ export default function SelectShippingAddress({
                   isSelected={isSelected}
                   showDeleteIcon={true}
                   onSelect={() => {
-                    setSelectedIndex(idx);
-                    onSelect?.(a);
+                    onSelect?.(a, idx);
                   }}
                   onEdit={() => {
                     setEditingIndex(idx);
@@ -120,7 +114,7 @@ export default function SelectShippingAddress({
         onConfirm={async () => {
           try {
             if (editingIndex !== null) {
-              await remove(editingIndex);
+              await onRemove(editingIndex);
               notify({ type: "success", message: "Address removed!" });
             }
           } catch (e) {
@@ -139,11 +133,18 @@ export default function SelectShippingAddress({
         onClose={() => setShowModal(false)}
         addressToEdit={addressToEdit}
         addressIndex={editingIndex ?? undefined}
-        onSave={async (newAddresses) => {
-          if (editingIndex === null) {
-            await add(newAddresses[newAddresses.length - 1]);
-          } else {
-            await update(editingIndex, newAddresses[editingIndex]!);
+        onAdd={async (newAddr) => {
+          await onAdd(newAddr);
+          if (newAddr.preferredShippingAddress) {
+            const newIdx = addresses.length;
+            onSelect?.(newAddr, newIdx);
+          }
+          setShowModal(false);
+        }}
+        onUpdate={async (idx, updAddr) => {
+          await onUpdate(idx, updAddr);
+          if (updAddr.preferredShippingAddress) {
+            onSelect?.(updAddr, idx);
           }
           setShowModal(false);
         }}

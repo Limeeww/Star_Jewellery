@@ -11,7 +11,7 @@ import SideCartModal from "./components/SideCartModal";
 import Footer from "@/app/components/Footer/Footer";
 import Notification from "@/app/components/MessageHandling/Notification";
 
-import useProductPage from "@/hooks/useProductPage";
+import { useProductPage } from "@/hooks/useProductPage";
 import { useRequireAuth } from "@/hooks/index";
 import {
   addOrIncrementCartItem,

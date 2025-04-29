@@ -1,10 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import Navbar from "@/app/components/Navbar/Navbar";
 import Loading from "@/app/components/Loading/Loading";
 import Footer from "@/app/components/Footer/Footer";
-import ConfirmModal from "@/app/components/MessageHandling/ConfirmModal";
 import { usePathname } from "next/navigation";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase/firebaseConfig";
@@ -15,18 +14,31 @@ import AccountLayout from "@/app/Account/components/AccountLayout";
 import WelcomeBlock from "@/app/Account/components/WelcomeBlock";
 import LinkButton from "@/app/Account/components/LinkButton";
 import PaymentMethodCard from "@/app/Account/components/PaymentMethodCard";
-import AddPaymentMethodModal from "@/app/Account/components/Modals/AddPaymentMethodModal";
 import Notification from "@/app/components/MessageHandling/Notification";
 import { useNotification } from "@/hooks/useNotification";
 import type { PaymentInfo } from "@/types/order";
+import dynamic from "next/dynamic";
+
+const AddPaymentMethodModal = dynamic(
+  () => import("@/app/Account/components/Modals/AddPaymentMethodModal"),
+  { ssr: false }
+);
+const ConfirmModal = dynamic(
+  () => import("@/app/components/MessageHandling/ConfirmModal"),
+  { ssr: false }
+);
+
+type ModalState =
+  | { type: "add" | "edit"; index: number | null }
+  | { type: "delete"; index: number };
 
 export default function PaymentMethods() {
   const pathname = usePathname();
   const [user, loadingAuth] = useAuthState(auth);
   useRequireAuth(user ?? null, loadingAuth);
+
   const [profileData] = useProfileData(user ?? null);
   const { notification, notify, clearNotification } = useNotification();
-
   const {
     paymentMethods,
     loading: loadingPM,
@@ -35,39 +47,49 @@ export default function PaymentMethods() {
     remove,
   } = usePaymentMethods();
 
-  const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const [showModal, setShowModal] = useState(false);
-  const [showDelete, setShowDelete] = useState(false);
+  const [modal, setModal] = useState<ModalState | null>(null);
 
-  if (loadingAuth) {
-    return <Loading />;
-  }
+  const handleSetDefault = useCallback(
+    async (idx: number) => {
+      const updated = paymentMethods.map((pm, i) => ({
+        ...pm,
+        isDefault: i === idx,
+      }));
+      await update(idx, { ...updated[idx], isDefault: true });
+    },
+    [paymentMethods, update]
+  );
 
-  const handleSetDefault = async (idx: number) => {
-    const updated = paymentMethods.map((pm, i) => ({
-      ...pm,
-      isDefault: i === idx,
-    }));
-    await update(idx, { ...updated[idx], isDefault: true });
-  };
-
-  const handleRemoveConfirm = async () => {
-    try {
-      if (editingIndex !== null) {
-        await remove(editingIndex);
+  const handleRemoveConfirm = useCallback(async () => {
+    if (modal?.type === "delete") {
+      try {
+        await remove(modal.index);
+        notify({ type: "success", message: "Payment method removed!" });
+      } catch (e) {
         notify({
-          type: "success",
-          message: "Payment method removed!",
+          type: "error",
+          message: (e as Error).message || "Delete failed",
         });
       }
-    } catch (e) {
-      notify({
-        type: "error",
-        message: (e as Error).message || "Delete failed",
-      });
+      setModal(null);
     }
-    setShowDelete(false);
-  };
+  }, [modal, remove, notify]);
+
+  const methodsList = useMemo(
+    () =>
+      paymentMethods.map((pm, idx) => (
+        <PaymentMethodCard
+          key={pm.id}
+          paymentMethod={pm}
+          isDefault={pm.isDefault}
+          onSetDefault={() => handleSetDefault(idx)}
+          onRemove={() => setModal({ type: "delete", index: idx })}
+        />
+      )),
+    [paymentMethods, handleSetDefault]
+  );
+
+  if (loadingAuth) return <Loading />;
 
   return (
     <>
@@ -111,12 +133,9 @@ export default function PaymentMethods() {
               </p>
               <LinkButton
                 text="Add new payment method"
-                className="underline text-sm cursor-pointer text-gray-700 hover:text-black transition-colors"
+                onClick={() => setModal({ type: "add", index: null })}
+                className="underline text-sm cursor-pointer"
                 showArrow
-                onClick={() => {
-                  setEditingIndex(null);
-                  setShowModal(true);
-                }}
               />
             </div>
           ) : (
@@ -130,69 +149,64 @@ export default function PaymentMethods() {
                 </h3>
                 <LinkButton
                   text="Add new payment method"
-                  className="underline text-sm cursor-pointer text-gray-700 hover:text-black transition-colors"
+                  onClick={() => setModal({ type: "add", index: null })}
+                  className="underline text-sm cursor-pointer"
                   showArrow
-                  onClick={() => {
-                    setEditingIndex(null);
-                    setShowModal(true);
-                  }}
                 />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {paymentMethods.map((pm, idx) => (
-                  <PaymentMethodCard
-                    key={pm.id}
-                    paymentMethod={pm}
-                    isDefault={pm.isDefault}
-                    onSetDefault={() => handleSetDefault(idx)}
-                    onRemove={() => {
-                      setEditingIndex(idx);
-                      setShowDelete(true);
-                    }}
-                  />
-                ))}
+                {methodsList}
               </div>
             </div>
           )}
 
-          <AddPaymentMethodModal
-            isOpen={showModal}
-            onClose={() => setShowModal(false)}
-            paymentMethodToEdit={
-              editingIndex !== null ? paymentMethods[editingIndex] : undefined
-            }
-            paymentMethodIndex={editingIndex ?? undefined}
-            onSave={async (newMethods: PaymentInfo[]) => {
-              try {
-                if (editingIndex === null) {
-                  await add(newMethods[newMethods.length - 1]);
-                  notify({ type: "success", message: "Payment method added!" });
-                } else {
-                  await update(editingIndex, newMethods[editingIndex]!);
+          {modal && modal.type !== "delete" && (
+            <AddPaymentMethodModal
+              isOpen
+              onClose={() => setModal(null)}
+              paymentMethodToEdit={
+                modal.type === "edit" ? paymentMethods[modal.index!] : undefined
+              }
+              paymentMethodIndex={
+                modal.type === "edit" ? modal.index! : undefined
+              }
+              onSave={async (newMethods: PaymentInfo[]) => {
+                try {
+                  if (modal.type === "add") {
+                    await add(newMethods[newMethods.length - 1]);
+                    notify({
+                      type: "success",
+                      message: "Payment method added!",
+                    });
+                  } else {
+                    await update(modal.index!, newMethods[modal.index!]!);
+                    notify({
+                      type: "success",
+                      message: "Payment method updated!",
+                    });
+                  }
+                  setModal(null);
+                } catch (e) {
                   notify({
-                    type: "success",
-                    message: "Payment method updated!",
+                    type: "error",
+                    message: (e as Error).message || "Save failed",
                   });
                 }
-                setShowModal(false);
-              } catch (e) {
-                notify({
-                  type: "error",
-                  message: (e as Error).message || "Save failed",
-                });
-              }
-            }}
-          />
+              }}
+            />
+          )}
 
-          <ConfirmModal
-            isOpen={showDelete}
-            title="Delete Payment Method"
-            message="Are you sure you want to delete this payment method?"
-            cancelLabel="No, keep it"
-            confirmLabel="Yes, delete"
-            onClose={() => setShowDelete(false)}
-            onConfirm={handleRemoveConfirm}
-          />
+          {modal?.type === "delete" && (
+            <ConfirmModal
+              isOpen
+              title="Delete Payment Method"
+              message="Are you sure you want to delete this payment method?"
+              cancelLabel="No, keep it"
+              confirmLabel="Yes, delete"
+              onClose={() => setModal(null)}
+              onConfirm={handleRemoveConfirm}
+            />
+          )}
         </div>
       </AccountLayout>
       <Footer />
