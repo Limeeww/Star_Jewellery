@@ -143,7 +143,7 @@ export default function AdminProductsPage() {
                             <strong>Weight:</strong> {variant.weight} g
                           </span>
                           <span>
-                            <strong>Price:</strong> ${variant.price}
+                            <strong>Price:</strong> {variant.price}₴
                           </span>
                         </div>
 

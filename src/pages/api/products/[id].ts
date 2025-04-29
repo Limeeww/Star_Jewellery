@@ -79,8 +79,13 @@ export default async function handler(
     if (req.method === "PUT") {
       const updated: Product = req.body;
 
-      // в Firestore удобнее использовать set(..., { merge: true })
-      await docRef.set(updated, { merge: true });
+      // Установим updatedAt на текущее время
+      const updatedWithTimestamp = {
+        ...updated,
+        updatedAt: new Date(), // добавляем новое время здесь
+      };
+
+      await docRef.set(updatedWithTimestamp, { merge: true });
 
       return res.status(200).json({ ok: true });
     }

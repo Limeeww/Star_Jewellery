@@ -51,7 +51,7 @@ export default function EditProductVariantsForm({ variants, onChange }: Props) {
           <h4 className="font-medium text-gray-700">Variant #{variant.id}</h4>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium">Price (€)</label>
+              <label className="block text-sm font-medium">Price (₴)</label>
               <input
                 type="number"
                 min={1}
