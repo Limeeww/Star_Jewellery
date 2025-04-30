@@ -121,47 +121,49 @@ export default function CartPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="col-span-1 lg:col-span-2 space-y-6">
-                {cartItems.map((item) => (
-                  <CartItemComponent
-                    key={`${item.productId}-${item.size}-${item.insert}-${item.materialColor}`}
-                    item={item}
-                    onIncrement={() =>
-                      user &&
-                      incrementQuantity(
-                        user.uid,
-                        item.productId,
-                        item.size,
-                        item.insert,
-                        item.materialColor
-                      )
-                    }
-                    onDecrement={() =>
-                      user &&
-                      decrementQuantity(
-                        user.uid,
-                        item.productId,
-                        item.size,
-                        item.insert,
-                        item.materialColor
-                      )
-                    }
-                    onRemove={() =>
-                      user &&
-                      removeItem(
-                        user.uid,
-                        item.productId,
-                        item.size,
-                        item.insert,
-                        item.materialColor
-                      )
-                    }
-                  />
-                ))}
+              <div className="col-span-1 lg:col-span-2">
+                <div className="space-y-4 max-h-[60vh] overflow-y-auto mb-4">
+                  {cartItems.map((item) => (
+                    <CartItemComponent
+                      key={`${item.productId}-${item.size}-${item.insert}-${item.materialColor}`}
+                      item={item}
+                      onIncrement={() =>
+                        user &&
+                        incrementQuantity(
+                          user.uid,
+                          item.productId,
+                          item.size,
+                          item.insert,
+                          item.materialColor
+                        )
+                      }
+                      onDecrement={() =>
+                        user &&
+                        decrementQuantity(
+                          user.uid,
+                          item.productId,
+                          item.size,
+                          item.insert,
+                          item.materialColor
+                        )
+                      }
+                      onRemove={() =>
+                        user &&
+                        removeItem(
+                          user.uid,
+                          item.productId,
+                          item.size,
+                          item.insert,
+                          item.materialColor
+                        )
+                      }
+                    />
+                  ))}
+                </div>
                 <GiftOptions register={register} watch={watch} />
               </div>
 
-              <div className="col-span-full lg:col-span-1 space-y-8">
+              <div className="col-span-full lg:col-span-1 space-y-4">
                 <OrderSummary
                   originalPrice={originalPriceSum}
                   subtotal={subtotal}

@@ -1,27 +1,16 @@
-import { useCallback } from "react";
+import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
-import {
-  collection,
-  query,
-  where,
-  getDocs,
-  writeBatch,
-} from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase/firebaseConfig";
+import { useCallback } from "react";
 
 export function useClearCart() {
   const [user] = useAuthState(auth);
 
   return useCallback(async () => {
     if (!user) return;
-    const q = query(
-      collection(db, "cartItems"),
-      where("userId", "==", user.uid)
-    );
-    const snap = await getDocs(q);
-    const batch = writeBatch(db);
-    snap.docs.forEach((d) => batch.delete(d.ref));
-    await batch.commit();
+
+    const userRef = doc(db, "users", user.uid);
+    await updateDoc(userRef, { cartItems: [] });
   }, [user]);
 }

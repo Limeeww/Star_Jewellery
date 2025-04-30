@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { db } from "@/firebase/firebaseConfig";
-import { collection, query, where, onSnapshot } from "firebase/firestore";
+import { doc, onSnapshot } from "firebase/firestore";
 import type { CartItem } from "@/types/cartItem";
 
 export function useCartItems(userId: string | null) {
@@ -11,15 +11,13 @@ export function useCartItems(userId: string | null) {
       setItems([]);
       return;
     }
-    const q = query(collection(db, "cartItems"), where("userId", "==", userId));
-    const unsubscribe = onSnapshot(q, (snap) => {
-      setItems(
-        snap.docs.map((d) => ({
-          id: d.id,
-          ...(d.data() as Omit<CartItem, "id">),
-        }))
-      );
+
+    const userRef = doc(db, "users", userId);
+    const unsubscribe = onSnapshot(userRef, (snap) => {
+      const userData = snap.data() as { cartItems?: CartItem[] } | undefined;
+      setItems(userData?.cartItems ?? []);
     });
+
     return () => unsubscribe();
   }, [userId]);
 
