@@ -58,7 +58,7 @@ export default function CartItemComponent({
 
   return (
     <>
-      <div className="w-full rounded flex-wrap bg-white p-4 shadow-sm flex items-center gap-4">
+      <div className="w-full border rounded flex-wrap bg-white p-4 flex items-center gap-4">
         <Link href={href} className="flex-shrink-0">
           <div className="relative w-16 h-16">
             <Image
@@ -117,7 +117,6 @@ export default function CartItemComponent({
           {hasDiscount && <DiscountDisplay discountedPrice={item.price} />}
         </div>
       </div>
-
       <ConfirmModal
         isOpen={confirmOpen}
         title={actionIsRemove ? "Remove Item" : "Decrease Quantity"}

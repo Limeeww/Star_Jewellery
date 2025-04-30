@@ -8,7 +8,7 @@ import ConfirmModal from "@/app/components/MessageHandling/ConfirmModal";
 import { usePathname } from "next/navigation";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase/firebaseConfig";
-import {useRequireAuth} from "@/hooks/index";
+import { useRequireAuth } from "@/hooks/index";
 import { useProfileData } from "@/utils/index";
 import { useAddresses } from "@/hooks/useAddresses";
 import AccountLayout from "@/app/Account/components/AccountLayout";
@@ -116,20 +116,23 @@ export default function Addresses() {
                 />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {addresses.map((address, idx) => (
-                  <AddressCard
-                    key={idx}
-                    address={address}
-                    onEdit={() => {
-                      setEditingIndex(idx);
-                      setShowModal(true);
-                    }}
-                    onRemove={() => {
-                      setEditingIndex(idx);
-                      setShowDelete(true);
-                    }}
-                  />
-                ))}
+                {addresses.map((address, idx) => {
+                  return (
+                    <AddressCard
+                      key={idx}
+                      address={address}
+                      isSelected={!!address.preferredShippingAddress}
+                      onEdit={() => {
+                        setEditingIndex(idx);
+                        setShowModal(true);
+                      }}
+                      onRemove={() => {
+                        setEditingIndex(idx);
+                        setShowDelete(true);
+                      }}
+                    />
+                  );
+                })}
               </div>
             </div>
           )}
@@ -141,20 +144,27 @@ export default function Addresses() {
               editingIndex !== null ? addresses[editingIndex] : undefined
             }
             addressIndex={editingIndex ?? undefined}
-            onSave={async (newAddresses) => {
+            onAdd={async (newAddr) => {
               try {
-                if (editingIndex === null) {
-                  await add(newAddresses[newAddresses.length - 1]);
-                  notify({ type: "success", message: "Address added!" });
-                } else {
-                  await update(editingIndex, newAddresses[editingIndex]!);
-                  notify({ type: "success", message: "Address updated!" });
-                }
+                await add(newAddr);
+                notify({ type: "success", message: "Address added!" });
                 setShowModal(false);
               } catch (e) {
-                const errorMessage =
-                  e instanceof Error ? e.message : "Save failed";
-                notify({ type: "error", message: errorMessage });
+                notify({
+                  type: "error",
+                  message: (e as Error).message || "Add failed",
+                });
+              }
+            }}
+            onUpdate={async (idx, updAddr) => {
+              try {
+                await update(idx, updAddr);
+                setShowModal(false);
+              } catch (e) {
+                notify({
+                  type: "error",
+                  message: (e as Error).message || "Update failed",
+                });
               }
             }}
           />

@@ -76,7 +76,7 @@ export default function Overview() {
           <ProfileCard
             title="MY ORDERS"
             description={
-              profileData?.orders && profileData.orders.length
+              Array.isArray(profileData?.orders) && profileData.orders.length  
                 ? `You have ${profileData.orders.length} orders.`
                 : "You have no orders yet."
             }

@@ -118,7 +118,7 @@ const InfoBlocks = () => {
       {infoItems.map((item, index) => (
         <div
           key={index}
-          className="flex items-center justify-between border-b border-gray-200 py-3 cursor-pointer hover:bg-gray-50 transition"
+          className="flex items-center justify-between border-b border-gray-200 py-3 px-2 cursor-pointer hover:bg-gray-50 transition"
           onClick={() => openModal(item)}
         >
           <div className="flex items-center space-x-2 text-gray-800">
@@ -140,7 +140,7 @@ const InfoBlocks = () => {
 
       <SideModal isOpen={isModalOpen} onClose={closeModal}>
         {selectedItem && (
-          <div>
+          <div className="px-4">
             <h2 className="text-2xl font-bold mb-4">{selectedItem.title}</h2>
             <div className="text-sm leading-relaxed space-y-4">
               {selectedItem.text}
