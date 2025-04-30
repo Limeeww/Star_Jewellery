@@ -1,10 +1,10 @@
 "use client";
 
 import React, { createContext, useContext, ReactNode } from "react";
-import { useCartItems } from "@/utils/cartUtils";
+import { useCartItems } from "@/hooks";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "../../firebase/firebaseConfig";
-import { CartItem } from "../../types/cartItem";
+import { auth } from "@/firebase/firebaseConfig";
+import { CartItem } from "@/types/cartItem";
 
 interface CartContextType {
   cartItemCount: number;

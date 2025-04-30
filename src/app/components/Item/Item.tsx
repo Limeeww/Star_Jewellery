@@ -69,10 +69,10 @@ export default function Item({ product, displayedVariant }: Props) {
               className="text-base md:text-lg mt-1"
               style={{ fontFamily: "var(--font-poppins)" }}
             >
-              ₴{" "}
               <span className="font-semibold">
                 {variant.price.toLocaleString()}
-              </span>
+              </span>{" "}
+              ₴
             </p>
           )}
         </div>

@@ -1,4 +1,4 @@
-import { CartItem } from "@/types/cartItem";
+  import { CartItem } from "@/types/cartItem";
 import { GiftOptionsForm } from "@/types/order";
 import { useState, useEffect } from "react";
 import { doc, onSnapshot } from "firebase/firestore";
