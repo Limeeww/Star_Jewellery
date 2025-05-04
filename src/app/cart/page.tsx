@@ -13,7 +13,7 @@ import CartItemComponent from "@/app/components/CartItem/CartItemComponent";
 import OrderSummary from "@/app/cart/components/OrderSummary";
 import RecentlyViewed from "@/app/components/RecentlyViewed/RecentlyViewed";
 import GiftOptions from "@/app/cart/components/GiftOptions";
-import { GiftOptionsForm, Order, PaymentInfo } from "@/types/order";
+import { GiftOptionsForm, Order, PaymentInfo, PaymentStatusValue } from "@/types/order";
 
 import {
   getTotalCount,
@@ -66,7 +66,7 @@ export default function CartPage() {
       method: "credit_card",
       transactionId: "",
       paid: false,
-    } as PaymentInfo;
+    } as unknown as PaymentInfo;
     const order: Partial<Order> = {
       orderId: Date.now(),
       userId: user.uid,
@@ -77,7 +77,7 @@ export default function CartPage() {
       giftOptions: giftOptionsValues,
       paymentInfo,
       discountsApplied: [],
-      status: "pending",
+      status: PaymentStatusValue.PENDING,
     };
 
     localStorage.setItem("currentOrder", JSON.stringify(order));
