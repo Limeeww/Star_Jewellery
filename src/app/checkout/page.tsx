@@ -20,8 +20,9 @@ import {
   getSubtotal,
   getShippingCost,
   getGiftOptionsTotal,
+  getTotal,
 } from "@/utils";
-import { useLocalOrder, useSubmitOrder } from "@/hooks";
+import { useCartItems, useLocalOrder, useSubmitOrder } from "@/hooks";
 
 export default function CheckoutPage() {
   const { notification, clearNotification } = useNotification();
@@ -49,7 +50,7 @@ export default function CheckoutPage() {
   } = usePaymentMethods();
 
   const order = useLocalOrder();
-
+  const products = useCartItems(user?.uid ?? null);
   const [shipAddress, setShipAddress] = useState<Address | null>(null);
   const [selectedPayment, setSelectedPayment] = useState<PaymentInfo | null>(
     null
@@ -86,15 +87,17 @@ export default function CheckoutPage() {
     pmIdx
   );
   if (loadingAuth || !order) return <Loading />;
-
-  const products = order.products;
   const original = calculateOriginalPriceSum(products);
   const subtotal = getSubtotal(products);
   const shipping = getShippingCost(subtotal);
   const giftTotal = getGiftOptionsTotal(order.giftOptions);
 
+  const total = getTotal(subtotal, shipping, giftTotal);
+
   const buttonText = submitting
     ? "Submitting…"
+    : products.length === 0
+    ? "No Products in Cart"
     : order.paymentInfo.paid
     ? "Already Paid"
     : !shipAddress
@@ -160,10 +163,11 @@ export default function CheckoutPage() {
                 subtotal={subtotal}
                 shipping={shipping}
                 giftOptionsTotal={giftTotal}
-                total={order.total}
+                total={total}
                 onClick={handleSubmitOrder}
                 disabled={
                   submitting ||
+                  products.length === 0 ||
                   order.paymentInfo.paid ||
                   !shipAddress ||
                   pmIdx === null

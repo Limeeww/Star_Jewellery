@@ -62,11 +62,11 @@ export default function CartPage() {
     if (!user) return;
 
     const now = new Date();
-    const paymentInfo: PaymentInfo = {
+    const paymentInfo = {
       method: "credit_card",
       transactionId: "",
       paid: false,
-    };
+    } as PaymentInfo;
     const order: Partial<Order> = {
       orderId: Date.now(),
       userId: user.uid,

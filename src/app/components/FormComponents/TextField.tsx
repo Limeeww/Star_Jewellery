@@ -8,6 +8,7 @@ interface TextFieldProps {
   error?: FieldError;
   type?: string; 
   className?: string;
+  defaultValue?: string;
 }
 
 function TextField({
@@ -17,6 +18,7 @@ function TextField({
   error,
   type = "text",
   className = "",
+  defaultValue,
 }: TextFieldProps) {
   return (
     <div className={className}>
@@ -26,6 +28,7 @@ function TextField({
       <input
         id={id}
         type={type}
+        defaultValue={defaultValue}
         className={`w-full border p-2 ${
           error ? "border-red-500" : "border-gray-300"
         }`}

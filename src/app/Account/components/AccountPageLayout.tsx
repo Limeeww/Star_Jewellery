@@ -1,6 +1,6 @@
 "use client";
 
-import React, { ReactNode } from "react";
+import React, { JSX, ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase/firebaseConfig";
@@ -35,7 +35,7 @@ export default function AccountPageLayout({
   title,
   description,
   children,
-}: AccountPageLayoutProps) {
+}: AccountPageLayoutProps): JSX.Element {
   const pathname = usePathname();
   const [user, loadingAuth] = useAuthState(auth);
   useRequireAuth(user ?? null, loadingAuth);
@@ -43,38 +43,40 @@ export default function AccountPageLayout({
   const [profileData] = useProfileData(user ?? null);
   const { notification, clearNotification } = useNotification();
 
-  <>
-    <Navbar isScrolled isLoggedIn={!!user} />
-    <AccountLayout pathname={pathname ?? ""} sideLinks={sideLinks}>
-      <WelcomeBlock
-        firstName={(profileData as unknown as ProfileData)?.firstName}
-        lastName={(profileData as unknown as ProfileData)?.lastName}
-      />
-
-      {notification && (
-        <Notification
-          type={notification.type}
-          message={notification.message}
-          duration={notification.duration}
-          onClose={clearNotification}
+  return (
+    <>
+      <Navbar isScrolled isLoggedIn={!!user} />
+      <AccountLayout pathname={pathname ?? ""} sideLinks={sideLinks}>
+        <WelcomeBlock
+          firstName={(profileData as unknown as ProfileData)?.firstName}
+          lastName={(profileData as unknown as ProfileData)?.lastName}
         />
-      )}
 
-      <div
-        className="mt-6 space-y-4 text-sm text-gray-800"
-        style={{ fontFamily: "var(--font-poppins)" }}
-      >
-        <h2
-          className="text-2xl font-semibold"
-          style={{ fontFamily: "var(--font-playfair)" }}
+        {notification && (
+          <Notification
+            type={notification.type}
+            message={notification.message}
+            duration={notification.duration}
+            onClose={clearNotification}
+          />
+        )}
+
+        <div
+          className="mt-6 space-y-4 text-sm text-gray-800"
+          style={{ fontFamily: "var(--font-poppins)" }}
         >
-          {title}
-        </h2>
-        {description && <div className="text-gray-600">{description}</div>}
+          <h2
+            className="text-2xl font-semibold"
+            style={{ fontFamily: "var(--font-playfair)" }}
+          >
+            {title}
+          </h2>
+          {description && <div className="text-gray-600">{description}</div>}
 
-        {children}
-      </div>
-    </AccountLayout>
-    <Footer />
-  </>;
+          {children}
+        </div>
+      </AccountLayout>
+      <Footer />
+    </>
+  );
 }
