@@ -12,7 +12,7 @@ export interface GiftOptionsForm {
 
 interface BasePaymentInfo {
   id: string;
-  method: "credit_card" | "paypal" | "klarna";
+  paymentInfo: BasePaymentInfo;
   transactionId: string; // transaction ID from payment provider
   paid: boolean;
   isDefault?: boolean;
@@ -21,7 +21,7 @@ interface BasePaymentInfo {
 }
 
 export interface CreditCardPaymentInfo extends BasePaymentInfo {
-  method: "credit_card";
+  paymentInfo: BasePaymentInfo;
   // Token maybe implemented later
   cardToken: PaymentMethod | string;
   // write only last 4 digits of the card number
@@ -32,13 +32,13 @@ export interface CreditCardPaymentInfo extends BasePaymentInfo {
 }
 
 export interface PayPalPaymentInfo extends BasePaymentInfo {
-  method: "paypal";
+  paymentInfo: BasePaymentInfo;
   paypalOrderId: string;
   payerEmail: string;
 }
 
 export interface KlarnaPaymentInfo extends BasePaymentInfo {
-  method: "klarna";
+  paymentInfo: BasePaymentInfo;
   klarnaOrderId: string;
 }
 
@@ -46,6 +46,31 @@ export type PaymentInfo =
   | CreditCardPaymentInfo
   | PayPalPaymentInfo
   | KlarnaPaymentInfo;
+
+export enum PaymentMethodValue {
+  CREDIT_CARD = "credit_card",
+  PAYPAL = "paypal",
+  KLARNA = "klarna",
+}
+
+export enum PaymentStatusValue {
+  PENDING = "pending",
+  COMPLETED = "completed",
+  FAILED = "failed",
+  REFUNDED = "refunded",
+}
+export const PaymentMethodLabel: Record<PaymentMethodValue, string> = {
+  [PaymentMethodValue.CREDIT_CARD]: "Credit Card",
+  [PaymentMethodValue.PAYPAL]: "PayPal",
+  [PaymentMethodValue.KLARNA]: "Klarna",
+};
+
+export const PaymentStatusLabel: Record<PaymentStatusValue, string> = {
+  [PaymentStatusValue.PENDING]: "Pending",
+  [PaymentStatusValue.COMPLETED]: "Completed",
+  [PaymentStatusValue.FAILED]: "Failed",
+  [PaymentStatusValue.REFUNDED]: "Refunded",
+};
 
 export interface Order {
   orderId: number;
@@ -58,5 +83,5 @@ export interface Order {
   paymentInfo: PaymentInfo;
   shippingAddress: Address;
   discountsApplied?: Discount[];
-  status: "pending" | "shipped" | "delivered" | "cancelled";
+  status: PaymentStatusValue;
 }

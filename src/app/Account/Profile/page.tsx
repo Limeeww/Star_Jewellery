@@ -105,7 +105,13 @@ export default function Profile() {
           lastName={profileData?.lastName as string}
         />
 
-        <div className="mt-4 space-y-2 text-sm text-gray-800">
+        <div className="mt-2 space-y-2 text-sm text-gray-800 flex flex-col">
+          <h2
+            className="text-2xl font-semibold mb-2"
+            style={{ fontFamily: "var(--font-playfair)" }}
+          >
+            Profile Information
+          </h2>
           <p>
             With your specified email address and password you can manage your
             personal data.
@@ -125,8 +131,6 @@ export default function Profile() {
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="mt-6  space-y-4">
-          <h2 className="text-lg font-semibold">Profile Information</h2>
-
           <div className="flex flex-col md:flex-row gap-4">
             <TextField
               label="First Name *"
