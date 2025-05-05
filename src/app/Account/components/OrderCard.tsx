@@ -13,7 +13,7 @@ interface OrderCardProps {
   order: Order;
 }
 
-const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
+function OrderCard({ order }: OrderCardProps) {
   const { orderId, orderDate, products, shippingAddress, paymentInfo, status } =
     order;
 
@@ -22,26 +22,23 @@ const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
 
   return (
     <div className="bg-gray-50 border border-gray-200 p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <h3 className="text-xl font-semibold text-primary-700">
           Order #{orderId}
         </h3>
         <LinkButton
-          href={`/account/orders/${orderId}/details`}
+          href={`/Account/Orders/${orderId}/details`}
           text="View Details"
           showArrow
           className="text-primary-500 hover:text-primary-700 underline"
         />
       </div>
 
-      {/* Date */}
       <p className="text-sm text-gray-500 mb-6">
         Placed on:{" "}
         <span className="text-gray-700">{orderDate.toLocaleDateString()}</span>
       </p>
 
-      {/* Products List */}
       <div className="space-y-4 mb-6">
         {products.map((item, index) => (
           <div
@@ -146,6 +143,6 @@ const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
       </div>
     </div>
   );
-};
+}
 
 export default OrderCard;
