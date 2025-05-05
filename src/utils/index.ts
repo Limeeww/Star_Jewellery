@@ -1,4 +1,3 @@
-export * from "./cartActions";
 export * from "./cartUtils";
 export * from "./collection";
 export * from "./priceUtils";

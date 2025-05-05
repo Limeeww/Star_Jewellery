@@ -22,7 +22,10 @@ import {
   getGiftOptionsTotal,
   getTotal,
 } from "@/utils";
-import { useCartItems, useLocalOrder, useSubmitOrder } from "@/hooks";
+import { useLocalOrder, useSubmitOrder } from "@/hooks";
+
+// Используем контекст корзины вместо useCartItems
+import { useCartContext } from "@/app/contexts/CartContent";
 
 export default function CheckoutPage() {
   const { notification, clearNotification } = useNotification();
@@ -50,7 +53,10 @@ export default function CheckoutPage() {
   } = usePaymentMethods();
 
   const order = useLocalOrder();
-  const products = useCartItems(user?.uid ?? null);
+
+  // Получаем элементы корзины из контекста
+  const { cartItems: products } = useCartContext();
+
   const [shipAddress, setShipAddress] = useState<Address | null>(null);
   const [selectedPayment, setSelectedPayment] = useState<PaymentInfo | null>(
     null
@@ -86,12 +92,13 @@ export default function CheckoutPage() {
     selectedPayment,
     pmIdx
   );
+
   if (loadingAuth || !order) return <Loading />;
+
   const original = calculateOriginalPriceSum(products);
   const subtotal = getSubtotal(products);
   const shipping = getShippingCost(subtotal);
   const giftTotal = getGiftOptionsTotal(order.giftOptions);
-
   const total = getTotal(subtotal, shipping, giftTotal);
 
   const buttonText = submitting
@@ -105,6 +112,14 @@ export default function CheckoutPage() {
     : pmIdx === null
     ? "Select Payment Method First"
     : "Confirm Payment";
+
+  if (!isLoggedIn) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-gray-600">Please sign in to access checkout.</p>
+      </div>
+    );
+  }
 
   return (
     <>

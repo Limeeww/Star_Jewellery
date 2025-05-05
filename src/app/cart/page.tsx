@@ -13,27 +13,34 @@ import CartItemComponent from "@/app/components/CartItem/CartItemComponent";
 import OrderSummary from "@/app/cart/components/OrderSummary";
 import RecentlyViewed from "@/app/components/RecentlyViewed/RecentlyViewed";
 import GiftOptions from "@/app/cart/components/GiftOptions";
-import { GiftOptionsForm, Order, PaymentInfo, PaymentStatusValue } from "@/types/order";
+import {
+  GiftOptionsForm,
+  Order,
+  PaymentInfo,
+  PaymentStatusValue,
+} from "@/types/order";
+import { useRouter } from "next/navigation";
 
+// Вместо утилитов используем контекст корзины
+import { useCartContext } from "@/app/contexts/CartContent";
+// Удалены: useCartItems, incrementQuantity, decrementQuantity, removeItem из utils
 import {
   getTotalCount,
   getSubtotal,
   getShippingCost,
   getGiftOptionsTotal,
   getTotal,
-  useCartItems,
-  incrementQuantity,
-  decrementQuantity,
-  removeItem,
   calculateOriginalPriceSum,
 } from "@/utils/index";
-import { useRouter } from "next/navigation";
 
 export default function CartPage() {
   const [user, loading] = useAuthState(auth);
   const router = useRouter();
   const isLoggedIn = !!user && !loading;
-  const cartItems = useCartItems(user ? user.uid : null);
+
+  // Достаём из контекста корзины
+  const { cartItems, incrementItem, decrementItem, removeItem } =
+    useCartContext();
 
   const { register, watch } = useForm<GiftOptionsForm>({
     defaultValues: {
@@ -81,7 +88,6 @@ export default function CartPage() {
     };
 
     localStorage.setItem("currentOrder", JSON.stringify(order));
-
     router.push("/checkout");
   };
 
@@ -127,36 +133,9 @@ export default function CartPage() {
                     <CartItemComponent
                       key={`${item.productId}-${item.size}-${item.insert}-${item.materialColor}`}
                       item={item}
-                      onIncrement={() =>
-                        user &&
-                        incrementQuantity(
-                          user.uid,
-                          item.productId,
-                          item.size,
-                          item.insert,
-                          item.materialColor
-                        )
-                      }
-                      onDecrement={() =>
-                        user &&
-                        decrementQuantity(
-                          user.uid,
-                          item.productId,
-                          item.size,
-                          item.insert,
-                          item.materialColor
-                        )
-                      }
-                      onRemove={() =>
-                        user &&
-                        removeItem(
-                          user.uid,
-                          item.productId,
-                          item.size,
-                          item.insert,
-                          item.materialColor
-                        )
-                      }
+                      onIncrement={() => incrementItem(item)}
+                      onDecrement={() => decrementItem(item)}
+                      onRemove={() => removeItem(item)}
                     />
                   ))}
                 </div>

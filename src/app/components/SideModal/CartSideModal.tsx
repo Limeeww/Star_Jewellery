@@ -4,29 +4,18 @@ import React from "react";
 import SideModal from "../SideModal/SideModal";
 import CartItemComponent from "../CartItem/CartItemComponent";
 import LinkButtonForm from "../FormComponents/LinkButtonForm";
-import {
-  incrementQuantity,
-  decrementQuantity,
-  removeItem,
-} from "@/utils/index";
-import { CartItem } from "@/types/cartItem";
-import { User } from "firebase/auth";
+import { useCartContext } from "@/app/contexts/CartContent";
 
 interface CartSideModalProps {
   isOpen: boolean;
   onClose: () => void;
-  cartItems: CartItem[];
-  user: User | null;
   added?: boolean;
 }
 
-function CartSideModal({
-  isOpen,
-  onClose,
-  cartItems,
-  user,
-  added = false,
-}: CartSideModalProps) {
+function CartSideModal({ isOpen, onClose, added = false }: CartSideModalProps) {
+  const { cartItems, incrementItem, decrementItem, removeItem } =
+    useCartContext();
+
   return (
     <SideModal isOpen={isOpen} onClose={onClose}>
       <div className="p-4 h-full flex flex-col max-h-screen overflow-y-auto">
@@ -43,7 +32,7 @@ function CartSideModal({
             </p>
           )}
 
-          {cartItems && cartItems.length > 0 ? (
+          {cartItems.length > 0 ? (
             cartItems.map((item) => (
               <div
                 key={`${item.productId}-${item.size}-${item.insert}-${item.materialColor}`}
@@ -51,39 +40,30 @@ function CartSideModal({
               >
                 <CartItemComponent
                   item={item}
-                  onIncrement={() => {
-                    if (user?.uid) {
-                      incrementQuantity(
-                        user.uid,
-                        item.productId,
-                        item.size,
-                        item.insert,
-                        item.materialColor
-                      );
-                    }
-                  }}
-                  onDecrement={() => {
-                    if (user?.uid) {
-                      decrementQuantity(
-                        user.uid,
-                        item.productId,
-                        item.size,
-                        item.insert,
-                        item.materialColor
-                      );
-                    }
-                  }}
-                  onRemove={() => {
-                    if (user?.uid) {
-                      removeItem(
-                        user.uid,
-                        item.productId,
-                        item.size,
-                        item.insert,
-                        item.materialColor
-                      );
-                    }
-                  }}
+                  onIncrement={() =>
+                    incrementItem({
+                      productId: item.productId,
+                      size: item.size,
+                      insert: item.insert,
+                      materialColor: item.materialColor,
+                    })
+                  }
+                  onDecrement={() =>
+                    decrementItem({
+                      productId: item.productId,
+                      size: item.size,
+                      insert: item.insert,
+                      materialColor: item.materialColor,
+                    })
+                  }
+                  onRemove={() =>
+                    removeItem({
+                      productId: item.productId,
+                      size: item.size,
+                      insert: item.insert,
+                      materialColor: item.materialColor,
+                    })
+                  }
                 />
               </div>
             ))

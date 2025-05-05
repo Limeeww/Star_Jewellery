@@ -39,7 +39,7 @@ export default function OrderDetailsPage() {
         <p className="text-red-600">Order not found.</p>
       )}
 
-      <div className="space-x-4">
+      <div className="space-x-4 mt-2">
         <LinkButton
           text="Print Receipt"
           onClick={() => window.print()}

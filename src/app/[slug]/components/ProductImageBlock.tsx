@@ -8,6 +8,8 @@ import {
   AiOutlineClose,
   AiOutlineLeft,
   AiOutlineRight,
+  AiOutlineHeart,
+  AiFillHeart,
 } from "react-icons/ai";
 import { useModalClose } from "@/hooks/useModal";
 
@@ -85,6 +87,8 @@ export default function ProductImageBlock({
   const [modalPage, setModalPage] = useState(0);
   const [modalDirection, setModalDirection] = useState(0);
 
+  const [isWishlisted, setIsWishlisted] = useState(false);
+
   const imageCount = images.length;
   const currentImage =
     imageCount > 0 ? images[page] : "/images/placeholder.png";
@@ -156,6 +160,24 @@ export default function ProductImageBlock({
   return (
     <div className="relative w-full mx-auto">
       <div className="relative w-full aspect-square overflow-hidden shadow-lg mt-6 max-h-[90vh]">
+        <motion.button
+          onClick={() => setIsWishlisted((prev) => !prev)}
+          initial={{ scale: 1, color: "#374151" }}
+          animate={{
+            scale: isWishlisted ? 1.1 : 1,
+            color: isWishlisted ? "#EF4444" : "#374151",
+          }}
+          whileTap={{ scale: 0.9 }}
+          transition={{ type: "spring", stiffness: 300, damping: 20 }}
+          className="absolute top-2 right-2 bg-white p-2 rounded-full cursor-pointer z-20"
+        >
+          {isWishlisted ? (
+            <AiFillHeart size={24} />
+          ) : (
+            <AiOutlineHeart size={24} />
+          )}
+        </motion.button>
+
         <AnimatePresence initial={false} custom={direction}>
           <motion.div
             key={page}
