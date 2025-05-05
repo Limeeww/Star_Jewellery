@@ -12,10 +12,14 @@ import {
   AiFillHeart,
 } from "react-icons/ai";
 import { useModalClose } from "@/hooks/useModal";
+import { WishlistItem } from "@/types/userTypes";
 
 interface ProductImageBlockProps {
   images: string[];
   altText: string;
+  wishlistItem: WishlistItem;
+  toggleWishlist: (item: WishlistItem) => void;
+  isWishlisted: (identifier: Omit<WishlistItem, "price">) => boolean;
 }
 
 interface ArrowButtonProps {
@@ -65,7 +69,7 @@ const DotNav = ({
   inactiveClass,
 }: DotNavProps) => (
   <div className={containerClass}>
-    {Array.from({ length: count }, (_, i) => (
+    {Array.from({ length: count }).map((_, i) => (
       <div
         key={i}
         className={`${dotSizeClass} rounded-full ${
@@ -80,14 +84,15 @@ const DotNav = ({
 export default function ProductImageBlock({
   images,
   altText,
+  wishlistItem,
+  toggleWishlist,
+  isWishlisted,
 }: ProductImageBlockProps) {
   const [page, setPage] = useState(0);
   const [direction, setDirection] = useState(0);
   const [isModalOpen, setModalOpen] = useState(false);
   const [modalPage, setModalPage] = useState(0);
   const [modalDirection, setModalDirection] = useState(0);
-
-  const [isWishlisted, setIsWishlisted] = useState(false);
 
   const imageCount = images.length;
   const currentImage =
@@ -110,6 +115,7 @@ export default function ProductImageBlock({
     setDir(dir);
     setIndex(newIndex);
   };
+
   const paginate = (dir: number) =>
     changeIndex(
       Math.min(Math.max(page + dir, 0), imageCount - 1),
@@ -117,6 +123,7 @@ export default function ProductImageBlock({
       setPage,
       setDirection
     );
+
   const modalPaginate = (dir: number) =>
     changeIndex(
       Math.min(Math.max(modalPage + dir, 0), imageCount - 1),
@@ -160,18 +167,19 @@ export default function ProductImageBlock({
   return (
     <div className="relative w-full mx-auto">
       <div className="relative w-full aspect-square overflow-hidden shadow-lg mt-6 max-h-[90vh]">
+        {/* Wishlist toggle */}
         <motion.button
-          onClick={() => setIsWishlisted((prev) => !prev)}
-          initial={{ scale: 1, color: "#374151" }}
+          onClick={() => toggleWishlist(wishlistItem)}
+          initial={{ scale: 1 }}
           animate={{
-            scale: isWishlisted ? 1.1 : 1,
-            color: isWishlisted ? "#EF4444" : "#374151",
+            scale: isWishlisted(wishlistItem) ? 1.1 : 1,
+            color: isWishlisted(wishlistItem) ? "#EF4444" : "#374151",
           }}
           whileTap={{ scale: 0.9 }}
           transition={{ type: "spring", stiffness: 300, damping: 20 }}
           className="absolute top-2 right-2 bg-white p-2 rounded-full cursor-pointer z-20"
         >
-          {isWishlisted ? (
+          {isWishlisted(wishlistItem) ? (
             <AiFillHeart size={24} />
           ) : (
             <AiOutlineHeart size={24} />

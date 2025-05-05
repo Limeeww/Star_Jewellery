@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
-
 import { auth } from "@/firebase/firebaseConfig";
 
 import VariantSelector from "./components/VariantSelector";
@@ -26,6 +25,9 @@ import AboutCollection from "./components/AboutCollection";
 import SimilarProducts from "@/app/components/SimilarProducts/SimilarProducts";
 import { calculateDiscountedPrice, formatPrice } from "@/utils";
 
+import { useWishlist } from "@/hooks/useWishlist";
+import { WishlistItem } from "@/types/userTypes";
+
 const ProductPage = () => {
   const [user, authLoading] = useAuthState(auth);
   useRequireAuth(user ?? null, authLoading);
@@ -45,6 +47,8 @@ const ProductPage = () => {
   } = useProductPage();
 
   const userId = user ? user.uid : null;
+
+  // Корзина
   const {
     items: cartItems,
     addOrIncrement,
@@ -53,14 +57,32 @@ const ProductPage = () => {
     removeItem,
   } = useCart(userId);
 
+  // Вишлист
+  const {
+    toggleItem: toggleWishlist,
+    isWishlisted,
+  } = useWishlist(userId);
+
   const [isModalOpen, setModalOpen] = useState(false);
 
   if (!product || !displayedVariant) return <Loading />;
 
+  // Цена с учётом скидки
   const discountedPrice = calculateDiscountedPrice(
     displayedVariant,
     activeDiscount
   );
+
+  // Упаковка данных для вишлиста
+  const wishlistItem: WishlistItem = {
+    productId: product.id,
+    variantId: displayedVariant.id,
+    slug: product.slug!,
+    materialColor: displayedVariant.materialColor,
+    insert: displayedVariant.insert,
+    size: sizeOptions && sizeOptions[0] ? Number(sizeOptions[0].value) : 0,
+    price: discountedPrice ?? displayedVariant.price,
+  };
 
   const handleAddToCart = async (data: FormValues) => {
     if (!userId) return;
@@ -102,6 +124,9 @@ const ProductPage = () => {
             key={`${displayedVariant.insert}-${displayedVariant.materialColor}`}
             images={displayedVariant.images || []}
             altText={`${displayedVariant.insert} - ${displayedVariant.materialColor}`}
+            wishlistItem={wishlistItem}
+            toggleWishlist={toggleWishlist}
+            isWishlisted={isWishlisted}
           />
 
           <div className="mt-6">

@@ -19,6 +19,16 @@ export interface Address {
   preferredBillingAddress?: boolean;
 }
 
+export interface WishlistItem {
+  productId: number;
+  variantId: number;
+  slug: string;
+  materialColor: string;
+  insert: string;
+  size: number;
+  price: number;
+}
+
 export interface UserData {
   firstName: string;
   lastName: string;
@@ -35,7 +45,7 @@ export interface UserData {
   anniversaryMonth?: string;
   anniversaryYear?: string;
   marketingConsent?: boolean;
-  wishList?: string[];
+  wishList?: WishlistItem[];
   orders?: Order[];
   addresses?: Address[];
   paymentMethods?: PaymentInfo[];
