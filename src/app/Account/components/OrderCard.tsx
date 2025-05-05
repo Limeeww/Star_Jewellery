@@ -2,23 +2,33 @@
 
 import React from "react";
 import Image from "next/image";
+import LinkButton from "./LinkButton";
 import {
+  OrderStatusValue,
   PaymentMethodLabel,
   PaymentStatusLabel,
   type Order,
 } from "@/types/order";
-import LinkButton from "./LinkButton";
 
 interface OrderCardProps {
   order: Order;
 }
 
-function OrderCard({ order }: OrderCardProps) {
+export default function OrderCard({ order }: OrderCardProps) {
   const { orderId, orderDate, products, shippingAddress, paymentInfo, status } =
     order;
 
-  const steps = ["pending", "shipped", "delivered"] as const;
-  const progressIndex = steps.indexOf(status as (typeof steps)[number]);
+  const steps = (Object.values(OrderStatusValue) as OrderStatusValue[]).filter(
+    (s) => s !== OrderStatusValue.CANCELLED
+  );
+
+  let progressIndex = steps.indexOf(
+    status as Exclude<OrderStatusValue, OrderStatusValue.CANCELLED>
+  );
+  if (progressIndex < 0) progressIndex = 0;
+
+  const maxIndex = steps.length - 1;
+  const progressPercent = maxIndex > 0 ? (progressIndex / maxIndex) * 100 : 0;
 
   return (
     <div className="bg-gray-50 border border-gray-200 p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
@@ -40,9 +50,9 @@ function OrderCard({ order }: OrderCardProps) {
       </p>
 
       <div className="space-y-4 mb-6">
-        {products.map((item, index) => (
+        {products.map((item, idx) => (
           <div
-            key={`${item.productId}-${item.variantId}-${index}`}
+            key={`${item.productId}-${item.variantId}-${idx}`}
             className="flex items-center space-x-4 bg-white p-4 rounded shadow-sm"
           >
             <div className="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
@@ -57,7 +67,7 @@ function OrderCard({ order }: OrderCardProps) {
             <div className="flex-1">
               <p className="font-medium text-gray-800">{item.name}</p>
               <p className="text-sm text-gray-500">
-                Qty: {item.quantity} × {item.price}
+                Qty: {item.quantity} × {item.price} ₴
               </p>
             </div>
           </div>
@@ -82,8 +92,8 @@ function OrderCard({ order }: OrderCardProps) {
           <h4 className="font-medium text-gray-700 mb-2 font-semibold">
             Payment
           </h4>
-          <p className="text-sm text-gray-600">
-            Payment Status:{" "}
+          <p className="text-sm text-gray-600 mb-1">
+            Status:{" "}
             <span
               className={paymentInfo.paid ? "text-green-600" : "text-red-600"}
             >
@@ -103,40 +113,36 @@ function OrderCard({ order }: OrderCardProps) {
         </div>
 
         <div>
-          <h4 className="font-medium text-gray-700 mb-2">Order Status</h4>
+          <h4 className="font-medium text-gray-700 mb-2 font-semibold">Order Status</h4>
           <div className="w-full bg-gray-200 h-2 rounded overflow-hidden mb-2">
             <div
-              className="h-2 bg-primary-500 transition-width"
-              style={{
-                width: `${((progressIndex + 1) / steps.length) * 100}%`,
-              }}
+              className={`h-2 transition-all bg-blue-500`}
+              style={{ width: `${progressPercent}%` }}
             />
           </div>
-          <div className="flex justify-between text-xs uppercase text-gray-500">
+          <div className="flex justify-between text-xs uppercase">
             <span
               className={
-                status !== "pending" ? "text-primary-500" : "text-gray-400"
+                status !== steps[0] ? "text-primary-500" : "text-gray-400"
               }
             >
-              Placed
+              {OrderStatusValue.PENDING}
             </span>
             <span
               className={
-                String(status) === "shipped" || String(status) === "delivered"
+                status === steps[1] || status === steps[2]
                   ? "text-primary-500"
                   : "text-gray-400"
               }
             >
-              Shipped
+              {OrderStatusValue.SHIPPED}
             </span>
             <span
               className={
-                String(status) === "delivered"
-                  ? "text-primary-500"
-                  : "text-gray-400"
+                status === steps[2] ? "text-primary-500" : "text-gray-400"
               }
             >
-              Delivered
+              {OrderStatusValue.DELIVERED}
             </span>
           </div>
         </div>
@@ -144,5 +150,3 @@ function OrderCard({ order }: OrderCardProps) {
     </div>
   );
 }
-
-export default OrderCard;
