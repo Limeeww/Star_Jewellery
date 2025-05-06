@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
 import LinkButton from "./LinkButton";
 import {
   OrderStatusValue,
@@ -9,6 +8,7 @@ import {
   PaymentStatusLabel,
   type Order,
 } from "@/types/order";
+import CartItemComponent from "@/app/components/CartItem/CartItemComponent";
 
 interface OrderCardProps {
   order: Order;
@@ -26,10 +26,8 @@ export default function OrderCard({ order }: OrderCardProps) {
     status as Exclude<OrderStatusValue, OrderStatusValue.CANCELLED>
   );
   if (progressIndex < 0) progressIndex = 0;
-
   const maxIndex = steps.length - 1;
   const progressPercent = maxIndex > 0 ? (progressIndex / maxIndex) * 100 : 0;
-
   return (
     <div className="bg-gray-50 border border-gray-200 p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
@@ -51,26 +49,7 @@ export default function OrderCard({ order }: OrderCardProps) {
 
       <div className="space-y-4 mb-6">
         {products.map((item, idx) => (
-          <div
-            key={`${item.productId}-${item.variantId}-${idx}`}
-            className="flex items-center space-x-4 bg-white p-4 rounded shadow-sm"
-          >
-            <div className="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-              <Image
-                src={item.imageUrl}
-                alt={item.name}
-                width={80}
-                height={80}
-                className="object-cover"
-              />
-            </div>
-            <div className="flex-1">
-              <p className="font-medium text-gray-800">{item.name}</p>
-              <p className="text-sm text-gray-500">
-                Qty: {item.quantity} × {item.price} ₴
-              </p>
-            </div>
-          </div>
+          <CartItemComponent mode="order" key={idx} item={item} />
         ))}
       </div>
 
@@ -113,7 +92,9 @@ export default function OrderCard({ order }: OrderCardProps) {
         </div>
 
         <div>
-          <h4 className="font-medium text-gray-700 mb-2 font-semibold">Order Status</h4>
+          <h4 className="font-medium text-gray-700 mb-2 font-semibold">
+            Order Status
+          </h4>
           <div className="w-full bg-gray-200 h-2 rounded overflow-hidden mb-2">
             <div
               className={`h-2 transition-all bg-blue-500`}

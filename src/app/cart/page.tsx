@@ -21,9 +21,7 @@ import {
 } from "@/types/order";
 import { useRouter } from "next/navigation";
 
-// Вместо утилитов используем контекст корзины
 import { useCartContext } from "@/app/contexts/CartContent";
-// Удалены: useCartItems, incrementQuantity, decrementQuantity, removeItem из utils
 import {
   getTotalCount,
   getSubtotal,
@@ -38,7 +36,6 @@ export default function CartPage() {
   const router = useRouter();
   const isLoggedIn = !!user && !loading;
 
-  // Достаём из контекста корзины
   const { cartItems, incrementItem, decrementItem, removeItem } =
     useCartContext();
 

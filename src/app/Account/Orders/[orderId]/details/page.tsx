@@ -9,6 +9,13 @@ import Notification from "@/app/components/MessageHandling/Notification";
 import { useNotification } from "@/hooks/useNotification";
 import OrderCard from "@/app/Account/components/OrderCard";
 import LinkButton from "@/app/Account/components/LinkButton";
+import {
+  getSubtotal,
+  getShippingCost,
+  getGiftOptionsTotal,
+  getTotal,
+} from "@/utils";
+import type { GiftOptionsForm } from "@/types/order";
 
 export default function OrderDetailsPage() {
   const { orderId } = useParams() as { orderId: string };
@@ -21,6 +28,26 @@ export default function OrderDetailsPage() {
   }
 
   const order = orders?.find((o) => o.orderId.toString() === orderId);
+  if (!order) {
+    return (
+      <AccountPageLayout sideLinks={[]} title="Order Details">
+        {notification && (
+          <Notification
+            type={notification.type}
+            message={notification.message}
+            duration={notification.duration}
+            onClose={clearNotification}
+          />
+        )}
+        <p className="text-red-600">Order not found.</p>
+      </AccountPageLayout>
+    );
+  }
+
+  const subtotal = getSubtotal(order.products);
+  const shipping = getShippingCost(subtotal);
+  const giftTotal = getGiftOptionsTotal(order.giftOptions as GiftOptionsForm);
+  const total = getTotal(subtotal, shipping, giftTotal);
 
   return (
     <AccountPageLayout sideLinks={[]} title="Order Details">
@@ -33,13 +60,31 @@ export default function OrderDetailsPage() {
         />
       )}
 
-      {order ? (
-        <OrderCard order={order} />
-      ) : (
-        <p className="text-red-600">Order not found.</p>
-      )}
+      <OrderCard order={order} />
 
-      <div className="space-x-4 mt-2">
+      <div className="mt-6 p-4 bg-gray-50 border border-gray-200 rounded shadow-sm">
+        <h4 className="font-medium text-gray-700 mb-2">Order Summary</h4>
+        <div className="space-y-2 text-sm text-gray-600">
+          <div className="flex justify-between">
+            <span>Subtotal:</span>
+            <span>{subtotal} ₴</span>
+          </div>
+          <div className="flex justify-between">
+            <span>Shipping:</span>
+            <span>{shipping} ₴</span>
+          </div>
+          <div className="flex justify-between">
+            <span>Gift Options:</span>
+            <span>{giftTotal} ₴</span>
+          </div>
+          <div className="flex justify-between font-semibold text-lg text-gray-800 border-t border-gray-200 pt-2">
+            <span>Total:</span>
+            <span>{total} ₴</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="space-x-4 mt-4">
         <LinkButton
           text="Print Receipt"
           onClick={() => window.print()}
