@@ -6,7 +6,6 @@ import { auth } from "@/firebase/firebaseConfig";
 
 import VariantSelector from "./components/VariantSelector";
 import ProductImageSlider from "./components/ProductImageBlock";
-import SideCartModal from "./components/SideCartModal";
 import Footer from "@/app/components/Footer/Footer";
 import Notification from "@/app/components/MessageHandling/Notification";
 
@@ -25,6 +24,7 @@ import AboutCollection from "./components/AboutCollection";
 import SimilarProducts from "@/app/components/SimilarProducts/SimilarProducts";
 import { calculateDiscountedPrice, formatPrice } from "@/utils";
 import type { WishlistItem } from "@/types/userTypes";
+import CartSideModal from "../components/SideModal/CartSideModal";
 
 const ProductPage = () => {
   const [user, authLoading] = useAuthState(auth);
@@ -192,7 +192,7 @@ const ProductPage = () => {
 
       <Footer />
 
-      <SideCartModal
+      <CartSideModal
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
         items={cartItems}

@@ -1,21 +1,51 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
-import Item from "../components/Item/Item";
 import { EmblaOptionsType } from "embla-carousel";
-import { useProducts } from "@/hooks/useProducts";
-import EmblaCarousel from "../components/EmblaCarousel/EmblaCarousel";
+import EmblaCarousel from "@/app/components/EmblaCarousel/EmblaCarousel";
 import Notification from "@/app/components/MessageHandling/Notification";
+import Loading from "@/app/components/Loading/Loading";
+import { useProducts } from "@/hooks/useProducts";
+import { useProduct } from "@/hooks/useProduct";
+import Item from "@/app/components/Item/Item";
+import { Product } from "@/types/product";
 
 const OPTIONS: EmblaOptionsType = { dragFree: true };
 
-export default function CollectionPage() {
+function ProductCard({ product }: { product: Product }) {
   const {
-    products: items,
+    displayedVariant,
+    sizeOptions,
+    insertOptions,
+    selectedSize,
+    handleSizeChange,
+    handleInsertChange,
+  } = useProduct(product);
+
+  return (
+    <Item
+      product={product}
+      displayedVariant={displayedVariant}
+      mode="default"
+      sizeOptions={sizeOptions}
+      insertOptions={insertOptions}
+      selectedSize={selectedSize}
+      onSizeChange={handleSizeChange}
+      onInsertChange={handleInsertChange}
+    />
+  );
+}
+
+export default function CatalogPage() {
+  const {
+    products,
     loading,
     notification,
     clearNotification,
   } = useProducts(10);
 
+  if (loading) return <Loading />;
 
   return (
     <div
@@ -39,17 +69,13 @@ export default function CollectionPage() {
         </Link>
       </div>
 
-      {loading ? (
-        <div className="text-center">Loading products...</div>
-      ) : (
-        <EmblaCarousel options={OPTIONS}>
-          {items.map((product) => (
-            <div key={product.id} className="flex-shrink-0 w-1/2 md:w-1/4">
-              <Item product={product} />
-            </div>
-          ))}
-        </EmblaCarousel>
-      )}
+      <EmblaCarousel options={OPTIONS}>
+        {products.map((product) => (
+          <div key={product.id} className="flex-shrink-0 w-1/2 md:w-1/4">
+            <ProductCard product={product} />
+          </div>
+        ))}
+      </EmblaCarousel>
 
       {notification && (
         <Notification {...notification} onClose={clearNotification} />

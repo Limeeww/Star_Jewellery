@@ -6,10 +6,19 @@ import CartItemComponent from "../CartItem/CartItemComponent";
 import LinkButtonForm from "../FormComponents/LinkButtonForm";
 import { useCartContext } from "@/app/contexts/CartContent";
 
+interface ItemInterface {
+  productId: number;
+  size: number;
+  insert: string;
+  materialColor: string;
+}
 interface CartSideModalProps {
   isOpen: boolean;
   onClose: () => void;
   added?: boolean;
+  onIncrement: (item: ItemInterface) => Promise<void>;
+  onDecrement: (item: ItemInterface) => Promise<void>;
+  onRemove: (item: ItemInterface) => Promise<void>;
 }
 
 function CartSideModal({ isOpen, onClose, added = false }: CartSideModalProps) {
@@ -18,8 +27,9 @@ function CartSideModal({ isOpen, onClose, added = false }: CartSideModalProps) {
 
   return (
     <SideModal isOpen={isOpen} onClose={onClose}>
-      <div className="p-4 h-full flex flex-col max-h-screen overflow-y-auto">
-        <div className="flex-1">
+      <div className="p-4 h-full flex flex-col max-h-screen overflow-y-auto space-y-4"
+      style={{ fontFamily: "var(--font-poppins)" }}>
+        <div className="flex-1 flex flex-col">
           <h2
             className="text-2xl font-semibold mb-2"
             style={{ fontFamily: "var(--font-playfair)" }}
@@ -36,7 +46,7 @@ function CartSideModal({ isOpen, onClose, added = false }: CartSideModalProps) {
             cartItems.map((item) => (
               <div
                 key={`${item.productId}-${item.size}-${item.insert}-${item.materialColor}`}
-                className="mb-4"
+                className="mb-2"
               >
                 <CartItemComponent
                   item={item}
@@ -71,7 +81,7 @@ function CartSideModal({ isOpen, onClose, added = false }: CartSideModalProps) {
             <p>Your cart is currently empty.</p>
           )}
         </div>
-        <div className="mt-auto">
+        <div>
           <LinkButtonForm href="/cart" label="View Cart" showArrow />
         </div>
       </div>

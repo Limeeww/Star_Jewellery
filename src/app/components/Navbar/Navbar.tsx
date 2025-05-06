@@ -33,7 +33,6 @@ export default function Navbar({
   const [openMenu, setOpenMenu] = useState(false);
   const [openCartModal, setOpenCartModal] = useState(false);
 
-  // Используем хук из контекста
   const { cartItemCount, cartItems } = useCartContext();
   const [user] = useAuthState(auth);
 
