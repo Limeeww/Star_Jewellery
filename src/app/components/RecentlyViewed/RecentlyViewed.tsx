@@ -4,7 +4,6 @@ import React, { useEffect, useState, useCallback } from "react";
 import EmblaCarousel from "@/app/components/EmblaCarousel/EmblaCarousel";
 import Item from "@/app/components/Item/Item";
 import { useNotification } from "@/hooks/useNotification";
-
 export interface RecentEntry {
   id: number;
   slug: string;
@@ -38,6 +37,7 @@ export default function RecentlyViewed() {
   }, [loadFromStorage]);
 
   if (recent.length === 0) return null;
+  console.log("recent", recent);
 
   return (
     <div className="bg-white p-4 rounded shadow">
@@ -46,7 +46,7 @@ export default function RecentlyViewed() {
       <EmblaCarousel options={{ align: "start", dragFree: true }}>
         {recent.map((p) => (
           <div key={`${p.id}-${p.variantId}`} className="min-w-[320px]">
-            <Item product={p} />
+            <Item product={p} mode="recent" />
           </div>
         ))}
       </EmblaCarousel>

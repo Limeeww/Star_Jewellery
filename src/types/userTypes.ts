@@ -27,6 +27,7 @@ export interface WishlistItem {
   insert: string;
   size: number;
   price: number;
+  image: string;
 }
 
 export interface UserData {

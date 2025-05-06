@@ -3,13 +3,10 @@
 import React, { useState, useEffect } from "react";
 import { FiX } from "react-icons/fi";
 import { LuSearch } from "react-icons/lu";
-
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-
 import Item from "../Item/Item";
-import { Product } from "@/types/product";
-import { fetchProducts } from "@/utils/product";
+import { useProducts } from "@/hooks/useProducts";
 
 type SearchOverlayProps = {
   open: boolean;
@@ -18,7 +15,7 @@ type SearchOverlayProps = {
 
 export default function SearchOverlay({ open, onClose }: SearchOverlayProps) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [lastSearches, setLastSearches] = useState(() => {
+  const [lastSearches, setLastSearches] = useState<string[]>(() => {
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem("lastSearches");
       return stored ? JSON.parse(stored) : [];
@@ -26,17 +23,9 @@ export default function SearchOverlay({ open, onClose }: SearchOverlayProps) {
     return [];
   });
   const router = useRouter();
-  const [items, setItems] = useState<Product[]>([]);
+  const { products, loading } = useProducts(4);
 
-  useEffect(() => {
-    async function loadProducts() {
-      const products = await fetchProducts(4);
-      setItems(products);
-    }
-    loadProducts();
-  }, []);
-
-  const filteredItems = items.filter((item) =>
+  const filteredItems = products.filter((item) =>
     item.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -88,9 +77,10 @@ export default function SearchOverlay({ open, onClose }: SearchOverlayProps) {
     setLastSearches((prev) => prev.filter((t) => t !== term));
   };
 
-  const itemsToDisplay = searchTerm ? filteredItems : items;
+  const itemsToDisplay = searchTerm ? filteredItems : products;
 
   if (!open) return null;
+
   return (
     <div className="fixed inset-0 z-50 bg-white flex flex-col text-gray-800">
       <div className="flex items-center justify-between p-4 border-b border-gray-200">
@@ -103,7 +93,7 @@ export default function SearchOverlay({ open, onClose }: SearchOverlayProps) {
         <input
           type="text"
           placeholder="Search..."
-          className="mx-4 text-lg text-gray-800 outline-none col-span-1 flex-grow"
+          className="mx-4 text-lg text-gray-800 outline-none flex-grow"
           style={{ fontFamily: "var(--font-poppins)" }}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -197,11 +187,15 @@ export default function SearchOverlay({ open, onClose }: SearchOverlayProps) {
             {searchTerm ? `Top Results for "${searchTerm}"` : "Bestsellers"}
           </h2>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {itemsToDisplay.map((item) => (
-              <Item key={item.id} product={item} />
-            ))}
-          </div>
+          {loading ? (
+            <div>Loading...</div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {itemsToDisplay.map((item) => (
+                <Item key={item.id} product={item} />
+              ))}
+            </div>
+          )}
 
           {filteredItems.length > 0 && searchTerm.length > 0 && (
             <div className="flex justify-center mt-4">

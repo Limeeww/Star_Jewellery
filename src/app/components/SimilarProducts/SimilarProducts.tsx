@@ -1,27 +1,22 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import EmblaCarousel from "@/app/components/EmblaCarousel/EmblaCarousel";
 import Item from "../Item/Item";
-import { Product } from "@/types/product";
-import { fetchProducts } from "@/utils/product";
 import { EmblaOptionsType } from "embla-carousel";
+import { useProducts } from "@/hooks/useProducts";
 
 const SimilarProducts = () => {
-  const [items, setItems] = useState<Product[]>([]);
+  const { products, loading } = useProducts(6);
 
   const options: EmblaOptionsType = {
     align: "start",
     loop: false,
   };
 
-  useEffect(() => {
-    async function loadSimilarProducts() {
-      const products = await fetchProducts(6);
-      setItems(products);
-    }
-    loadSimilarProducts();
-  }, []);
+  if (loading) {
+    return <div className="text-center">Loading...</div>;
+  }
 
   return (
     <div
@@ -36,7 +31,7 @@ const SimilarProducts = () => {
         Similar Products
       </h1>
       <EmblaCarousel options={options}>
-        {items.map((product) => (
+        {products.map((product) => (
           <div key={product.id} className="flex-shrink-0 w-1/2 xl:w-1/4">
             <Item product={product} />
           </div>

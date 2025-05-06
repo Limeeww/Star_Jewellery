@@ -1,23 +1,21 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Link from "next/link";
 import Item from "../components/Item/Item";
 import { EmblaOptionsType } from "embla-carousel";
-import { Product } from "../../types/product";
-import { fetchProducts } from "@/utils/product";
+import { useProducts } from "@/hooks/useProducts";
 import EmblaCarousel from "../components/EmblaCarousel/EmblaCarousel";
+import Notification from "@/app/components/MessageHandling/Notification";
 
 const OPTIONS: EmblaOptionsType = { dragFree: true };
 
 export default function CollectionPage() {
-  const [items, setItems] = useState<Product[]>([]);
+  const {
+    products: items,
+    loading,
+    notification,
+    clearNotification,
+  } = useProducts(10);
 
-  useEffect(() => {
-    async function loadProducts() {
-      const products = await fetchProducts(10);
-      setItems(products);
-    }
-    loadProducts();
-  }, []);
 
   return (
     <div
@@ -32,7 +30,7 @@ export default function CollectionPage() {
         CATALOG
       </h1>
 
-      <div className="text-center mb-">
+      <div className="text-center mb-4">
         <Link
           href="/all-collections"
           className="text-sm text-gray-600 hover:text-gray-800 underline"
@@ -41,13 +39,21 @@ export default function CollectionPage() {
         </Link>
       </div>
 
-      <EmblaCarousel options={OPTIONS}>
-        {items.map((product) => (
-          <div key={product.id} className="flex-shrink-0 w-1/2 md:w-1/4">
-            <Item product={product} />
-          </div>
-        ))}
-      </EmblaCarousel>
+      {loading ? (
+        <div className="text-center">Loading products...</div>
+      ) : (
+        <EmblaCarousel options={OPTIONS}>
+          {items.map((product) => (
+            <div key={product.id} className="flex-shrink-0 w-1/2 md:w-1/4">
+              <Item product={product} />
+            </div>
+          ))}
+        </EmblaCarousel>
+      )}
+
+      {notification && (
+        <Notification {...notification} onClose={clearNotification} />
+      )}
     </div>
   );
 }

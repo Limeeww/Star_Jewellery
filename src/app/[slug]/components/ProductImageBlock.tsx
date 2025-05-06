@@ -8,18 +8,15 @@ import {
   AiOutlineClose,
   AiOutlineLeft,
   AiOutlineRight,
-  AiOutlineHeart,
-  AiFillHeart,
 } from "react-icons/ai";
 import { useModalClose } from "@/hooks/useModal";
 import { WishlistItem } from "@/types/userTypes";
+import WishlistButton from "@/app/components/WishlistButton";
 
 interface ProductImageBlockProps {
   images: string[];
   altText: string;
   wishlistItem: WishlistItem;
-  toggleWishlist: (item: WishlistItem) => void;
-  isWishlisted: (identifier: Omit<WishlistItem, "price">) => boolean;
 }
 
 interface ArrowButtonProps {
@@ -85,8 +82,6 @@ export default function ProductImageBlock({
   images,
   altText,
   wishlistItem,
-  toggleWishlist,
-  isWishlisted,
 }: ProductImageBlockProps) {
   const [page, setPage] = useState(0);
   const [direction, setDirection] = useState(0);
@@ -167,25 +162,10 @@ export default function ProductImageBlock({
   return (
     <div className="relative w-full mx-auto">
       <div className="relative w-full aspect-square overflow-hidden shadow-lg mt-6 max-h-[90vh]">
-        {/* Wishlist toggle */}
-        <motion.button
-          onClick={() => toggleWishlist(wishlistItem)}
-          initial={{ scale: 1 }}
-          animate={{
-            scale: isWishlisted(wishlistItem) ? 1.1 : 1,
-            color: isWishlisted(wishlistItem) ? "#EF4444" : "#374151",
-          }}
-          whileTap={{ scale: 0.9 }}
-          transition={{ type: "spring", stiffness: 300, damping: 20 }}
-          className="absolute top-2 right-2 bg-white p-2 rounded-full cursor-pointer z-20"
-        >
-          {isWishlisted(wishlistItem) ? (
-            <AiFillHeart size={24} />
-          ) : (
-            <AiOutlineHeart size={24} />
-          )}
-        </motion.button>
-
+        {" "}
+        <div className="absolute top-1 right-1 z-20">
+          <WishlistButton item={wishlistItem} />
+        </div>
         <AnimatePresence initial={false} custom={direction}>
           <motion.div
             key={page}
@@ -207,7 +187,6 @@ export default function ProductImageBlock({
             />
           </motion.div>
         </AnimatePresence>
-
         <ArrowButton
           onClick={() => paginate(-1)}
           disabled={page <= 0}
@@ -222,7 +201,6 @@ export default function ProductImageBlock({
         >
           <AiOutlineRight size={24} />
         </ArrowButton>
-
         <button
           onClick={() => setModalOpen(true)}
           className="absolute bottom-2 right-2 bg-white p-2 rounded-full cursor-pointer transition-transform duration-200 transform hover:scale-110"
