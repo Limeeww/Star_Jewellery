@@ -4,7 +4,9 @@ interface ActionButtonProps {
   text: string;
   disabled?: boolean;
   className?: string;
-  onClick: () => void;
+  onClick?: (
+    e: React.MouseEvent<HTMLButtonElement> | React.FormEvent<HTMLFormElement>
+  ) => void;
 }
 
 function ActionButton({

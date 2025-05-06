@@ -20,28 +20,23 @@ export default function LinkButton({
 }: LinkButtonProps) {
   const content = (
     <>
-      {text}
+      <span className="text-center w-full">{text}</span>
       {showArrow && <span className="ml-1 inline-block">&rarr;</span>}
     </>
   );
 
+  const baseClasses = `inline-flex items-center justify-center text-center font-medium w-full ${className}`;
+
   if (href) {
     return (
-      <Link
-        href={href}
-        className={`inline-flex items-center font-medium ${className}`}
-      >
+      <Link href={href} className={baseClasses}>
         {content}
       </Link>
     );
   }
 
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`inline-flex items-center font-medium ${className}`}
-    >
+    <button type="button" onClick={onClick} className={baseClasses}>
       {content}
     </button>
   );

@@ -1,7 +1,11 @@
-import { useEffect, useState } from "react";
-import { Product, Category } from "@/types/product";
+"use client";
+
+import { useState } from "react";
+import { Product } from "@/types/product";
 import LinkButtonForm from "@/app/components/FormComponents/LinkButtonForm";
 import EditProductVariantsForm from "@/app/components/FormComponents/ProductForm/EditProductVariantsForm";
+import { useCategories } from "@/hooks/useCategories";
+import InputField from "@/app/components/FormComponents/InputField";
 
 interface ProductFormProps {
   product: Product;
@@ -15,24 +19,8 @@ export default function EditProductForm({
   onDelete,
 }: ProductFormProps) {
   const [formData, setFormData] = useState<Product>(product);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loadingCategories, setLoadingCategories] = useState(true);
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const res = await fetch("/api/categories");
-        const data = await res.json();
-        setCategories(data.categories);
-      } catch (error) {
-        console.error("Ошибка при загрузке категорий:", error);
-      } finally {
-        setLoadingCategories(false);
-      }
-    };
-
-    fetchCategories();
-  }, []);
+  const { categories, loading: loadingCategories } = useCategories();
+  const [showModal, setShowModal] = useState(false);
 
   const handleChange = <T extends keyof Product>(
     field: T,
@@ -45,61 +33,49 @@ export default function EditProductForm({
   };
 
   const handleSubmit = (e: React.FormEvent) => {
-    console.log("SUBMIT", formData);
     e.preventDefault();
     onSave(formData);
   };
 
-  const handleDeleteProduct = () => {
-    if (confirm("Are you sure you want to delete this product?")) {
-      onDelete?.(formData.id);
-    }
+  const confirmDelete = () => setShowModal(true);
+  const handleConfirmDelete = () => {
+    setShowModal(false);
+    onDelete?.(formData.id);
   };
 
   return (
     <>
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium">Name</label>
-          <input
-            value={formData.name}
-            placeholder={product.name}
-            onChange={(e) => handleChange("name", e.target.value)}
-            className="w-full border p-2 rounded"
-          />
-        </div>
+        <InputField
+          label="Name"
+          value={formData.name}
+          placeholder={product.name}
+          onChange={(val: string) => handleChange("name", val)}
+          required
+        />
 
-        <div>
-          <label className="block text-sm font-medium">Slug</label>
-          <input
-            value={formData.slug}
-            placeholder={product.slug}
-            onChange={(e) => handleChange("slug", e.target.value)}
-            className="w-full border p-2 rounded"
-          />
-        </div>
+        <InputField
+          label="Slug"
+          value={formData.slug}
+          placeholder={product.slug}
+          onChange={(val: string) => handleChange("slug", val)}
+          required
+        />
 
-        <div>
-          <label className="block text-sm font-medium">Description</label>
-          <input
-            value={formData.description}
-            placeholder={product.description}
-            onChange={(e) => handleChange("description", e.target.value)}
-            className="w-full border p-2 rounded"
-          />
-        </div>
+        <InputField
+          label="Description"
+          value={formData.description}
+          placeholder={product.description}
+          onChange={(val: string) => handleChange("description", val)}
+          required
+        />
 
-        <div>
-          <label className="block text-sm font-medium">Additional Info</label>
-          <input
-            value={formData.additionalDescription}
-            placeholder={product.additionalDescription}
-            onChange={(e) =>
-              handleChange("additionalDescription", e.target.value)
-            }
-            className="w-full border p-2 rounded"
-          />
-        </div>
+        <InputField
+          label="Additional Info"
+          value={formData.additionalDescription}
+          placeholder={product.additionalDescription}
+          onChange={(val: string) => handleChange("additionalDescription", val)}
+        />
 
         <div>
           <label className="block text-sm font-medium">Category</label>
@@ -134,6 +110,7 @@ export default function EditProductForm({
             <span className="text-sm">Hide this product</span>
           </label>
         </div>
+
         <EditProductVariantsForm
           variants={formData.variants}
           onChange={(updatedVariants) =>
@@ -157,13 +134,38 @@ export default function EditProductForm({
 
           <button
             type="button"
-            onClick={handleDeleteProduct}
+            onClick={confirmDelete}
             className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded"
           >
             Delete Product
           </button>
         </div>
       </form>
+
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+          <div className="bg-white rounded-lg shadow-md p-6 max-w-sm w-full">
+            <h2 className="text-lg font-semibold mb-3">Confirm Deletion</h2>
+            <p className="text-sm text-gray-700 mb-6">
+              Are you sure you want to delete this product?
+            </p>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setShowModal(false)}
+                className="px-4 py-2 text-sm bg-gray-200 rounded hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmDelete}
+                className="px-4 py-2 text-sm bg-red-600 text-white rounded hover:bg-red-700"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
