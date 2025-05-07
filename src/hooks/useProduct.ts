@@ -16,7 +16,7 @@ export function useProduct(product: Product) {
     if (!displayedVariant?.quantitySize) return [];
     return displayedVariant.quantitySize.map((q) => ({
       value: String(q.size),
-      label: `Size ${q.size} (${q.quantity} available)`,
+      label: `Size ${q.size}${q.quantity > 0 ? ` (${q.quantity} available)` : ""}`,
     }));
   }, [displayedVariant]);
 

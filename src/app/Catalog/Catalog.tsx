@@ -71,7 +71,7 @@ export default function CatalogPage() {
 
       <EmblaCarousel options={OPTIONS}>
         {products.map((product) => (
-          <div key={product.id} className="flex-shrink-0 w-1/2 md:w-1/4">
+          <div key={product.id} className="flex-shrink-0 w-1/2 xl:w-1/3">
             <ProductCard product={product} />
           </div>
         ))}

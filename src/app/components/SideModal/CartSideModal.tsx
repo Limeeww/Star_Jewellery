@@ -5,6 +5,7 @@ import SideModal from "../SideModal/SideModal";
 import CartItemComponent from "../CartItem/CartItemComponent";
 import LinkButtonForm from "../FormComponents/LinkButtonForm";
 import { useCartContext } from "@/app/contexts/CartContent";
+import { CartItem } from "@/types/cartItem";
 
 interface ItemInterface {
   productId: number;
@@ -15,6 +16,7 @@ interface ItemInterface {
 interface CartSideModalProps {
   isOpen: boolean;
   onClose: () => void;
+  items: CartItem[];
   added?: boolean;
   onIncrement: (item: ItemInterface) => Promise<void>;
   onDecrement: (item: ItemInterface) => Promise<void>;

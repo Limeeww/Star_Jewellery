@@ -1,4 +1,3 @@
-// src/app/components/Item/Item.tsx
 "use client";
 
 import React, { useState } from "react";
@@ -109,8 +108,8 @@ export default function Item({
     setIsAdding(false);
   };
 
-  const needSize = sizeOptions.length > 0;
-  const needInsert = insertOptions.length > 0;
+  const needSize = sizeOptions.length > 1;
+  const needInsert = insertOptions.length > 1;
 
   let missingText = "";
   if (needSize && !selectedSize) missingText = "Select size";
@@ -120,8 +119,12 @@ export default function Item({
   const btnText = isAdding ? "Adding…" : missingText || "Add to Cart";
 
   return (
-    <div className="p-2">
-      <div className="relative border p-2 bg-white text-gray-800 hover:shadow-lg transition-shadow duration-300 flex flex-col h-full">
+    <div className="p-2 h-full flex flex-col min-w-[170px] xl:min-w-[450px]">
+      <div
+        className="relative border p-2 bg-white text-gray-800
+                     hover:shadow-lg transition-shadow duration-300
+                     flex flex-col flex-1 items-stretch"
+      >
         <Link href={href} className="block flex-grow">
           <div className="relative w-full pb-[100%] overflow-hidden">
             <Image
@@ -172,13 +175,13 @@ export default function Item({
               text={btnText}
               disabled={btnDisabled}
               onClick={handleAddToCart}
-              className="w-full bg-black text-white px-4 py-2 rounded disabled:opacity-50"
+              className="w-full bg-black text-white px-4 py-1 disabled:opacity-50"
             />
           </form>
         )}
 
         {mode === "default" && (
-          <div className="absolute top-2 right-2 z-10">
+          <div className="absolute top-1 right-1 z-10">
             <WishlistButton item={wishlistItem} />
           </div>
         )}

@@ -37,7 +37,6 @@ export default function RecentlyViewed() {
   }, [loadFromStorage]);
 
   if (recent.length === 0) return null;
-  console.log("recent", recent);
 
   return (
     <div className="bg-white p-4 rounded shadow">
@@ -45,7 +44,10 @@ export default function RecentlyViewed() {
 
       <EmblaCarousel options={{ align: "start", dragFree: true }}>
         {recent.map((p) => (
-          <div key={`${p.id}-${p.variantId}`} className="min-w-[320px]">
+          <div
+            key={`${p.id}-${p.variantId}`}
+            className="flex-shrink-0 w-1/2 xl:w-1/3 mr-6"
+          >
             <Item product={p} mode="recent" />
           </div>
         ))}
