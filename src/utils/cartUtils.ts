@@ -1,8 +1,5 @@
   import { CartItem } from "@/types/cartItem";
 import { GiftOptionsForm } from "@/types/order";
-import { useState, useEffect } from "react";
-import { doc, onSnapshot } from "firebase/firestore";
-import { db } from "@/firebase/firebaseConfig";
 
 export const FREE_SHIPPING_THRESHOLD = 100;
 export const SHIPPING_FLAT_RATE = 50;
@@ -39,29 +36,3 @@ export const getTotal = (
   shipping: number,
   giftOptionsTotal: number
 ): number => subtotal + shipping + giftOptionsTotal;
-
-export const useCartItems = (userId: string | null): CartItem[] => {
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
-
-  useEffect(() => {
-    if (!userId) {
-      setCartItems([]);
-      return;
-    }
-    const userDocRef = doc(db, "users", userId);
-    const unsubscribe = onSnapshot(userDocRef, (snapshot) => {
-      if (snapshot.exists()) {
-        const data = snapshot.data();
-        setCartItems(data.cartItems || []);
-      } else {
-        setCartItems([]);
-      }
-    });
-
-    return () => unsubscribe();
-  }, [userId]);
-
-  return cartItems;
-};
-
-

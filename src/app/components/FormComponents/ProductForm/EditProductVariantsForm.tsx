@@ -12,7 +12,7 @@ import {
   PURITIES,
   Material,
   Insert,
-} from "@/types/productOprtions";
+} from "@/types/productOptions";
 
 interface Props {
   variants: ProductVariant[];

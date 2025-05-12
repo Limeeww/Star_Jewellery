@@ -13,27 +13,31 @@ import CartItemComponent from "@/app/components/CartItem/CartItemComponent";
 import OrderSummary from "@/app/cart/components/OrderSummary";
 import RecentlyViewed from "@/app/components/RecentlyViewed/RecentlyViewed";
 import GiftOptions from "@/app/cart/components/GiftOptions";
-import { GiftOptionsForm, Order, PaymentInfo, PaymentStatusValue } from "@/types/order";
+import {
+  GiftOptionsForm,
+  Order,
+  PaymentInfo,
+  PaymentStatusValue,
+} from "@/types/order";
+import { useRouter } from "next/navigation";
 
+import { useCartContext } from "@/app/contexts/CartContent";
 import {
   getTotalCount,
   getSubtotal,
   getShippingCost,
   getGiftOptionsTotal,
   getTotal,
-  useCartItems,
-  incrementQuantity,
-  decrementQuantity,
-  removeItem,
   calculateOriginalPriceSum,
 } from "@/utils/index";
-import { useRouter } from "next/navigation";
 
 export default function CartPage() {
   const [user, loading] = useAuthState(auth);
   const router = useRouter();
   const isLoggedIn = !!user && !loading;
-  const cartItems = useCartItems(user ? user.uid : null);
+
+  const { cartItems, incrementItem, decrementItem, removeItem } =
+    useCartContext();
 
   const { register, watch } = useForm<GiftOptionsForm>({
     defaultValues: {
@@ -81,7 +85,6 @@ export default function CartPage() {
     };
 
     localStorage.setItem("currentOrder", JSON.stringify(order));
-
     router.push("/checkout");
   };
 
@@ -106,7 +109,7 @@ export default function CartPage() {
             className="text-4xl mb-6 mt-10 text-center"
             style={{ fontFamily: "var(--font-playfair)" }}
           >
-            Your Cart ({totalCount} {totalCount > 1 ? "Items" : "Item"})
+            Your Cart {totalCount > 1 ? `(${totalCount} Items)` : null}
           </h1>
 
           {cartItems.length === 0 ? (
@@ -117,6 +120,7 @@ export default function CartPage() {
                 className="inline-block mt-2 text-sm underline text-gray-700 hover:text-black transition-colors"
               >
                 Return to the shop
+                <span className="ml-1">&rarr;</span>
               </Link>
             </div>
           ) : (
@@ -127,36 +131,9 @@ export default function CartPage() {
                     <CartItemComponent
                       key={`${item.productId}-${item.size}-${item.insert}-${item.materialColor}`}
                       item={item}
-                      onIncrement={() =>
-                        user &&
-                        incrementQuantity(
-                          user.uid,
-                          item.productId,
-                          item.size,
-                          item.insert,
-                          item.materialColor
-                        )
-                      }
-                      onDecrement={() =>
-                        user &&
-                        decrementQuantity(
-                          user.uid,
-                          item.productId,
-                          item.size,
-                          item.insert,
-                          item.materialColor
-                        )
-                      }
-                      onRemove={() =>
-                        user &&
-                        removeItem(
-                          user.uid,
-                          item.productId,
-                          item.size,
-                          item.insert,
-                          item.materialColor
-                        )
-                      }
+                      onIncrement={() => incrementItem(item)}
+                      onDecrement={() => decrementItem(item)}
+                      onRemove={() => removeItem(item)}
                     />
                   ))}
                 </div>

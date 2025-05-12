@@ -36,7 +36,7 @@ function EmblaCarousel({ options, children }: EmblaCarouselProps) {
   }, [emblaApi]);
 
   return (
-    <div className="relative">
+    <div className="relative h-full">
       <div className="relative lg:px-8 sm:px-6 py-2">
         <button
           className="hidden xl:flex absolute top-1/2 -left-2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow hover:scale-110 transition-transform z-10"

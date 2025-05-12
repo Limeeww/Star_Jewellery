@@ -19,7 +19,6 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase/firebaseConfig";
 import type { Order } from "@/types/order";
 
-// Конвертер: безопасно конвертим Timestamp -> Date
 const orderConverter: FirestoreDataConverter<Order> = {
   toFirestore(order) {
     return {
@@ -65,7 +64,6 @@ const orderConverter: FirestoreDataConverter<Order> = {
   },
 };
 
-// Разбить массив на чанки по size элементов
 function chunkArray<T>(arr: T[], size: number): T[][] {
   const chunks: T[][] = [];
   for (let i = 0; i < arr.length; i += size) {
@@ -98,7 +96,6 @@ export function useUserOrders() {
       const db = getFirestore();
 
       try {
-        // Читаем массив ID заказов из users/{uid}.orders
         const userSnap = await getDoc(doc(db, "users", user.uid));
         const data = userSnap.exists()
           ? (userSnap.data() as { orders?: string[] })
@@ -110,7 +107,6 @@ export function useUserOrders() {
           return;
         }
 
-        // Разбиваем на чанки и делаем запросы по documentId
         const all: Order[] = [];
         for (const chunk of chunkArray(orderIds, 10)) {
           const q = query(

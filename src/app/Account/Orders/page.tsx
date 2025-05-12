@@ -5,19 +5,30 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase/firebaseConfig";
 import Loading from "@/app/components/Loading/Loading";
 import { useRequireAuth } from "@/hooks/index";
-import { useUserOrders } from "@/hooks/index";
 import OrderCard from "../components/OrderCard";
 import { useNotification } from "@/hooks/useNotification";
 import Notification from "@/app/components/MessageHandling/Notification";
 
 import AccountPageLayout from "@/app/Account/components/AccountPageLayout";
+import { usePaginatedUserOrders } from "@/hooks/usePaginatedUserOrders";
+import { PaginationControls } from "@/app/components/PaginationControls";
 
 export default function MyOrders() {
   const [user, loadingAuth] = useAuthState(auth);
   useRequireAuth(user ?? null, loadingAuth);
 
   const { notification, notify, clearNotification } = useNotification();
-  const { orders, loading, error } = useUserOrders();
+  const {
+    orders,
+    loading,
+    error,
+    page,
+    totalPages,
+    hasPrev,
+    hasNext,
+    prevPage,
+    nextPage,
+  } = usePaginatedUserOrders(5);
 
   if (loadingAuth || loading) return <Loading />;
   if (error) {
@@ -32,8 +43,7 @@ export default function MyOrders() {
     <AccountPageLayout
       sideLinks={[]}
       title="My Orders"
-      description=" Track your orders in one convenient place. Review order details, status
-        updates, and delivery progress anytime."
+      description="Track your orders in one convenient place. Review order details, status updates, and delivery progress anytime."
     >
       {notification && (
         <Notification
@@ -44,16 +54,20 @@ export default function MyOrders() {
         />
       )}
 
-      <div
-        className="mt-6 space-y-6 text-gray-800"
-        style={{ fontFamily: "var(--font-poppins)" }}
-      >
-        {orders && orders.length > 0 ? (
-          orders.map((order) => <OrderCard key={order.orderId} order={order} />)
-        ) : (
-          <p>You don&apos;t have orders yet</p>
-        )}
+      <div className="space-y-6">
+        {orders.map((o) => (
+          <OrderCard key={o.orderId} order={o} />
+        ))}
       </div>
+
+      <PaginationControls
+        page={page}
+        totalPages={totalPages}
+        hasPrev={hasPrev}
+        hasNext={hasNext}
+        prevPage={prevPage}
+        nextPage={nextPage}
+      />
     </AccountPageLayout>
   );
 }

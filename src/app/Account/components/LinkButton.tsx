@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 
 type LinkButtonProps = {
-  text: string;
+  text: React.ReactNode;
   href?: string;
   className?: string;
   onClick?: () => void;

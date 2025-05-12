@@ -22,7 +22,10 @@ import {
   getGiftOptionsTotal,
   getTotal,
 } from "@/utils";
-import { useCartItems, useLocalOrder, useSubmitOrder } from "@/hooks";
+import { useLocalOrder, useSubmitOrder } from "@/hooks";
+import { LuCreditCard, LuMapPin } from "react-icons/lu";
+
+import { useCartContext } from "@/app/contexts/CartContent";
 
 export default function CheckoutPage() {
   const { notification, clearNotification } = useNotification();
@@ -50,7 +53,9 @@ export default function CheckoutPage() {
   } = usePaymentMethods();
 
   const order = useLocalOrder();
-  const products = useCartItems(user?.uid ?? null);
+
+  const { cartItems: products } = useCartContext();
+
   const [shipAddress, setShipAddress] = useState<Address | null>(null);
   const [selectedPayment, setSelectedPayment] = useState<PaymentInfo | null>(
     null
@@ -86,12 +91,13 @@ export default function CheckoutPage() {
     selectedPayment,
     pmIdx
   );
+
   if (loadingAuth || !order) return <Loading />;
+
   const original = calculateOriginalPriceSum(products);
   const subtotal = getSubtotal(products);
   const shipping = getShippingCost(subtotal);
   const giftTotal = getGiftOptionsTotal(order.giftOptions);
-
   const total = getTotal(subtotal, shipping, giftTotal);
 
   const buttonText = submitting
@@ -105,6 +111,14 @@ export default function CheckoutPage() {
     : pmIdx === null
     ? "Select Payment Method First"
     : "Confirm Payment";
+
+  if (!isLoggedIn) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-gray-600">Please sign in to access checkout.</p>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -128,7 +142,10 @@ export default function CheckoutPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
               <section className="bg-white p-4 rounded shadow">
-                <h3 className="text-lg font-semibold mb-2">Payment Method</h3>
+                <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
+                  <LuCreditCard size={18} />
+                  Payment Method
+                </h3>
                 <SelectPaymentMethod
                   paymentMethods={paymentMethods}
                   loading={loadingPM}
@@ -141,7 +158,10 @@ export default function CheckoutPage() {
               </section>
 
               <section className="bg-white p-4 rounded shadow">
-                <h3 className="text-lg font-semibold mb-2">Shipping Address</h3>
+                <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
+                  <LuMapPin size={18} />
+                  Shipping Address
+                </h3>
                 {loadingAddrs ? (
                   <p>Loading addresses…</p>
                 ) : (

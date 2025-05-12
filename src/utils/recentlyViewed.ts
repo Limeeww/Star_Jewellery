@@ -38,8 +38,7 @@ export function getRecent(): RecentEntry[] {
         date: new Date(e.date),
       }))
       .filter((e) => e.date.getTime() > cutoff);
-  } catch (err) {
-    console.error("recentlyViewed: getRecent failed", err);
+  } catch {
     return [];
   }
 }
