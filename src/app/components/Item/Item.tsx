@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -7,34 +6,24 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase/firebaseConfig";
 import { useCart } from "@/hooks/useCart";
 import WishlistButton from "@/app/components/WishlistButton";
+import RemoveWishlistButton from "@/app/Account/components/RemoveWishlistButton";
 import ActionButton from "@/app/components/FormComponents/ActionButton";
 import SelectField from "@/app/components/FormComponents/SelectField";
-
 import type { Product, ProductVariant } from "@/types/product";
-import type { WishlistItem } from "@/types/userTypes";
 import type { CartItem } from "@/types/cartItem";
 
-type LightProduct = {
-  id: number;
-  slug: string;
-  name: string;
-  image: string;
-  variantId: number;
-};
-
-interface ItemProps {
-  product: Product | LightProduct;
+interface Props {
+  product: Product;
   displayedVariant?: ProductVariant;
-  mode?: "default" | "recent";
-
+  mode?: "default" | "recent" | "wishlist";
   sizeOptions?: { value: string; label: string }[];
   insertOptions?: { value: string; label: string }[];
   materialColorOptions?: { value: string; label: string }[];
-
   selectedSize?: string;
   onSizeChange?: (size: string) => void;
   onInsertChange?: (insert: string) => void;
   onColorChange?: (color: string) => void;
+  onRemove?: () => void;
 }
 
 export default function Item({
@@ -46,67 +35,25 @@ export default function Item({
   selectedSize = "",
   onSizeChange,
   onInsertChange,
-}: ItemProps) {
-  const variant: ProductVariant =
-    displayedVariant ??
-    ("variants" in product
-      ? product.variants[0]
-      : {
-          id: product.variantId,
-          images: [product.image],
-          price: 0,
-          weight: 0,
-          material: "",
-          materialColor: "",
-          insert: "",
-          insertColor: "",
-          quantitySize: [],
-        });
-
-  const href = `/${product.slug}${
-    variant.id ? `?variantID=${variant.id}` : ""
-  }`;
-  const src = variant.images?.[0] ?? "/placeholder.jpg";
-
-  const wishlistItem: WishlistItem = {
-    productId: product.id,
-    variantId: variant.id,
-    slug: product.slug,
-    materialColor: variant.materialColor,
-    insert: variant.insert,
-    size: Number(selectedSize) || 0,
-    price: variant.price ?? 0,
-    image: src,
-  };
-
+  onRemove,
+}: Props) {
   const [user] = useAuthState(auth);
   const userId = user?.uid ?? null;
   const { addOrIncrement } = useCart(userId);
   const [isAdding, setIsAdding] = useState(false);
 
-  const handleAddToCart = async () => {
-    if (!userId) return;
+  const variant: ProductVariant | undefined =
+    displayedVariant ??
+    (product.variants && product.variants.length > 0
+      ? product.variants[0]
+      : undefined);
 
-    const item: CartItem = {
-      productId: product.id,
-      slug: product.slug,
-      name: product.name,
-      description: "description" in product ? product.description : "",
-      variantId: variant.id,
-      originalPrice: variant.price ?? 0,
-      discountName: "",
-      imageUrl: src,
-      price: variant.price ?? 0,
-      quantity: 1,
-      size: Number(selectedSize),
-      insert: variant.insert,
-      materialColor: variant.materialColor,
-    };
+  if (!variant) return null;
 
-    setIsAdding(true);
-    await addOrIncrement(item);
-    setIsAdding(false);
-  };
+  const href = `/${product.slug}${
+    variant.id ? `?variantID=${variant.id}` : ""
+  }`;
+  const src = variant.images?.[0] ?? "/placeholder.jpg";
 
   const needSize = sizeOptions.length > 1;
   const needInsert = insertOptions.length > 1;
@@ -118,12 +65,36 @@ export default function Item({
   const btnDisabled = isAdding || !!missingText;
   const btnText = isAdding ? "Adding…" : missingText || "Add to Cart";
 
+  const handleAddToCart = async () => {
+    if (!userId) return;
+    const item: CartItem = {
+      productId: product.id,
+      slug: product.slug,
+      name: product.name,
+      description: product.description,
+      variantId: variant.id,
+      originalPrice: variant.price,
+      discountName: "",
+      imageUrl: src,
+      price: variant.price,
+      quantity: 1,
+      size: Number(selectedSize),
+      insert: variant.insert,
+      materialColor: variant.materialColor,
+    };
+    setIsAdding(true);
+    await addOrIncrement(item);
+    setIsAdding(false);
+  };
+
   return (
-    <div className="p-2 h-full flex flex-col min-w-[170px] xl:min-w-[450px]">
+    <div
+      className={`${
+        mode === "wishlist" ? "p-0 max-w" : "p-2"
+      } h-full flex flex-col`}
+    >
       <div
-        className="relative border p-2 bg-white text-gray-800
-                     hover:shadow-lg transition-shadow duration-300
-                     flex flex-col flex-1 items-stretch"
+        className={` relative border p-2 bg-white text-gray-800 hover:shadow-lg transition-shadow duration-300 flex flex-col flex-1`}
       >
         <Link href={href} className="block flex-grow">
           <div className="relative w-full pb-[100%] overflow-hidden">
@@ -138,17 +109,17 @@ export default function Item({
             {product.name}{" "}
             <span className="text-sm text-gray-400">#{variant.id}</span>
           </h3>
-          {mode === "default" && (
+          {mode !== "recent" && (
             <p className="text-base md:text-lg mt-1">
               <span className="font-semibold">
-                {variant.price?.toLocaleString()}
+                {variant.price.toLocaleString()}
               </span>{" "}
               ₴
             </p>
           )}
         </Link>
 
-        {mode === "default" && (
+        {(mode === "default" || mode === "wishlist") && (
           <form className="mt-4 space-y-3">
             {needSize && (
               <SelectField
@@ -170,7 +141,6 @@ export default function Item({
                 id="insert"
               />
             )}
-
             <ActionButton
               text={btnText}
               disabled={btnDisabled}
@@ -180,11 +150,31 @@ export default function Item({
           </form>
         )}
 
-        {mode === "default" && (
-          <div className="absolute top-1 right-1 z-10">
-            <WishlistButton item={wishlistItem} />
-          </div>
-        )}
+        <div className="absolute top-2 right-2 z-10">
+          {mode === "default" && (
+            <div className="absolute top-2 right-2 z-10">
+              <WishlistButton
+                item={{
+                  product,
+                  productId: product.id,
+                  variantId: variant.id,
+                  slug: product.slug,
+                  materialColor: variant.materialColor,
+                  insert: variant.insert,
+                  size: Number(selectedSize) || 0,
+                  price: variant.price,
+                  image: src,
+                }}
+              />
+            </div>
+          )}
+
+          {mode === "wishlist" && (
+            <div className="absolute z-10">
+              <RemoveWishlistButton onClick={onRemove!} />
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

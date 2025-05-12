@@ -109,7 +109,7 @@ export default function CartPage() {
             className="text-4xl mb-6 mt-10 text-center"
             style={{ fontFamily: "var(--font-playfair)" }}
           >
-            Your Cart ({totalCount} {totalCount > 1 ? "Items" : "Item"})
+            Your Cart {totalCount > 1 ? `(${totalCount} Items)` : null}
           </h1>
 
           {cartItems.length === 0 ? (
@@ -120,6 +120,7 @@ export default function CartPage() {
                 className="inline-block mt-2 text-sm underline text-gray-700 hover:text-black transition-colors"
               >
                 Return to the shop
+                <span className="ml-1">&rarr;</span>
               </Link>
             </div>
           ) : (

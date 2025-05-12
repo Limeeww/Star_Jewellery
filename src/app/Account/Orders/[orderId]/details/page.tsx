@@ -16,6 +16,7 @@ import {
   getTotal,
 } from "@/utils";
 import type { GiftOptionsForm } from "@/types/order";
+import { LuPrinter, LuLifeBuoy } from "react-icons/lu";
 
 export default function OrderDetailsPage() {
   const { orderId } = useParams() as { orderId: string };
@@ -83,15 +84,24 @@ export default function OrderDetailsPage() {
           </div>
         </div>
       </div>
-
-      <div className="space-x-4 mt-4">
+      <div className="space-x-4 mt-4 flex items-center">
         <LinkButton
-          text="Print Receipt"
+          text={
+            <span className="inline-flex items-center gap-1">
+              <LuPrinter size={16} />
+              Print Receipt
+            </span>
+          }
           onClick={() => window.print()}
           className="text-sm text-primary-500 hover:underline"
         />
         <LinkButton
-          text="Contact Support"
+          text={
+            <span className="inline-flex items-center gap-1">
+              <LuLifeBuoy size={16} />
+              Contact Support
+            </span>
+          }
           href="/support"
           className="text-sm text-primary-500 hover:underline"
         />

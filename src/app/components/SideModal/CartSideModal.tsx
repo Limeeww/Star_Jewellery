@@ -7,20 +7,15 @@ import LinkButtonForm from "../FormComponents/LinkButtonForm";
 import { useCartContext } from "@/app/contexts/CartContent";
 import { CartItem } from "@/types/cartItem";
 
-interface ItemInterface {
-  productId: number;
-  size: number;
-  insert: string;
-  materialColor: string;
-}
+
 interface CartSideModalProps {
   isOpen: boolean;
   onClose: () => void;
   items: CartItem[];
   added?: boolean;
-  onIncrement: (item: ItemInterface) => Promise<void>;
-  onDecrement: (item: ItemInterface) => Promise<void>;
-  onRemove: (item: ItemInterface) => Promise<void>;
+  onIncrement?: (item: CartItem) => void;  
+  onDecrement?: (item: CartItem) => void;
+  onRemove?:    (item: CartItem) => void;
 }
 
 function CartSideModal({ isOpen, onClose, added = false }: CartSideModalProps) {
@@ -48,9 +43,10 @@ function CartSideModal({ isOpen, onClose, added = false }: CartSideModalProps) {
             cartItems.map((item) => (
               <div
                 key={`${item.productId}-${item.size}-${item.insert}-${item.materialColor}`}
-                className="mb-2"
+                className="my-4"
               >
                 <CartItemComponent
+                  mode="cart"
                   item={item}
                   onIncrement={() =>
                     incrementItem({

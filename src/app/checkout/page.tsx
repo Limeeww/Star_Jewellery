@@ -23,8 +23,8 @@ import {
   getTotal,
 } from "@/utils";
 import { useLocalOrder, useSubmitOrder } from "@/hooks";
+import { LuCreditCard, LuMapPin } from "react-icons/lu";
 
-// Используем контекст корзины вместо useCartItems
 import { useCartContext } from "@/app/contexts/CartContent";
 
 export default function CheckoutPage() {
@@ -54,7 +54,6 @@ export default function CheckoutPage() {
 
   const order = useLocalOrder();
 
-  // Получаем элементы корзины из контекста
   const { cartItems: products } = useCartContext();
 
   const [shipAddress, setShipAddress] = useState<Address | null>(null);
@@ -143,7 +142,10 @@ export default function CheckoutPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
               <section className="bg-white p-4 rounded shadow">
-                <h3 className="text-lg font-semibold mb-2">Payment Method</h3>
+                <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
+                  <LuCreditCard size={18} />
+                  Payment Method
+                </h3>
                 <SelectPaymentMethod
                   paymentMethods={paymentMethods}
                   loading={loadingPM}
@@ -156,7 +158,10 @@ export default function CheckoutPage() {
               </section>
 
               <section className="bg-white p-4 rounded shadow">
-                <h3 className="text-lg font-semibold mb-2">Shipping Address</h3>
+                <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
+                  <LuMapPin size={18} />
+                  Shipping Address
+                </h3>
                 {loadingAddrs ? (
                   <p>Loading addresses…</p>
                 ) : (

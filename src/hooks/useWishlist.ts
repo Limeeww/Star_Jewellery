@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { doc, onSnapshot, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
-import { WishlistItem } from "@/types/userTypes";
+import type { WishlistItem } from "@/types/userTypes";
+import type { Identifier } from "@/types/userTypes";
 
-type Identifier = Omit<WishlistItem, "price">;
 
 const makeKey = (it: Identifier) =>
   `${it.productId}_${it.variantId}_${it.size}_${it.insert}_${it.materialColor}`;
@@ -26,10 +26,8 @@ export function useWishlist(userId: string | null): UseWishlistReturn {
     }
     const ref = doc(db, "users", userId);
     const unsub = onSnapshot(ref, (snap) => {
-      const data = snap.data() as
-        | { wishListItems?: WishlistItem[] }
-        | undefined;
-      setItems(data?.wishListItems ?? []);
+      const data = snap.data() as { wishList?: WishlistItem[] } | undefined;
+      setItems(data?.wishList ?? []);
     });
     return () => unsub();
   }, [userId]);
@@ -47,9 +45,15 @@ export function useWishlist(userId: string | null): UseWishlistReturn {
 
       const snap = await getDoc(ref);
       if (!snap.exists()) return;
-      const list: WishlistItem[] = snap.data().wishListItems || [];
-      if (!list.some((it) => makeKey(it) === makeKey(item))) {
-        await updateDoc(ref, { wishListItems: [...list, item] });
+      const existing: WishlistItem[] = snap.data().wishList || [];
+
+      if (!existing.some((it) => makeKey(it) === makeKey(item))) {
+        const cleanItem = JSON.parse(JSON.stringify(item));
+        const newList = [
+          ...existing.map((it) => JSON.parse(JSON.stringify(it))),
+          cleanItem,
+        ];
+        await updateDoc(ref, { wishList: newList });
       }
     },
     [userId]
@@ -66,9 +70,14 @@ export function useWishlist(userId: string | null): UseWishlistReturn {
 
       const snap = await getDoc(ref);
       if (!snap.exists()) return;
-      const list: WishlistItem[] = snap.data().wishListItems || [];
+      const existing: WishlistItem[] = snap.data().wishList || [];
+
       await updateDoc(ref, {
-        wishListItems: list.filter((it) => makeKey(it) !== makeKey(identifier)),
+        wishList: JSON.parse(
+          JSON.stringify(
+            existing.filter((it) => makeKey(it) !== makeKey(identifier))
+          )
+        ),
       });
     },
     [userId]
@@ -79,10 +88,10 @@ export function useWishlist(userId: string | null): UseWishlistReturn {
       const id: Identifier = {
         productId: item.productId,
         variantId: item.variantId,
-        size: item.size,
-        insert: item.insert,
-        materialColor: item.materialColor,
         slug: item.slug,
+        materialColor: item.materialColor,
+        insert: item.insert,
+        size: item.size,
         image: item.image,
       };
       if (items.some((it) => makeKey(it) === makeKey(id))) {
@@ -94,16 +103,10 @@ export function useWishlist(userId: string | null): UseWishlistReturn {
     [items, addItem, removeItem]
   );
 
-  const keySet = useMemo(() => {
-    const s = new Set<string>();
-    items.forEach((it) => s.add(makeKey(it)));
-    return s;
+  const isWishlisted = useMemo(() => {
+    const keys = new Set(items.map((it) => makeKey(it)));
+    return (id: Identifier) => keys.has(makeKey(id));
   }, [items]);
-
-  const isWishlisted = useCallback(
-    (identifier: Identifier) => keySet.has(makeKey(identifier)),
-    [keySet]
-  );
 
   return { items, addItem, removeItem, toggleItem, isWishlisted };
 }

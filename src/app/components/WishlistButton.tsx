@@ -26,7 +26,7 @@ export default function WishlistButton({ item }: WishlistButtonProps) {
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
       className="absolute top-2 right-2 bg-white p-2 rounded-full z-10"
     >
-      {active ? <AiFillHeart size={20} /> : <AiOutlineHeart size={20} />}
+      {active ? <AiFillHeart size={24} /> : <AiOutlineHeart size={24} />}
     </motion.button>
   );
 }

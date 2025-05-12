@@ -26,7 +26,8 @@ export default function CartItemComponent({
   const [actionIsRemove, setActionIsRemove] = useState(false);
   if (mode === "order") {
     return (
-      <div className="flex items-center space-x-4 bg-white p-4 rounded shadow-sm">
+      <div className="flex items-center space-x-4 bg-white p-4 rounded shadow-sm"
+      >
         <div className="relative w-16 h-16 bg-gray-100 rounded overflow-hidden flex-shrink-0">
           <Image
             src={item.imageUrl}
@@ -135,7 +136,7 @@ export default function CartItemComponent({
           </button>
         )}
 
-        <div className="ml-auto text-right">
+        <div className="ml-auto text-right font-semibold">
           {hasDiscount ? (
             <DiscountDisplay discountedPrice={item.price} />
           ) : (

@@ -11,15 +11,24 @@ import Notification from "@/app/components/MessageHandling/Notification";
 
 import AccountPageLayout from "@/app/Account/components/AccountPageLayout";
 import { usePaginatedUserOrders } from "@/hooks/usePaginatedUserOrders";
-import ActionButton from "@/app/components/FormComponents/ActionButton";
+import { PaginationControls } from "@/app/components/PaginationControls";
 
 export default function MyOrders() {
   const [user, loadingAuth] = useAuthState(auth);
   useRequireAuth(user ?? null, loadingAuth);
 
   const { notification, notify, clearNotification } = useNotification();
-  const { orders, loading, error, nextPage, prevPage, hasNext, hasPrev } =
-    usePaginatedUserOrders(5);
+  const {
+    orders,
+    loading,
+    error,
+    page,
+    totalPages,
+    hasPrev,
+    hasNext,
+    prevPage,
+    nextPage,
+  } = usePaginatedUserOrders(5);
 
   if (loadingAuth || loading) return <Loading />;
   if (error) {
@@ -34,8 +43,7 @@ export default function MyOrders() {
     <AccountPageLayout
       sideLinks={[]}
       title="My Orders"
-      description=" Track your orders in one convenient place. Review order details, status
-        updates, and delivery progress anytime."
+      description="Track your orders in one convenient place. Review order details, status updates, and delivery progress anytime."
     >
       {notification && (
         <Notification
@@ -52,20 +60,14 @@ export default function MyOrders() {
         ))}
       </div>
 
-      <div className="mt-8 flex justify-center items-center space-x-4">
-        <ActionButton
-          onClick={prevPage}
-          disabled={!hasPrev}
-          text="Previous"
-          className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
-        />
-        <ActionButton
-          onClick={nextPage}
-          disabled={!hasNext}
-          text="Next"
-          className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
-        />
-      </div>
+      <PaginationControls
+        page={page}
+        totalPages={totalPages}
+        hasPrev={hasPrev}
+        hasNext={hasNext}
+        prevPage={prevPage}
+        nextPage={nextPage}
+      />
     </AccountPageLayout>
   );
 }

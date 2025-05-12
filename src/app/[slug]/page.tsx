@@ -62,6 +62,7 @@ const ProductPage = () => {
     activeDiscount
   );
   const wishlistItem: WishlistItem = {
+    product: product,
     productId: product.id,
     variantId: displayedVariant.id,
     slug: product.slug!,

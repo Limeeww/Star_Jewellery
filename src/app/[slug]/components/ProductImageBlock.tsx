@@ -163,9 +163,7 @@ export default function ProductImageBlock({
     <div className="relative w-full mx-auto">
       <div className="relative w-full aspect-square overflow-hidden shadow-lg mt-6 max-h-[90vh]">
         {" "}
-        <div className="absolute top-1 right-1 z-20">
-          <WishlistButton item={wishlistItem} />
-        </div>
+        <WishlistButton item={wishlistItem} />
         <AnimatePresence initial={false} custom={direction}>
           <motion.div
             key={page}

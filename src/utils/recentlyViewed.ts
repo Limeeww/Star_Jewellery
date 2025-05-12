@@ -38,7 +38,7 @@ export function getRecent(): RecentEntry[] {
         date: new Date(e.date),
       }))
       .filter((e) => e.date.getTime() > cutoff);
-  } catch (err) {
+  } catch {
     return [];
   }
 }

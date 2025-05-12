@@ -5,7 +5,7 @@ import { adminAuth } from "../../lib/firebaseAdmin";
 
 type RoleRequestBody = {
   uid: string;
-  role: "user" | "admin"; // можно расширить при необходимости
+  role: "user" | "admin";
 };
 
 export default async function handler(
