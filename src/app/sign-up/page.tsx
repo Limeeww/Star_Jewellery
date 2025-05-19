@@ -115,7 +115,7 @@ export default function SignUpPage() {
         wishList: userData.wishList || [],
         orders: userData.orders || [],
         addresses: userData.addresses || [],
-        bonuses: userData.bonuses || "0",
+        bonuses: userData.bonuses || 0,
         cartItems: userData.cartItems || [],
         role: "user",
       };

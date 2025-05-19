@@ -14,3 +14,4 @@ export * from "./useCart";
 export * from "./useUserOrders";    
 export * from "./useProductPage";
 export * from "./useProducts";
+export * from "./useBonuses"

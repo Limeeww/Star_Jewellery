@@ -63,7 +63,7 @@ export default function CatalogPage() {
       <div className="text-center mb-4">
         <Link
           href="/all-collections"
-          className="text-sm text-gray-600 hover:text-gray-800 underline"
+          className="text-md text-gray-600 hover:text-gray-800 underline"
         >
           VIEW ALL
         </Link>
