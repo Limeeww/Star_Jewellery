@@ -12,9 +12,10 @@ import CartItemComponent from "@/app/components/CartItem/CartItemComponent";
 
 interface OrderCardProps {
   order: Order;
+  mode?: "detail";
 }
 
-export default function OrderCard({ order }: OrderCardProps) {
+export default function OrderCard({ order, mode }: OrderCardProps) {
   const { orderId, orderDate, products, shippingAddress, paymentInfo, status } =
     order;
 
@@ -34,12 +35,14 @@ export default function OrderCard({ order }: OrderCardProps) {
         <h3 className="text-xl font-semibold text-primary-700">
           Order #{orderId}
         </h3>
-        <LinkButton
-          href={`/Account/Orders/${orderId}/details`}
-          text="View Details"
-          showArrow
-          className="text-primary-500 hover:text-primary-700 underline"
-        />
+        {mode !== "detail" && (
+          <LinkButton
+            href={`/Account/Orders/${orderId}/details`}
+            text="View Details"
+            showArrow
+            className="text-primary-500 hover:text-primary-700 underline"
+          />
+        )}
       </div>
 
       <p className="text-sm text-gray-500 mb-6">

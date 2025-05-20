@@ -1,4 +1,4 @@
-  import { CartItem } from "@/types/cartItem";
+import { CartItem } from "@/types/cartItem";
 import { GiftOptionsForm } from "@/types/order";
 
 export const FREE_SHIPPING_THRESHOLD = 100;
@@ -17,13 +17,16 @@ export const getSubtotal = (cartItems: CartItem[]): number =>
 export const getShippingCost = (subtotal: number): number =>
   subtotal > FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FLAT_RATE;
 
-export const getGiftOptionsTotal = (giftOptions: GiftOptionsForm): number => {
-  const giftPackagingCost = giftOptions.giftPackaging ? GIFT_PACKAGING_COST : 0;
-  const giftMessageCost = giftOptions.giftMessage ? GIFT_MESSAGE_COST : 0;
-  const giftReceiptCost = giftOptions.giftReceipt ? GIFT_RECEIPT_COST : 0;
-
-  return giftPackagingCost + giftMessageCost + giftReceiptCost;
-};
+export function getGiftOptionsTotal(opts: GiftOptionsForm[]): number {
+  return opts.reduce(
+    (sum, o) =>
+      sum +
+      (o.giftPackaging ? GIFT_PACKAGING_COST : 0) +
+      (o.giftMessage ? GIFT_MESSAGE_COST : 0) +
+      (o.giftReceipt ? GIFT_RECEIPT_COST : 0),
+    0
+  );
+}
 
 export function calculateOriginalPriceSum(cartItems: CartItem[]): number {
   return cartItems.reduce((total, item) => {

@@ -15,13 +15,25 @@ import { auth } from "@/firebase/firebaseConfig";
 import { useRouter } from "next/navigation";
 import type { Order, PaymentInfo } from "@/types/order";
 import { Address } from "@/types/userTypes";
+import { creditBonuses, redeemBonuses } from "@/services/bonusesService";
 
-export function useSubmitOrder(
-  order: Order | null,
-  shipAddress: Address | null,
-  selectedPayment: PaymentInfo | null,
-  pmIdx: number | null
-) {
+interface UseSubmitOrderParams {
+  order: Order | null;
+  shipAddress: Address | null;
+  selectedPayment: PaymentInfo | null;
+  pmIdx: number | null;
+  usedBonuses: number;
+  finalTotal: number;
+}
+
+export function useSubmitOrder({
+  order,
+  shipAddress,
+  selectedPayment,
+  pmIdx,
+  usedBonuses,
+  finalTotal,
+}: UseSubmitOrderParams) {
   const [user] = useAuthState(auth);
   const { notify } = useNotification();
   const clearCart = useClearCart();
@@ -43,6 +55,8 @@ export function useSubmitOrder(
         ...order,
         shippingAddress: shipAddress,
         paymentInfo: paidInfo,
+        usedBonuses,
+        total: finalTotal,
         status: "Pending",
         createdAt: now,
         updatedAt: now,
@@ -53,6 +67,13 @@ export function useSubmitOrder(
       await updateDoc(doc(db, "users", user.uid), {
         orders: arrayUnion(ref.id),
       });
+
+      if (usedBonuses > 0) {
+        await redeemBonuses(user.uid, usedBonuses);
+      }
+
+      await creditBonuses(user.uid, finalTotal);
+
       await clearCart();
       router.push(`/checkout/success?orderId=${ref.id}`);
     } catch (e) {
@@ -66,12 +87,14 @@ export function useSubmitOrder(
   }, [
     order,
     shipAddress,
-    selectedPayment,
     pmIdx,
+    selectedPayment,
     user,
-    notify,
+    usedBonuses,
+    finalTotal,
     clearCart,
     router,
+    notify,
   ]);
 
   return { submit, submitting };
