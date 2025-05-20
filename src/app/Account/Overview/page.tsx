@@ -76,7 +76,7 @@ export default function Overview() {
           <ProfileCard
             title="MY ORDERS"
             description={
-              Array.isArray(profileData?.orders) && profileData.orders.length  
+              Array.isArray(profileData?.orders) && profileData.orders.length
                 ? `You have ${profileData.orders.length} orders.`
                 : "You have no orders yet."
             }
@@ -108,7 +108,8 @@ export default function Overview() {
           <ProfileCard
             title="MY WISH LIST"
             description={
-              profileData?.wishList && profileData.wishList.length
+              Array.isArray(profileData?.wishList) &&
+              profileData.wishList.length
                 ? `You have ${profileData.wishList.length} items in your wish list.`
                 : "Your wish list is empty."
             }
