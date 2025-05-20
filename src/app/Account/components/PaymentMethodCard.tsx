@@ -35,6 +35,7 @@ export default function PaymentMethodCard({
         ${isDefault ? "border-gray-500" : "border-gray-200"}
         ${className}
       `}
+      style={{ fontFamily: "var(--font-poppins)" }}
     >
       {showDeleteIcon && onRemove && (
         <button

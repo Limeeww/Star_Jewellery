@@ -57,7 +57,7 @@ export default function CartPage() {
   const totalCount = getTotalCount(cartItems);
   const subtotal = getSubtotal(cartItems);
   const shipping = getShippingCost(subtotal);
-  const giftOptionsTotal = getGiftOptionsTotal(giftOptionsValues);
+  const giftOptionsTotal = getGiftOptionsTotal([giftOptionsValues]);
   const total = getTotal(subtotal, shipping, giftOptionsTotal);
 
   const originalPriceSum = calculateOriginalPriceSum(cartItems);
@@ -148,6 +148,7 @@ export default function CartPage() {
                   giftOptionsTotal={giftOptionsTotal}
                   total={total}
                   onClick={handleProceed}
+                  mode={"cart"}
                 />
 
                 <div className="bg-white p-4 rounded shadow space-y-4 w-full">

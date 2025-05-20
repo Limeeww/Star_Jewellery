@@ -15,8 +15,12 @@ import {
   getGiftOptionsTotal,
   getTotal,
 } from "@/utils";
-import type { GiftOptionsForm } from "@/types/order";
-import { LuPrinter, LuLifeBuoy } from "react-icons/lu";
+import { LuPrinter, LuLifeBuoy, LuSparkles } from "react-icons/lu";
+import {
+  calculateDiscountAmount,
+  calculateDiscountPercentFromBonuses,
+  calculateAccrualBonus,
+} from "@/services/bonusesService";
 
 export default function OrderDetailsPage() {
   const { orderId } = useParams() as { orderId: string };
@@ -47,8 +51,22 @@ export default function OrderDetailsPage() {
 
   const subtotal = getSubtotal(order.products);
   const shipping = getShippingCost(subtotal);
-  const giftTotal = getGiftOptionsTotal(order.giftOptions as GiftOptionsForm);
-  const total = getTotal(subtotal, shipping, giftTotal);
+  const giftTotal = getGiftOptionsTotal([order.giftOptions]);
+  const baseTotal = getTotal(subtotal, shipping, giftTotal);
+
+  const usedBonuses = order.usedBonuses ?? 0;
+
+  const discountPercent =
+    usedBonuses >= 100 ? calculateDiscountPercentFromBonuses(usedBonuses) : 0;
+  const discountAmount =
+    discountPercent > 0 ? calculateDiscountAmount(subtotal, usedBonuses) : 0;
+
+  const finalTotal =
+    discountAmount > 0
+      ? +(subtotal + shipping + giftTotal - discountAmount).toFixed(2)
+      : baseTotal;
+
+  const gainedBonuses = calculateAccrualBonus(finalTotal);
 
   return (
     <AccountPageLayout sideLinks={[]} title="Order Details">
@@ -61,26 +79,57 @@ export default function OrderDetailsPage() {
         />
       )}
 
-      <OrderCard order={order} />
+      <OrderCard order={order} mode={"detail"} />
 
       <div className="mt-6 p-4 bg-gray-50 border border-gray-200 rounded shadow-sm">
-        <h4 className="font-medium text-gray-700 mb-2">Order Summary</h4>
+        <h4 className="font-medium text-gray-700 mb-2 font-semibold">
+          Order Summary
+        </h4>
         <div className="space-y-2 text-sm text-gray-600">
           <div className="flex justify-between">
             <span>Subtotal:</span>
-            <span>{subtotal} ₴</span>
+            <span className="flex items-center gap-1 min-w-[70px] justify-end">
+              <span>{subtotal}</span>
+              <span>₴</span>
+            </span>
           </div>
           <div className="flex justify-between">
             <span>Shipping:</span>
-            <span>{shipping} ₴</span>
+            <span className="flex items-center gap-1 min-w-[70px] justify-end">
+              <span>{shipping}</span>
+              <span>₴</span>
+            </span>
           </div>
           <div className="flex justify-between">
             <span>Gift Options:</span>
-            <span>{giftTotal} ₴</span>
+            <span className="flex items-center gap-1 min-w-[70px] justify-end">
+              <span>{giftTotal}</span>
+              <span>₴</span>
+            </span>
           </div>
+          <div className="flex justify-between">
+            <span>Gained Bonuses:</span>
+            <span className="flex items-center gap-1 min-w-[70px] justify-end">
+              <span>{gainedBonuses}</span>
+              <LuSparkles size={16} className="text-cyan-600" />
+            </span>
+          </div>
+
+          {discountAmount > 0 && (
+            <>
+              <div className="flex justify-between">
+                <span>
+                  Discount ({discountPercent}
+                  %):
+                </span>
+                <span className="text-red-600">–{discountAmount} ₴</span>
+              </div>
+            </>
+          )}
+
           <div className="flex justify-between font-semibold text-lg text-gray-800 border-t border-gray-200 pt-2">
             <span>Total:</span>
-            <span>{total} ₴</span>
+            <span>{finalTotal} ₴</span>
           </div>
         </div>
       </div>

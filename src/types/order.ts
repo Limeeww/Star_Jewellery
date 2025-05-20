@@ -96,4 +96,5 @@ export interface Order {
   shippingAddress: Address;
   discountsApplied?: Discount[];
   status: OrderStatusValue;
+  usedBonuses: number;
 }

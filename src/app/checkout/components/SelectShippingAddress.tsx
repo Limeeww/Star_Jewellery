@@ -47,7 +47,8 @@ export default function SelectShippingAddress({
         />
       )}
       {addresses.length === 0 ? (
-        <div className="space-y-4">
+        <div className="space-y-4"
+        style={{ fontFamily: "var(--font-poppins)" }}>
           <p>There are no addresses yet. Please add one.</p>
           <LinkButton
             text="Add new address"

@@ -1,4 +1,3 @@
-// app/Account/MyBonusesPage.tsx
 "use client";
 
 import React from "react";
@@ -11,6 +10,7 @@ import Navbar from "@/app/components/Navbar/Navbar";
 import AccountPageLayout from "@/app/Account/components/AccountPageLayout";
 import LinkButton from "@/app/Account/components/LinkButton";
 import { useRouter } from "next/navigation";
+import { LuSparkles } from "react-icons/lu";
 
 export default function MyBonusesPage() {
   const [user, loadingAuth] = useAuthState(auth);
@@ -31,20 +31,40 @@ export default function MyBonusesPage() {
         sideLinks={[]}
         title="My Bonuses"
         description={
-          <div className="space-y-2">
-            <p className="text-sm text-gray-600">
-              Bonuses are credited after each purchase: you receive 0.3% of the
-              item&apos;s price as points. You can use your bonus points for a
-              discount on your next order.
+          <div className="space-y-3 text-sm text-gray-600">
+            <p>
+              Earn bonus points on every purchase and redeem them for discounts:
+            </p>
+            <ul className="list-disc list-inside space-y-1">
+              <li>
+                <strong>Earn Rate:</strong> 0.3% of each order’s total price.
+              </li>
+              <li>
+                <strong>Minimum to Redeem:</strong> 100 points.
+              </li>
+              <li>
+                <strong>Redemption Rate:</strong> 100 points = 5% off your
+                order. Proportional discount for other point balances.
+              </li>
+              <li>
+                <strong>Validity:</strong> Points expire 12 months after
+                issuance.
+              </li>
+            </ul>
+            <p>
+              You can stack bonus discounts with promotional offers (unless
+              stated otherwise). Points are non-transferable and cannot be
+              exchanged for cash.
             </p>
           </div>
         }
       >
-        <div>
-          <p className="text-sm text-gray-800">
-            Your balance is <span className="font-medium">{bonuses}</span> bonus
-            points.
-          </p>
+        <div className="bg-white p-4 rounded shadow flex items-center gap-4 max-w-xs">
+          <LuSparkles size={32} className="text-cyan-600" />
+          <div>
+            <p className="text-xs text-gray-500 uppercase">Bonus Points</p>
+            <p className="text-2xl font-bold text-gray-800">{bonuses}</p>
+          </div>
         </div>
         <div className="mt-4">
           <LinkButton
