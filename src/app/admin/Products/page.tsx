@@ -58,7 +58,6 @@ export default function AdminProductsPage() {
 
     return "N/A";
   };
-
   if (loading || role !== "admin" || isLoading) return <Loading />;
 
   return (
@@ -147,7 +146,7 @@ export default function AdminProductsPage() {
                           </span>
                         </div>
 
-                        {variant.quantitySize.length > 0 && (
+                        {variant.quantitySize?.length > 0 && (
                           <div className="mt-4">
                             <p className="font-medium text-sm text-gray-800 mb-1">
                               Quantity by Size:

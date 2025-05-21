@@ -27,6 +27,7 @@ const ADMIN_LINKS = [
   ...COMMON_LINKS,
   { label: "Manage User Roles", href: "/Admin/Roles" },
   { label: "Manage Products", href: "/Admin/Products" },
+  { label: "Manage Collections", href: "/Admin/Collections" },
 ];
 
 const getLinks = (role?: string | null): NavLink[] => {

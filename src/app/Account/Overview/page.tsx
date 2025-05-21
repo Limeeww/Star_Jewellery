@@ -76,7 +76,7 @@ export default function Overview() {
           <ProfileCard
             title="MY ORDERS"
             description={
-              Array.isArray(profileData?.orders) && profileData.orders.length  
+              Array.isArray(profileData?.orders) && profileData.orders.length
                 ? `You have ${profileData.orders.length} orders.`
                 : "You have no orders yet."
             }
@@ -136,6 +136,11 @@ export default function Overview() {
                 title="MANAGE PRODUCTS"
                 description={"Start managing the products via link."}
                 linkHref="/Admin/Products"
+              />
+              <ProfileCard
+                title="MANAGE COLLECTIONS"
+                description={"Start managing the collections via link."}
+                linkHref="/Admin/Collections"
               />
             </>
           ) : (

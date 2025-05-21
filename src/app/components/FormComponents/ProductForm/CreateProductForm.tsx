@@ -8,7 +8,7 @@ import {
   PURITIES,
   INSERTS,
   INSERT_COLORS,
-} from "@/types/productOprtions";
+} from "@/types/productOptions";
 import QuantitySizeForm from "@/app/components/FormComponents/ProductForm/QuantitySizeForm";
 import VariantImagesForm from "@/app/components/FormComponents/ProductForm/VariantImagesForm";
 import LinkButtonForm from "@/app/components/FormComponents/LinkButtonForm";
@@ -288,6 +288,7 @@ export default function CreateProductForm({
             />
 
             <ActionButton
+              type="button"
               text="Delete Variant"
               onClick={() => handleRemoveVariant(index)}
               className="text-red-500 text-sm hover:underline"
@@ -296,6 +297,7 @@ export default function CreateProductForm({
         ))}
 
         <ActionButton
+          type="button"
           text="Add Variant"
           onClick={handleAddVariant}
           className="bg-green-600 text-white px-4 py-2 rounded text-sm"
@@ -310,6 +312,7 @@ export default function CreateProductForm({
         />
 
         <ActionButton
+          type="submit"
           text="Create Product"
           onClick={handleSubmit}
           className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded"

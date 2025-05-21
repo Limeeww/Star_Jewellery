@@ -12,7 +12,7 @@ import {
   PURITIES,
   Material,
   Insert,
-} from "@/types/productOprtions";
+} from "@/types/productOptions";
 import SelectVariantField from "@/app/components/FormComponents/ProductForm/SelectVariantField";
 import { v4 as uuidv4 } from "uuid";
 import { uuidToNumber } from "@/hooks/uuidToNumber";
