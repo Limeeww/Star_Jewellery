@@ -1,33 +1,33 @@
 "use client";
 
 import React from "react";
-import { signOut } from "firebase/auth";
-import { useAuthState } from "react-firebase-hooks/auth";
 import { useRouter } from "next/navigation";
-import { auth } from "../../firebase/firebaseConfig";
-import Loading from "../components/Loading/Loading";
 import Image from "next/image";
+import Loading from "@/app/components/Loading/Loading";
+import { useAuthStatus } from "@/hooks/useAuthStatus";
+import { auth } from "@/firebase/firebaseConfig";
+import { signOut } from "firebase/auth";
+import { useProtectRoute } from "@/hooks";
 
 export default function SignOutPage() {
-  const [user, loading, error] = useAuthState(auth);
   const router = useRouter();
 
-  const handleSignOut = async () => {
-    await signOut(auth);
-    router.push("/");
-  };
+  useProtectRoute("/sign-in");
+
+  const { user, loading, isLoggedIn } = useAuthStatus();
 
   if (loading) {
     return <Loading />;
   }
 
-  if (error) {
-    return (
-      <div className="flex flex-col justify-center items-center w-full h-full mt-20">
-        <p className="text-red-500 text-lg">Error: {error.message}</p>
-      </div>
-    );
+  if (!isLoggedIn) {
+    return null;
   }
+
+  const handleSignOut = async () => {
+    await signOut(auth);
+    router.push("/");
+  };
 
   return (
     <div
@@ -46,6 +46,7 @@ export default function SignOutPage() {
         </div>
       </div>
 
+      {/* Мобильное изображение */}
       <div className="lg:hidden w-full bg-[#E6F7F8] p-8">
         <Image
           src="/images/auth/pexels-hatice-796619215-28914388.jpg"
@@ -56,6 +57,7 @@ export default function SignOutPage() {
         />
       </div>
 
+      {/* Основной блок */}
       <div className="w-full lg:w-1/2 overflow-y-auto p-8 bg-white flex flex-col items-center justify-center">
         <button
           type="button"
@@ -64,6 +66,7 @@ export default function SignOutPage() {
         >
           &larr; Back to Home
         </button>
+
         <h1
           className="font-semibold text-5xl mt-20 mb-12 text-center"
           style={{ fontFamily: "var(--font-playfair)" }}

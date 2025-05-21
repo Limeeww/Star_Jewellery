@@ -61,7 +61,10 @@ export default function PaymentMethods() {
         await remove(modal.index);
         notify({ type: "success", message: "Payment method removed!" });
       } catch (e) {
-        notify({ type: "error", message: (e as Error).message || "Delete failed" });
+        notify({
+          type: "error",
+          message: (e as Error).message || "Delete failed",
+        });
       }
       setModal(null);
     }
@@ -91,7 +94,8 @@ export default function PaymentMethods() {
         title="My Payment Methods"
         description={
           <p>
-            Save your payment methods to complete your purchase faster. You can set one as default and select it during checkout.
+            Save your payment methods to complete your purchase faster. You can
+            set one as default and select it during checkout.
           </p>
         }
       >
@@ -122,7 +126,10 @@ export default function PaymentMethods() {
           <>
             <div className="flex items-center justify-between mt-4 py-2">
               <h3 className="text-sm font-medium mb-2">
-                You have {paymentMethods.length} saved {paymentMethods.length > 1 ? "payment methods" : "payment method"}
+                You have {paymentMethods.length} saved{" "}
+                {paymentMethods.length > 1
+                  ? "payment methods"
+                  : "payment method"}
               </h3>
               <LinkButton
                 text="Add new payment method"
@@ -151,11 +158,17 @@ export default function PaymentMethods() {
                   notify({ type: "success", message: "Payment method added!" });
                 } else {
                   await update(modal.index!, newMethods[modal.index!]!);
-                  notify({ type: "success", message: "Payment method updated!" });
+                  notify({
+                    type: "success",
+                    message: "Payment method updated!",
+                  });
                 }
                 setModal(null);
               } catch (e) {
-                notify({ type: "error", message: (e as Error).message || "Save failed" });
+                notify({
+                  type: "error",
+                  message: (e as Error).message || "Save failed",
+                });
               }
             }}
           />

@@ -5,19 +5,19 @@ import { useSearchParams, useRouter } from "next/navigation";
 import Loading from "@/app/components/Loading/Loading";
 import Footer from "@/app/components/Footer/Footer";
 import Navbar from "@/app/components/Navbar/Navbar";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "@/firebase/firebaseConfig";
 import { useNotification } from "@/hooks/useNotification";
 import Notification from "@/app/components/MessageHandling/Notification";
 import { FcOk } from "react-icons/fc";
 import useOrder from "@/hooks/useOrder";
 import ActionButton from "@/app/components/FormComponents/ActionButton";
+import { useAuthStatus } from "@/hooks/useAuthStatus";
 
 export default function OrderSuccessPage() {
   const params = useSearchParams();
   const router = useRouter();
   const { notification, notify, clearNotification } = useNotification();
-  const [user, loadingAuth] = useAuthState(auth);
+  const { user, isLoggedIn, loading: loadingAuth } = useAuthStatus();
+
   const orderId = params?.get("orderId") ?? null;
   const { order, loading, error } = useOrder(orderId, user ?? null);
 
@@ -40,7 +40,7 @@ export default function OrderSuccessPage() {
       {notification && (
         <Notification {...notification} onClose={clearNotification} />
       )}
-      <Navbar isScrolled isLoggedIn={!!user} />
+      <Navbar isScrolled isLoggedIn={isLoggedIn} />
 
       <main
         className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4 text-gray-800"

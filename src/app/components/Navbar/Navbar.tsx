@@ -100,6 +100,7 @@ export default function Navbar({
                 text-md 
                 font-medium 
                 transition-colors
+                
                 ${
                   isScrolled
                     ? "text-gray-800 hover:text-gray-500"

@@ -2,15 +2,16 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "@/firebase/firebaseConfig";
 import { useCart } from "@/hooks/useCart";
 import WishlistButton from "@/app/components/WishlistButton";
 import RemoveWishlistButton from "@/app/Account/components/RemoveWishlistButton";
 import ActionButton from "@/app/components/FormComponents/ActionButton";
 import SelectField from "@/app/components/FormComponents/SelectField";
 import type { Product, ProductVariant } from "@/types/product";
+import { badgeLabels } from "@/types/product";
 import type { CartItem } from "@/types/cartItem";
+import TagBadge from "./TagBadge";
+import { useAuthStatus } from "@/hooks/useAuthStatus";
 
 interface Props {
   product: Product;
@@ -37,7 +38,7 @@ export default function Item({
   onInsertChange,
   onRemove,
 }: Props) {
-  const [user] = useAuthState(auth);
+  const { user } = useAuthStatus();
   const userId = user?.uid ?? null;
   const { addOrIncrement } = useCart(userId);
   const [isAdding, setIsAdding] = useState(false);
@@ -93,9 +94,15 @@ export default function Item({
         mode === "wishlist" ? "p-0 max-w" : "p-2"
       } h-full flex flex-col`}
     >
-      <div
-        className={` relative border p-2 bg-white text-gray-800 hover:shadow-lg transition-shadow duration-300 flex flex-col flex-1`}
-      >
+      <div className="relative border p-2 bg-white text-gray-800 hover:shadow-lg transition-shadow duration-300 flex flex-col flex-1">
+        {product.tag && (
+          <TagBadge
+            variant={product.tag}
+            className="absolute top-4 left-4 z-10"
+          >
+            {badgeLabels[product.tag]}
+          </TagBadge>
+        )}
         <Link href={href} className="block flex-grow">
           <div className="relative w-full pb-[100%] overflow-hidden">
             <Image
@@ -152,7 +159,7 @@ export default function Item({
 
         <div className="absolute top-2 right-2 z-10">
           {mode === "default" && (
-            <div className="absolute top-2 right-2 z-10">
+            <div className="absolute z-10">
               <WishlistButton
                 item={{
                   product,

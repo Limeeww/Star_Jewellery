@@ -78,7 +78,9 @@ export default function SignInPage() {
       await signInWithEmailAndPassword(data.email, data.password);
     } catch (err: unknown) {
       const errorMessage =
-        err instanceof Error ? err.message : "Failed to sign in with email/password.";
+        err instanceof Error
+          ? err.message
+          : "Failed to sign in with email/password.";
       setNotification({
         message: errorMessage,
         type: "error",
@@ -125,7 +127,6 @@ export default function SignInPage() {
         />
       </div>
 
-      {/* Правая часть (форма) */}
       <div className="w-full lg:w-1/2 overflow-y-auto p-8 bg-white">
         <form
           onSubmit={handleSubmit(onSubmit)}
@@ -154,7 +155,6 @@ export default function SignInPage() {
             error={errors.email}
           />
 
-          {/* Password */}
           <PasswordField
             label="Password *"
             id="password"
@@ -162,7 +162,6 @@ export default function SignInPage() {
             error={errors.password}
           />
 
-          {/* Кнопка отправки */}
           <SubmitButton label="SIGN IN" isLoading={false} />
 
           <p className="text-sm text-gray-600 font-light pt-2">
@@ -178,7 +177,6 @@ export default function SignInPage() {
             </p>
           </div>
 
-          {/* Google Sign-In */}
           <div className="flex items-center justify-center">
             <button
               type="button"

@@ -3,8 +3,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import Navbar from "./components/Navbar/Navbar";
 import Link from "next/link";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "../firebase/firebaseConfig";
 import Image from "next/image";
 import Catalog from "./Catalog/Catalog";
 
@@ -12,6 +10,7 @@ import Collection from "./Collections/Collection";
 import AboutUsSection from "./AboutUsSection/AboutUsSection";
 import { FaGift, FaHeadset, FaShippingFast } from "react-icons/fa";
 import Footer from "./components/Footer/Footer";
+import { useAuthStatus } from "@/hooks/useAuthStatus";
 
 const NAV_LINKS = [
   { href: "#about-us", label: "ABOUT US" },
@@ -22,12 +21,7 @@ const NAV_LINKS = [
 export default function HomePage() {
   const [isScrolled, setIsScrolled] = useState(false);
   const header = useRef<HTMLDivElement>(null);
-  const [user, loading] = useAuthState(auth);
-  let isLoggedIn = false;
-
-  if (!loading && user) {
-    isLoggedIn = true;
-  }
+  const { isLoggedIn } = useAuthStatus();
 
   useEffect(() => {
     const handleScroll = () => {

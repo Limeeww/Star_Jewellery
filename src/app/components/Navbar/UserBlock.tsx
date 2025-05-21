@@ -19,14 +19,14 @@ export default function UserBlock({ isScrolled, isLoggedIn, onClose }: UserBlock
     setMounted(true);
   }, []);
 
-  const linkClass = `
-    transition-colors
-    duration-300
-    hover:underline
-    flex
-    items-center
-    space-x-1
-  `;
+    const linkClass = `
+      transition-colors
+      duration-300
+      hover:underline
+      flex
+      items-center
+      space-x-1
+    `;
 
   const textColor = isScrolled
     ? "text-gray-800 hover:text-gray-500"

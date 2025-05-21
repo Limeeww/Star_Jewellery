@@ -14,7 +14,6 @@ export function useUserList<T>(field: string) {
   const [items, setItems] = useState<T[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // load
   const load = useCallback(async () => {
     if (!user) return setItems([]), setLoading(false);
     setLoading(true);
@@ -30,7 +29,6 @@ export function useUserList<T>(field: string) {
     }
   }, [user, field, notify]);
 
-  // save
   const save = useCallback(
     async (newList: T[]) => {
       if (!user) throw new Error("Not authenticated");
@@ -43,7 +41,6 @@ export function useUserList<T>(field: string) {
     },
     [user, field, notify]
   );
-
 
   useEffect(() => {
     load();

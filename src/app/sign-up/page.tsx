@@ -53,7 +53,7 @@ export default function SignUpPage() {
   });
 
   useEffect(() => {
-    if (user || userEmail) {
+    if ((user && !user.isAnonymous) || userEmail) {
       router.push("/Account/Overview");
     }
   }, [user, userEmail, router]);
