@@ -1,5 +1,7 @@
 import { Timestamp } from "firebase/firestore";
 
+export type ProductTag = "must-have" | "new" | "exclusive" | "sale" | "default";
+
 export interface Discount {
   id: number;
   name: string;
@@ -48,4 +50,5 @@ export interface Product {
   updatedAt: Timestamp;
   isHidden: boolean;
   additionalDescription: string;
+  tag: ProductTag;
 }
