@@ -10,6 +10,7 @@ import RemoveWishlistButton from "@/app/Account/components/RemoveWishlistButton"
 import ActionButton from "@/app/components/FormComponents/ActionButton";
 import SelectField from "@/app/components/FormComponents/SelectField";
 import type { Product, ProductVariant } from "@/types/product";
+import { badgeLabels } from "@/types/product";
 import type { CartItem } from "@/types/cartItem";
 import TagBadge from "./TagBadge";
 
@@ -95,9 +96,14 @@ export default function Item({
       } h-full flex flex-col`}
     >
       <div className="relative border p-2 bg-white text-gray-800 hover:shadow-lg transition-shadow duration-300 flex flex-col flex-1">
-        <TagBadge variant="exclusive" className="absolute top-4 left-4 z-10">
-          Must have
-        </TagBadge>
+        {product.tag && (
+          <TagBadge
+            variant={product.tag}
+            className="absolute top-4 left-4 z-10"
+          >
+            {badgeLabels[product.tag]}
+          </TagBadge>
+        )}
         <Link href={href} className="block flex-grow">
           <div className="relative w-full pb-[100%] overflow-hidden">
             <Image

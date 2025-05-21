@@ -2,6 +2,15 @@ import { Timestamp } from "firebase/firestore";
 
 export type ProductTag = "must-have" | "new" | "exclusive" | "sale" | "default";
 
+export const badgeLabels: Record<NonNullable<ProductTag>, string> = {
+  "must-have": "Must have",
+  "new": "New",
+  "exclusive": "Exclusive",
+  "sale": "Sale",
+  default: ""
+};
+
+
 export interface Discount {
   id: number;
   name: string;

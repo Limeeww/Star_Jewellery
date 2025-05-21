@@ -1,10 +1,9 @@
+import React from "react";
 import type { Metadata } from "next";
 import { Poppins, Playfair_Display } from "next/font/google";
 import "./globals.css";
 
-import { CartProvider } from "./contexts/CartContent";
-import { WishlistProvider } from "./contexts/WishlistContext";
-import StripeProvider from "./components/StripeProvider";
+import Providers from "./providers";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -25,19 +24,13 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
       <body className={`${poppins.variable} ${playfair.variable} antialiased`}>
-        <StripeProvider>
-          <CartProvider>
-            <WishlistProvider>
-              {children}
-            </WishlistProvider>
-          </CartProvider>
-        </StripeProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
