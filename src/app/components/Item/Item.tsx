@@ -2,8 +2,6 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "@/firebase/firebaseConfig";
 import { useCart } from "@/hooks/useCart";
 import WishlistButton from "@/app/components/WishlistButton";
 import RemoveWishlistButton from "@/app/Account/components/RemoveWishlistButton";
@@ -13,6 +11,7 @@ import type { Product, ProductVariant } from "@/types/product";
 import { badgeLabels } from "@/types/product";
 import type { CartItem } from "@/types/cartItem";
 import TagBadge from "./TagBadge";
+import { useAuthStatus } from "@/hooks/useAuthStatus";
 
 interface Props {
   product: Product;
@@ -39,7 +38,7 @@ export default function Item({
   onInsertChange,
   onRemove,
 }: Props) {
-  const [user] = useAuthState(auth);
+  const { user } = useAuthStatus();
   const userId = user?.uid ?? null;
   const { addOrIncrement } = useCart(userId);
   const [isAdding, setIsAdding] = useState(false);

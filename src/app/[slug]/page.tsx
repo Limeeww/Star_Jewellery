@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "@/firebase/firebaseConfig";
 
 import VariantSelector from "./components/VariantSelector";
 import ProductImageSlider from "./components/ProductImageBlock";
@@ -10,7 +8,6 @@ import Footer from "@/app/components/Footer/Footer";
 import Notification from "@/app/components/MessageHandling/Notification";
 
 import { useProductPage } from "@/hooks/useProductPage";
-import { useRequireAuth } from "@/hooks/index";
 
 import { useCart } from "@/hooks/useCart";
 import { CartItem } from "@/types/cartItem";
@@ -25,10 +22,10 @@ import SimilarProducts from "@/app/components/SimilarProducts/SimilarProducts";
 import { calculateDiscountedPrice, formatPrice } from "@/utils";
 import type { WishlistItem } from "@/types/userTypes";
 import CartSideModal from "../components/SideModal/CartSideModal";
+import { useAuthStatus } from "@/hooks/useAuthStatus";
 
 const ProductPage = () => {
-  const [user, authLoading] = useAuthState(auth);
-  useRequireAuth(user ?? null, authLoading);
+  const { user, isLoggedIn } = useAuthStatus();
 
   const {
     product,
@@ -101,7 +98,7 @@ const ProductPage = () => {
 
   return (
     <div style={{ fontFamily: "var(--font-poppins)" }}>
-      <Navbar isScrolled isLoggedIn={!!user} />
+      <Navbar isScrolled isLoggedIn={isLoggedIn} />
 
       <section className="px-4 py-16 sm:px-6 lg:px-8" id="product-page">
         {notification && (

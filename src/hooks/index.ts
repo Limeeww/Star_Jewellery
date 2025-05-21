@@ -11,7 +11,10 @@ export * from "./useLocalOrder";
 export * from "./useClearCart";
 export * from "./useSubmitOrder";
 export * from "./useCart";
-export * from "./useUserOrders";    
+export * from "./useUserOrders";
 export * from "./useProductPage";
 export * from "./useProducts";
-export * from "./useBonuses"
+export * from "./useBonuses";
+export * from "./useProtectRoute";
+export * from "./useAnonymousAuth"
+export * from "./useAuthStatus"

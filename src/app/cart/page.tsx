@@ -3,8 +3,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "@/firebase/firebaseConfig";
 import { useForm } from "react-hook-form";
 
 import Navbar from "@/app/components/Navbar/Navbar";
@@ -30,11 +28,11 @@ import {
   getTotal,
   calculateOriginalPriceSum,
 } from "@/utils/index";
+import { useAuthStatus } from "@/hooks/useAuthStatus";
 
 export default function CartPage() {
-  const [user, loading] = useAuthState(auth);
+  const { user, isLoggedIn } = useAuthStatus();
   const router = useRouter();
-  const isLoggedIn = !!user && !loading;
 
   const { cartItems, incrementItem, decrementItem, removeItem } =
     useCartContext();

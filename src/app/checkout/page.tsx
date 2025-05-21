@@ -1,9 +1,6 @@
-// src/app/checkout/page.tsx
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "@/firebase/firebaseConfig";
 
 import Navbar from "@/app/components/Navbar/Navbar";
 import Footer from "@/app/components/Footer/Footer";
@@ -37,12 +34,12 @@ import type { PaymentInfo } from "@/types/order";
 import type { Address } from "@/types/userTypes";
 import type { GiftOptionsForm } from "@/types/order";
 import { LuCreditCard, LuMapPin } from "react-icons/lu";
+import { useAuthStatus } from "@/hooks/useAuthStatus";
 
 export default function CheckoutPage() {
   const { notification, clearNotification } = useNotification();
 
-  const [user, loadingAuth] = useAuthState(auth);
-  const isLoggedIn = !!user && !loadingAuth;
+  const { user, isLoggedIn } = useAuthStatus();
 
   const { cartItems: products } = useCartContext();
   const order = useLocalOrder();
@@ -139,7 +136,7 @@ export default function CheckoutPage() {
     [selectPayment]
   );
 
-  if (loadingAuth || !order) {
+  if (!order) {
     return <Loading />;
   }
 
