@@ -1,104 +1,161 @@
+// src/app/checkout/page.tsx
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase/firebaseConfig";
+
 import Navbar from "@/app/components/Navbar/Navbar";
 import Footer from "@/app/components/Footer/Footer";
 import Loading from "@/app/components/Loading/Loading";
 import Notification from "@/app/components/MessageHandling/Notification";
 import { useNotification } from "@/hooks/useNotification";
+
 import SelectShippingAddress from "@/app/checkout/components/SelectShippingAddress";
 import SelectPaymentMethod from "@/app/checkout/components/SelectPaymentMethod";
 import OrderSummary from "@/app/cart/components/OrderSummary";
+
 import { useAddresses } from "@/hooks/useAddresses";
 import { usePaymentMethods } from "@/hooks/usePaymentMethods";
-import type { PaymentInfo } from "@/types/order";
-import type { Address } from "@/types/userTypes";
+import { useLocalOrder, useSubmitOrder } from "@/hooks";
+import { useCartContext } from "@/app/contexts/CartContent";
+import { useBonuses } from "@/hooks/useBonuses";
+
+import {
+  calculateDiscountPercentFromBonuses,
+  calculateDiscountAmount,
+} from "@/services/bonusesService";
+
 import {
   calculateOriginalPriceSum,
   getSubtotal,
   getShippingCost,
   getGiftOptionsTotal,
-  getTotal,
 } from "@/utils";
-import { useCartItems, useLocalOrder, useSubmitOrder } from "@/hooks";
+
+import type { PaymentInfo } from "@/types/order";
+import type { Address } from "@/types/userTypes";
+import type { GiftOptionsForm } from "@/types/order";
+import { LuCreditCard, LuMapPin } from "react-icons/lu";
 
 export default function CheckoutPage() {
   const { notification, clearNotification } = useNotification();
+
   const [user, loadingAuth] = useAuthState(auth);
   const isLoggedIn = !!user && !loadingAuth;
+
+  const { cartItems: products } = useCartContext();
+  const order = useLocalOrder();
 
   const {
     addresses,
     loading: loadingAddrs,
+    selectedIndex: addrIdx,
+    selectAddress,
     add: addAddress,
     update: updateAddress,
     remove: removeAddress,
-    selectedIndex: addrIdx,
-    selectAddress,
   } = useAddresses();
 
   const {
     paymentMethods,
     loading: loadingPM,
-    add,
-    update,
-    remove,
     selectedIndex: pmIdx,
     selectPayment,
+    add: addPM,
+    update: updatePM,
+    remove: removePM,
   } = usePaymentMethods();
 
-  const order = useLocalOrder();
-  const products = useCartItems(user?.uid ?? null);
+  const { bonuses, loading: loadingBonuses } = useBonuses(user?.uid ?? null);
+  const [usePoints, setUsePoints] = useState(false);
+
   const [shipAddress, setShipAddress] = useState<Address | null>(null);
   const [selectedPayment, setSelectedPayment] = useState<PaymentInfo | null>(
     null
   );
 
+  const original = calculateOriginalPriceSum(products);
+  const subtotal = getSubtotal(products);
+  const shipping = getShippingCost(subtotal);
+
+  const giftOptsArray: GiftOptionsForm[] = Array.isArray(order?.giftOptions)
+    ? order.giftOptions
+    : order?.giftOptions
+    ? [order.giftOptions]
+    : [];
+
+  const giftTotal = getGiftOptionsTotal(giftOptsArray);
+
+  const discountPercent =
+    usePoints && bonuses >= 100
+      ? calculateDiscountPercentFromBonuses(bonuses)
+      : 0;
+  const discountAmount =
+    discountPercent > 0 ? calculateDiscountAmount(subtotal, bonuses) : 0;
+
+  const finalTotal = +(
+    subtotal +
+    shipping +
+    giftTotal -
+    discountAmount
+  ).toFixed(2);
+  const usedBonuses = usePoints && bonuses >= 100 ? bonuses : 0;
+
+  const { submit: handleSubmitOrder, submitting } = useSubmitOrder({
+    order,
+    shipAddress,
+    selectedPayment,
+    pmIdx,
+    usedBonuses,
+    finalTotal,
+  });
+
   useEffect(() => {
     if (!order) return;
-    if (order.shippingAddress) setShipAddress(order.shippingAddress);
-    else if (!loadingAddrs && addresses.length)
+    if (order.shippingAddress) {
+      setShipAddress(order.shippingAddress);
+    } else if (!loadingAddrs && addresses.length > 0) {
       setShipAddress(addresses[addrIdx ?? 0]);
-    if (order.paymentInfo) setSelectedPayment(order.paymentInfo);
+    }
+    if (order.paymentInfo) {
+      setSelectedPayment(order.paymentInfo);
+    }
   }, [order, addresses, addrIdx, loadingAddrs]);
 
   const handleAddressSelect = useCallback(
-    (a: Address, i: number) => {
-      setShipAddress(a);
-      selectAddress(i);
+    (addr: Address, idx: number) => {
+      setShipAddress(addr);
+      selectAddress(idx);
     },
     [selectAddress]
   );
 
   const handlePaymentSelect = useCallback(
-    (pm: PaymentInfo, i: number) => {
+    (pm: PaymentInfo, idx: number) => {
       setSelectedPayment(pm);
-      selectPayment(i);
+      selectPayment(idx);
     },
     [selectPayment]
   );
 
-  const { submit: handleSubmitOrder, submitting } = useSubmitOrder(
-    order,
-    shipAddress,
-    selectedPayment,
-    pmIdx
-  );
-  if (loadingAuth || !order) return <Loading />;
-  const original = calculateOriginalPriceSum(products);
-  const subtotal = getSubtotal(products);
-  const shipping = getShippingCost(subtotal);
-  const giftTotal = getGiftOptionsTotal(order.giftOptions);
+  if (loadingAuth || !order) {
+    return <Loading />;
+  }
 
-  const total = getTotal(subtotal, shipping, giftTotal);
+  if (!isLoggedIn) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-gray-600">Please sign in to access checkout.</p>
+      </div>
+    );
+  }
 
   const buttonText = submitting
     ? "Submitting…"
     : products.length === 0
     ? "No Products in Cart"
-    : order.paymentInfo.paid
+    : order.paymentInfo?.paid
     ? "Already Paid"
     : !shipAddress
     ? "Select Address First"
@@ -114,7 +171,7 @@ export default function CheckoutPage() {
       <Navbar isScrolled isLoggedIn={isLoggedIn} />
 
       <main
-        className="min-h-screen bg-gray-50 p-4 text-gray-800 mt-10 font-poppins"
+        className="min-h-screen bg-gray-50 p-4 text-gray-800 mt-10"
         style={{ fontFamily: "var(--font-poppins)" }}
       >
         <div className="container mx-auto">
@@ -124,24 +181,27 @@ export default function CheckoutPage() {
           >
             Review and Confirm Order
           </h1>
-
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
               <section className="bg-white p-4 rounded shadow">
-                <h3 className="text-lg font-semibold mb-2">Payment Method</h3>
+                <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
+                  <LuCreditCard size={18} /> Payment Method
+                </h3>
                 <SelectPaymentMethod
                   paymentMethods={paymentMethods}
                   loading={loadingPM}
-                  add={add}
-                  update={update}
-                  remove={remove}
+                  add={addPM}
+                  update={updatePM}
+                  remove={removePM}
                   selectedIndex={pmIdx}
                   onSelect={handlePaymentSelect}
                 />
               </section>
 
               <section className="bg-white p-4 rounded shadow">
-                <h3 className="text-lg font-semibold mb-2">Shipping Address</h3>
+                <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
+                  <LuMapPin size={18} /> Shipping Address
+                </h3>
                 {loadingAddrs ? (
                   <p>Loading addresses…</p>
                 ) : (
@@ -157,18 +217,24 @@ export default function CheckoutPage() {
                 )}
               </section>
             </div>
+
             <div className="lg:col-span-1">
               <OrderSummary
                 originalPrice={original}
                 subtotal={subtotal}
                 shipping={shipping}
                 giftOptionsTotal={giftTotal}
-                total={total}
+                total={finalTotal}
+                mode="checkout"
+                bonuses={bonuses}
+                usePoints={usePoints}
+                loadingBonuses={loadingBonuses}
+                onToggleUsePoints={() => setUsePoints((p) => !p)}
                 onClick={handleSubmitOrder}
                 disabled={
                   submitting ||
                   products.length === 0 ||
-                  order.paymentInfo.paid ||
+                  order.paymentInfo?.paid ||
                   !shipAddress ||
                   pmIdx === null
                 }

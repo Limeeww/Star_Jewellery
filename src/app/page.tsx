@@ -77,7 +77,7 @@ export default function HomePage() {
             >
               Discover the beauty and elegance of our jewellery collection.
             </p>
-            <Link href="/all-products">
+            <Link href="/shop">
               <button
                 className="
             mt-6 

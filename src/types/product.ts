@@ -33,7 +33,7 @@ export interface ProductVariant {
 }
 
 export interface QuantitySize {
-  size: number;
+  size?: number;
   quantity: number;
 }
 

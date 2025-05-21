@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import CartCollection from "../components/CartCollection/CartCollection";
 import { Collection } from "@/types/collection";
 import { fetchCollections } from "@/utils/collection";
+import Link from "next/link";
 
 export default function CollectionsSection() {
   const [collections, setCollections] = useState<Collection[]>([]);
@@ -28,11 +29,20 @@ export default function CollectionsSection() {
       id="collections"
     >
       <h2
-        className="text-2xl xl:text-3xl font-bold mb-8 text-gray-800 text-center"
+        className="text-2xl xl:text-3xl font-bold mb-2 text-gray-800 text-center"
         style={{ fontFamily: "var(--font-playfair)", letterSpacing: "0.05em" }}
       >
         COLLECTIONS
       </h2>
+
+      <div className="text-center mb-6">
+        <Link
+          href="/all-collections"
+          className="text-md text-gray-600 hover:text-gray-800 underline"
+        >
+          VIEW ALL
+        </Link>
+      </div>
 
       <div className="grid grid-cols-1 2xl:grid-cols-2 gap-4">
         <div className="order-2 2xl:order-1 grid grid-cols-2 gap-2">

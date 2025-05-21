@@ -10,10 +10,13 @@ import {
   AiOutlineRight,
 } from "react-icons/ai";
 import { useModalClose } from "@/hooks/useModal";
+import { WishlistItem } from "@/types/userTypes";
+import WishlistButton from "@/app/components/WishlistButton";
 
 interface ProductImageBlockProps {
   images: string[];
   altText: string;
+  wishlistItem: WishlistItem;
 }
 
 interface ArrowButtonProps {
@@ -63,7 +66,7 @@ const DotNav = ({
   inactiveClass,
 }: DotNavProps) => (
   <div className={containerClass}>
-    {Array.from({ length: count }, (_, i) => (
+    {Array.from({ length: count }).map((_, i) => (
       <div
         key={i}
         className={`${dotSizeClass} rounded-full ${
@@ -78,6 +81,7 @@ const DotNav = ({
 export default function ProductImageBlock({
   images,
   altText,
+  wishlistItem,
 }: ProductImageBlockProps) {
   const [page, setPage] = useState(0);
   const [direction, setDirection] = useState(0);
@@ -106,6 +110,7 @@ export default function ProductImageBlock({
     setDir(dir);
     setIndex(newIndex);
   };
+
   const paginate = (dir: number) =>
     changeIndex(
       Math.min(Math.max(page + dir, 0), imageCount - 1),
@@ -113,6 +118,7 @@ export default function ProductImageBlock({
       setPage,
       setDirection
     );
+
   const modalPaginate = (dir: number) =>
     changeIndex(
       Math.min(Math.max(modalPage + dir, 0), imageCount - 1),
@@ -156,6 +162,8 @@ export default function ProductImageBlock({
   return (
     <div className="relative w-full mx-auto">
       <div className="relative w-full aspect-square overflow-hidden shadow-lg mt-6 max-h-[90vh]">
+        {" "}
+        <WishlistButton item={wishlistItem} />
         <AnimatePresence initial={false} custom={direction}>
           <motion.div
             key={page}
@@ -177,7 +185,6 @@ export default function ProductImageBlock({
             />
           </motion.div>
         </AnimatePresence>
-
         <ArrowButton
           onClick={() => paginate(-1)}
           disabled={page <= 0}
@@ -192,7 +199,6 @@ export default function ProductImageBlock({
         >
           <AiOutlineRight size={24} />
         </ArrowButton>
-
         <button
           onClick={() => setModalOpen(true)}
           className="absolute bottom-2 right-2 bg-white p-2 rounded-full cursor-pointer transition-transform duration-200 transform hover:scale-110"

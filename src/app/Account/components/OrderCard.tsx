@@ -1,69 +1,58 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
+import LinkButton from "./LinkButton";
 import {
+  OrderStatusValue,
   PaymentMethodLabel,
   PaymentStatusLabel,
   type Order,
 } from "@/types/order";
-import LinkButton from "./LinkButton";
+import CartItemComponent from "@/app/components/CartItem/CartItemComponent";
 
 interface OrderCardProps {
   order: Order;
+  mode?: "detail";
 }
 
-const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
+export default function OrderCard({ order, mode }: OrderCardProps) {
   const { orderId, orderDate, products, shippingAddress, paymentInfo, status } =
     order;
 
-  const steps = ["pending", "shipped", "delivered"] as const;
-  const progressIndex = steps.indexOf(status as (typeof steps)[number]);
+  const steps = (Object.values(OrderStatusValue) as OrderStatusValue[]).filter(
+    (s) => s !== OrderStatusValue.CANCELLED
+  );
 
+  let progressIndex = steps.indexOf(
+    status as Exclude<OrderStatusValue, OrderStatusValue.CANCELLED>
+  );
+  if (progressIndex < 0) progressIndex = 0;
+  const maxIndex = steps.length - 1;
+  const progressPercent = maxIndex > 0 ? (progressIndex / maxIndex) * 100 : 0;
   return (
     <div className="bg-gray-50 border border-gray-200 p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <h3 className="text-xl font-semibold text-primary-700">
           Order #{orderId}
         </h3>
-        <LinkButton
-          href={`/account/orders/${orderId}/details`}
-          text="View Details"
-          showArrow
-          className="text-primary-500 hover:text-primary-700 underline"
-        />
+        {mode !== "detail" && (
+          <LinkButton
+            href={`/Account/Orders/${orderId}/details`}
+            text="View Details"
+            showArrow
+            className="text-primary-500 hover:text-primary-700 underline"
+          />
+        )}
       </div>
 
-      {/* Date */}
       <p className="text-sm text-gray-500 mb-6">
         Placed on:{" "}
         <span className="text-gray-700">{orderDate.toLocaleDateString()}</span>
       </p>
 
-      {/* Products List */}
       <div className="space-y-4 mb-6">
-        {products.map((item, index) => (
-          <div
-            key={`${item.productId}-${item.variantId}-${index}`}
-            className="flex items-center space-x-4 bg-white p-4 rounded shadow-sm"
-          >
-            <div className="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-              <Image
-                src={item.imageUrl}
-                alt={item.name}
-                width={80}
-                height={80}
-                className="object-cover"
-              />
-            </div>
-            <div className="flex-1">
-              <p className="font-medium text-gray-800">{item.name}</p>
-              <p className="text-sm text-gray-500">
-                Qty: {item.quantity} × {item.price}
-              </p>
-            </div>
-          </div>
+        {products.map((item, idx) => (
+          <CartItemComponent mode="order" key={idx} item={item} />
         ))}
       </div>
 
@@ -85,8 +74,8 @@ const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
           <h4 className="font-medium text-gray-700 mb-2 font-semibold">
             Payment
           </h4>
-          <p className="text-sm text-gray-600">
-            Payment Status:{" "}
+          <p className="text-sm text-gray-600 mb-1">
+            Status:{" "}
             <span
               className={paymentInfo.paid ? "text-green-600" : "text-red-600"}
             >
@@ -106,46 +95,42 @@ const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
         </div>
 
         <div>
-          <h4 className="font-medium text-gray-700 mb-2">Order Status</h4>
+          <h4 className="font-medium text-gray-700 mb-2 font-semibold">
+            Order Status
+          </h4>
           <div className="w-full bg-gray-200 h-2 rounded overflow-hidden mb-2">
             <div
-              className="h-2 bg-primary-500 transition-width"
-              style={{
-                width: `${((progressIndex + 1) / steps.length) * 100}%`,
-              }}
+              className={`h-2 transition-all bg-blue-500`}
+              style={{ width: `${progressPercent}%` }}
             />
           </div>
-          <div className="flex justify-between text-xs uppercase text-gray-500">
+          <div className="flex justify-between text-xs uppercase">
             <span
               className={
-                status !== "pending" ? "text-primary-500" : "text-gray-400"
+                status !== steps[0] ? "text-primary-500" : "text-gray-400"
               }
             >
-              Placed
+              {OrderStatusValue.PENDING}
             </span>
             <span
               className={
-                String(status) === "shipped" || String(status) === "delivered"
+                status === steps[1] || status === steps[2]
                   ? "text-primary-500"
                   : "text-gray-400"
               }
             >
-              Shipped
+              {OrderStatusValue.SHIPPED}
             </span>
             <span
               className={
-                String(status) === "delivered"
-                  ? "text-primary-500"
-                  : "text-gray-400"
+                status === steps[2] ? "text-primary-500" : "text-gray-400"
               }
             >
-              Delivered
+              {OrderStatusValue.DELIVERED}
             </span>
           </div>
         </div>
       </div>
     </div>
   );
-};
-
-export default OrderCard;
+}

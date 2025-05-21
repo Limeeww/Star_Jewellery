@@ -2,26 +2,17 @@
 
 import { useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
-
 import { auth } from "@/firebase/firebaseConfig";
 
 import VariantSelector from "./components/VariantSelector";
 import ProductImageSlider from "./components/ProductImageBlock";
-import SideCartModal from "./components/SideCartModal";
 import Footer from "@/app/components/Footer/Footer";
 import Notification from "@/app/components/MessageHandling/Notification";
 
 import { useProductPage } from "@/hooks/useProductPage";
 import { useRequireAuth } from "@/hooks/index";
-import {
-  addOrIncrementCartItem,
-  decrementQuantity,
-  incrementQuantity,
-  removeItem,
-  calculateDiscountedPrice,
-  formatPrice,
-  useCartItems,
-} from "@/utils/index";
+
+import { useCart } from "@/hooks/useCart";
 import { CartItem } from "@/types/cartItem";
 import { FormValues } from "./components/VariantSelector";
 import Loading from "@/app/components/Loading/Loading";
@@ -31,6 +22,9 @@ import InfoBlocks from "./components/InfoItem";
 import ShareButton from "@/app/components/ShareButton/ShareButton";
 import AboutCollection from "./components/AboutCollection";
 import SimilarProducts from "@/app/components/SimilarProducts/SimilarProducts";
+import { calculateDiscountedPrice, formatPrice } from "@/utils";
+import type { WishlistItem } from "@/types/userTypes";
+import CartSideModal from "../components/SideModal/CartSideModal";
 
 const ProductPage = () => {
   const [user, authLoading] = useAuthState(auth);
@@ -50,7 +44,15 @@ const ProductPage = () => {
     handleInsertChange,
   } = useProductPage();
 
-  const cartItems = useCartItems(user ? user.uid : null);
+  const userId = user?.uid ?? null;
+  const {
+    items: cartItems,
+    addOrIncrement,
+    incrementItem,
+    decrementItem,
+    removeItem,
+  } = useCart(userId);
+
   const [isModalOpen, setModalOpen] = useState(false);
 
   if (!product || !displayedVariant) return <Loading />;
@@ -59,8 +61,20 @@ const ProductPage = () => {
     displayedVariant,
     activeDiscount
   );
+  const wishlistItem: WishlistItem = {
+    product: product,
+    productId: product.id,
+    variantId: displayedVariant.id,
+    slug: product.slug!,
+    materialColor: displayedVariant.materialColor,
+    insert: displayedVariant.insert,
+    size: (displayedVariant as any).size ?? 0,
+    price: discountedPrice ?? displayedVariant.price,
+    image: displayedVariant.images?.[0] ?? "/placeholder.jpg",
+  };
 
   const handleAddToCart = async (data: FormValues) => {
+    if (!userId) return;
     const item: CartItem = {
       productId: product.id,
       slug: product.slug!,
@@ -78,8 +92,7 @@ const ProductPage = () => {
     };
 
     try {
-      console.log("Adding to cart:", item);
-      await addOrIncrementCartItem(user!.uid, item);
+      await addOrIncrement(item);
       setModalOpen(true);
     } catch (e) {
       console.error("Error adding to cart:", e);
@@ -99,7 +112,8 @@ const ProductPage = () => {
           <ProductImageSlider
             key={`${displayedVariant.insert}-${displayedVariant.materialColor}`}
             images={displayedVariant.images || []}
-            altText={`${displayedVariant.insert} - ${displayedVariant.materialColor}`}
+            altText={`${displayedVariant.insert} – ${displayedVariant.materialColor}`}
+            wishlistItem={wishlistItem}
           />
 
           <div className="mt-6">
@@ -179,39 +193,33 @@ const ProductPage = () => {
 
       <Footer />
 
-      <SideCartModal
+      <CartSideModal
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
         items={cartItems}
         onIncrement={(it) =>
-          user &&
-          incrementQuantity(
-            user.uid,
-            it.productId,
-            it.size,
-            it.insert,
-            it.materialColor
-          )
+          incrementItem({
+            productId: it.productId,
+            size: it.size,
+            insert: it.insert,
+            materialColor: it.materialColor,
+          })
         }
         onDecrement={(it) =>
-          user &&
-          decrementQuantity(
-            user.uid,
-            it.productId,
-            it.size,
-            it.insert,
-            it.materialColor
-          )
+          decrementItem({
+            productId: it.productId,
+            size: it.size,
+            insert: it.insert,
+            materialColor: it.materialColor,
+          })
         }
         onRemove={(it) =>
-          user &&
-          removeItem(
-            user.uid,
-            it.productId,
-            it.size,
-            it.insert,
-            it.materialColor
-          )
+          removeItem({
+            productId: it.productId,
+            size: it.size,
+            insert: it.insert,
+            materialColor: it.materialColor,
+          })
         }
       />
     </div>

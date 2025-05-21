@@ -1,27 +1,51 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import EmblaCarousel from "@/app/components/EmblaCarousel/EmblaCarousel";
 import Item from "../Item/Item";
-import { Product } from "@/types/product";
-import { fetchProducts } from "@/utils/product";
 import { EmblaOptionsType } from "embla-carousel";
+import { useProduct } from "@/hooks/useProduct";
+import { Product } from "@/types/product";
+import { useProducts } from "@/hooks";
+import Notification from "@/app/components/MessageHandling/Notification";
+
+
+function ProductCard({ product }: { product: Product }) {
+  const {
+    displayedVariant,
+    sizeOptions,
+    insertOptions,
+    selectedSize,
+    handleSizeChange,
+    handleInsertChange,
+  } = useProduct(product);
+
+  return (
+    <Item
+      product={product}
+      displayedVariant={displayedVariant}
+      mode="default"
+      sizeOptions={sizeOptions}
+      insertOptions={insertOptions}
+      selectedSize={selectedSize}
+      onSizeChange={handleSizeChange}
+      onInsertChange={handleInsertChange}
+    />
+  );
+}
 
 const SimilarProducts = () => {
-  const [items, setItems] = useState<Product[]>([]);
+  const { products, loading, notification, clearNotification } =
+    useProducts(10);
 
   const options: EmblaOptionsType = {
     align: "start",
     loop: false,
   };
 
-  useEffect(() => {
-    async function loadSimilarProducts() {
-      const products = await fetchProducts(6);
-      setItems(products);
-    }
-    loadSimilarProducts();
-  }, []);
+  if (loading) {
+    return <div className="text-center">Loading...</div>;
+  }
 
   return (
     <div
@@ -29,6 +53,9 @@ const SimilarProducts = () => {
       style={{ fontFamily: "var(--font-poppins)" }}
       id="similar-products"
     >
+      {notification && (
+        <Notification {...notification} onClose={clearNotification} />
+      )}
       <h1
         className="text-center text-3xl text-gray-800 mb-1"
         style={{ fontFamily: "var(--font-playfair)" }}
@@ -36,9 +63,9 @@ const SimilarProducts = () => {
         Similar Products
       </h1>
       <EmblaCarousel options={options}>
-        {items.map((product) => (
+        {products.map((product) => (
           <div key={product.id} className="flex-shrink-0 w-1/2 xl:w-1/4">
-            <Item product={product} />
+            <ProductCard product={product} />
           </div>
         ))}
       </EmblaCarousel>

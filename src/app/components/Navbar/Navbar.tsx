@@ -8,9 +8,7 @@ import MobileMenu from "./MobileMenu";
 import NavLinks from "./NavLinks";
 import UserBlock from "./UserBlock";
 import CartSideModal from "@/app/components/SideModal/CartSideModal";
-import { useCart } from "@/app/contexts/CartContent";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "@/firebase/firebaseConfig";
+import { useCartContext } from "@/app/contexts/CartContent";
 
 const NAV_LINKS = [
   { href: "/about-us", label: "ABOUT US" },
@@ -33,8 +31,8 @@ export default function Navbar({
   const [openMenu, setOpenMenu] = useState(false);
   const [openCartModal, setOpenCartModal] = useState(false);
 
-  const { cartItemCount, cartItems } = useCart();
-  const [user] = useAuthState(auth);
+  const { cartItems, incrementItem, decrementItem, removeItem, cartItemCount } =
+    useCartContext();
 
   return (
     <>
@@ -156,9 +154,11 @@ export default function Navbar({
       <CartSideModal
         isOpen={openCartModal}
         onClose={() => setOpenCartModal(false)}
-        cartItems={cartItems}
-        user={user ?? null}
         added={false}
+        items={cartItems}
+        onIncrement={incrementItem}
+        onDecrement={decrementItem}
+        onRemove={removeItem}
       />
     </>
   );

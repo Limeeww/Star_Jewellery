@@ -1,6 +1,9 @@
 import { Timestamp } from "firebase/firestore";
 import { CartItem } from "./cartItem";
 import { Order, PaymentInfo } from "./order";
+import { Product } from "./product";
+
+export type Identifier = Omit<WishlistItem, "price" | "product">;
 
 export interface Address {
   title?: "Mr" | "Mrs";
@@ -19,6 +22,17 @@ export interface Address {
   preferredBillingAddress?: boolean;
 }
 
+export interface WishlistItem {
+  product: Product;
+  productId: number;
+  variantId: number;
+  slug: string;
+  materialColor: string;
+  insert: string;
+  size: number;
+  price: number;
+  image: string;
+}
 export interface UserData {
   firstName: string;
   lastName: string;
@@ -35,7 +49,7 @@ export interface UserData {
   anniversaryMonth?: string;
   anniversaryYear?: string;
   marketingConsent?: boolean;
-  wishList?: string[];
+  wishList?: WishlistItem[];
   orders?: Order[];
   addresses?: Address[];
   paymentMethods?: PaymentInfo[];

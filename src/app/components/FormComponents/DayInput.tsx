@@ -26,9 +26,9 @@ function DayInput({
       {label && (
         <label className="block text-sm font-semibold mb-1">{label}</label>
       )}
-      <div className="flex gap-2 bg-white">
+      <div className="flex gap-2">
         <select
-          className="w-1/3 border border-gray-300 p-2 
+          className="w-1/3 border bg-white border-gray-300 p-2 
                                          focus:outline-none focus:border-black bg-transparent"
           defaultValue={defaultDay}
           {...register(dayName)}
@@ -42,7 +42,7 @@ function DayInput({
         </select>
 
         <select
-          className="w-1/3 border border-gray-300 p-2 
+          className="w-1/3 border bg-white border-gray-300 p-2 
                                          focus:outline-none focus:border-black bg-transparent"
           defaultValue={defaultMonth}
           {...register(monthName)}
@@ -56,7 +56,7 @@ function DayInput({
         </select>
 
         <select
-          className="w-1/3 border border-gray-300 p-2 
+          className="w-1/3 border bg-white border-gray-300 p-2 
                                          focus:outline-none focus:border-black bg-transparent"
           defaultValue={defaultYear}
           {...register(yearName)}

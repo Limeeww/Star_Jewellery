@@ -71,7 +71,19 @@ export const PaymentStatusLabel: Record<PaymentStatusValue, string> = {
   [PaymentStatusValue.FAILED]: "Failed",
   [PaymentStatusValue.REFUNDED]: "Refunded",
 };
+export enum OrderStatusValue {
+  PENDING = "pending",
+  SHIPPED = "shipped",
+  DELIVERED = "delivered",
+  CANCELLED = "cancelled",
+}
 
+export const OrderStatusLabel: Record<OrderStatusValue, string> = {
+  [OrderStatusValue.PENDING]: "Pending",
+  [OrderStatusValue.SHIPPED]: "Shipped",
+  [OrderStatusValue.DELIVERED]: "Delivered",
+  [OrderStatusValue.CANCELLED]: "Cancelled",
+};
 export interface Order {
   orderId: number;
   userId: string;
@@ -83,5 +95,6 @@ export interface Order {
   paymentInfo: PaymentInfo;
   shippingAddress: Address;
   discountsApplied?: Discount[];
-  status: PaymentStatusValue;
+  status: OrderStatusValue;
+  usedBonuses: number;
 }

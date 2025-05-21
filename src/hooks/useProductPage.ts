@@ -19,7 +19,6 @@ import {
 } from "@/utils/product";
 import { pushRecent, RecentEntry } from "@/utils";
 
-
 export function useProductPage() {
   const { slug } = useParams<{ slug: string }>() ?? {};
   const searchParams = useSearchParams();
