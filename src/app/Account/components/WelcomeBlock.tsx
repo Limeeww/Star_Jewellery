@@ -10,6 +10,12 @@ interface WelcomeBlockProps {
 function WelcomeBlock({ firstName, lastName }: WelcomeBlockProps): JSX.Element {
   const router = useRouter();
 
+  const handleSignOut = async () => {
+    await signOutUser();
+    router.replace("/");
+    router.refresh();
+  };
+
   return (
     <div
       className="p-6 mb-8 flex justify-center"
@@ -28,7 +34,7 @@ function WelcomeBlock({ firstName, lastName }: WelcomeBlockProps): JSX.Element {
           your addresses, bonuses, manage your wish list, and more.
         </p>
         <button
-          onClick={() => signOutUser(router)}
+          onClick={handleSignOut}
           className="bg-black text-white text-sm font-medium px-4 py-2 hover:bg-gray-800 transition-colors"
         >
           LOG OUT

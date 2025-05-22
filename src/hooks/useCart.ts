@@ -1,5 +1,6 @@
+// src/hooks/useCart.ts
 import { useState, useEffect, useCallback } from "react";
-import { doc, onSnapshot, getDoc, updateDoc } from "firebase/firestore";
+import { doc, onSnapshot, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
 import type { CartItem } from "@/types/cartItem";
 
@@ -16,30 +17,94 @@ interface UseCartReturn {
   removeItem: (item: CartItemIdentifier) => Promise<void>;
 }
 
+const LOCAL_KEY = "star_cart";
+
+/**
+ * Хук корзины, поддерживает:
+ * - гостевую: хранение в localStorage
+ * - авторизованную: хранение в Firestore /users/{userId}.cartItems
+ */
 export function useCart(userId: string | null): UseCartReturn {
   const [items, setItems] = useState<CartItem[]>([]);
 
+  // 1) Слушаем источник правды: Firestore или localStorage
   useEffect(() => {
-    if (!userId) {
-      setItems([]);
-      return;
+    if (userId) {
+      // соединяем локальную корзину в базу при первом mount
+      const raw = localStorage.getItem(LOCAL_KEY);
+      if (raw) {
+        const localCart: CartItem[] = JSON.parse(raw);
+        localStorage.removeItem(LOCAL_KEY);
+        const userRef = doc(db, "users", userId);
+        // если пользователя ещё нет — создаём
+        getDoc(userRef).then((snap) => {
+          if (!snap.exists()) {
+            setDoc(userRef, { cartItems: localCart }, { merge: true });
+          } else {
+            const serverCart: CartItem[] = snap.data().cartItems || [];
+            const merged = [...serverCart];
+            localCart.forEach((li) => {
+              const idx = merged.findIndex(
+                (it) =>
+                  it.productId === li.productId &&
+                  it.size === li.size &&
+                  it.insert === li.insert &&
+                  it.materialColor === li.materialColor
+              );
+              if (idx > -1) merged[idx].quantity += li.quantity;
+              else merged.push(li);
+            });
+            updateDoc(userRef, { cartItems: merged });
+          }
+        });
+
+        // теперь подпишемся на базу
+        const userRef2 = doc(db, "users", userId);
+        const unsub = onSnapshot(userRef2, (snap) => {
+          const data = snap.data() as { cartItems?: CartItem[] } | undefined;
+          setItems(data?.cartItems ?? []);
+        });
+        return () => unsub();
+      } else {
+        // просто слушаем базу
+        const userRef = doc(db, "users", userId);
+        const unsub = onSnapshot(userRef, (snap) => {
+          const data = snap.data() as { cartItems?: CartItem[] } | undefined;
+          setItems(data?.cartItems ?? []);
+        });
+        return () => unsub();
+      }
+    } else {
+      // гость: читаем из localStorage
+      const raw = localStorage.getItem(LOCAL_KEY);
+      setItems(raw ? JSON.parse(raw) : []);
     }
-    const userRef = doc(db, "users", userId);
-    const unsubscribe = onSnapshot(userRef, (snap) => {
-      const data = snap.data() as { cartItems?: CartItem[] } | undefined;
-      setItems(data?.cartItems ?? []);
-    });
-    return () => unsubscribe();
   }, [userId]);
 
+  // 2) Функция сохранения
+  const persist = useCallback(
+    async (newCart: CartItem[]) => {
+      setItems(newCart);
+      if (userId) {
+        const userRef = doc(db, "users", userId);
+        const snap = await getDoc(userRef);
+        if (!snap.exists()) {
+          await setDoc(userRef, { cartItems: newCart }, { merge: true });
+        } else {
+          await updateDoc(userRef, { cartItems: newCart });
+        }
+      } else {
+        localStorage.setItem(LOCAL_KEY, JSON.stringify(newCart));
+        setItems(newCart);
+      }
+    },
+    [userId]
+  );
+
+  // 3) Методы манипуляции корзиной
   const addOrIncrement = useCallback(
     async (newItem: CartItem) => {
-      if (!userId) return;
-      const userRef = doc(db, "users", userId);
-      const snap = await getDoc(userRef);
-      if (!snap.exists()) return;
-
-      const cart: CartItem[] = snap.data().cartItems || [];
+      const cart = [...items];
       const idx = cart.findIndex(
         (it) =>
           it.productId === newItem.productId &&
@@ -47,27 +112,19 @@ export function useCart(userId: string | null): UseCartReturn {
           it.insert === newItem.insert &&
           it.materialColor === newItem.materialColor
       );
-
       if (idx > -1) {
         cart[idx].quantity += newItem.quantity;
       } else {
         cart.push(newItem);
       }
-
-      await updateDoc(userRef, { cartItems: cart });
+      await persist(cart);
     },
-    [userId]
+    [items, persist]
   );
 
   const incrementItem = useCallback(
     async (item: CartItemIdentifier) => {
-      if (!userId) return;
-      const userRef = doc(db, "users", userId);
-      const snap = await getDoc(userRef);
-      if (!snap.exists()) return;
-
-      const cart: CartItem[] = snap.data().cartItems || [];
-      const updated = cart.map((it) =>
+      const cart = items.map((it) =>
         it.productId === item.productId &&
         it.size === item.size &&
         it.insert === item.insert &&
@@ -75,46 +132,36 @@ export function useCart(userId: string | null): UseCartReturn {
           ? { ...it, quantity: it.quantity + 1 }
           : it
       );
-      await updateDoc(userRef, { cartItems: updated });
+      await persist(cart);
     },
-    [userId]
+    [items, persist]
   );
 
   const decrementItem = useCallback(
     async (item: CartItemIdentifier) => {
-      if (!userId) return;
-      const userRef = doc(db, "users", userId);
-      const snap = await getDoc(userRef);
-      if (!snap.exists()) return;
-
-      const cartOrNull: (CartItem | null)[] = snap.data().cartItems || [];
-      const filtered = cartOrNull
-        .map((it) =>
-          it &&
-          it.productId === item.productId &&
-          it.size === item.size &&
-          it.insert === item.insert &&
-          it.materialColor === item.materialColor
-            ? it.quantity > 1
+      const cart = items
+        .map((it) => {
+          if (
+            it.productId === item.productId &&
+            it.size === item.size &&
+            it.insert === item.insert &&
+            it.materialColor === item.materialColor
+          ) {
+            return it.quantity > 1
               ? { ...it, quantity: it.quantity - 1 }
-              : null
-            : it
-        )
+              : null;
+          }
+          return it;
+        })
         .filter(Boolean) as CartItem[];
-      await updateDoc(userRef, { cartItems: filtered });
+      await persist(cart);
     },
-    [userId]
+    [items, persist]
   );
 
   const removeItem = useCallback(
     async (item: CartItemIdentifier) => {
-      if (!userId) return;
-      const userRef = doc(db, "users", userId);
-      const snap = await getDoc(userRef);
-      if (!snap.exists()) return;
-
-      const cart: CartItem[] = snap.data().cartItems || [];
-      const filtered = cart.filter(
+      const cart = items.filter(
         (it) =>
           !(
             it.productId === item.productId &&
@@ -123,9 +170,9 @@ export function useCart(userId: string | null): UseCartReturn {
             it.materialColor === item.materialColor
           )
       );
-      await updateDoc(userRef, { cartItems: filtered });
+      await persist(cart);
     },
-    [userId]
+    [items, persist]
   );
 
   return { items, addOrIncrement, incrementItem, decrementItem, removeItem };

@@ -1,23 +1,27 @@
 import React from "react";
 
-interface ActionButtonProps {
+export interface ActionButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   text: string;
-  disabled?: boolean;
-  className?: string;
-  onClick: () => void;
 }
 
-function ActionButton({
+export default function ActionButton({
   text,
-  disabled,
   className,
+  disabled,
   onClick,
+  type = "button",
+  ...props
 }: ActionButtonProps) {
   return (
-    <button className={className} disabled={disabled} onClick={onClick}>
+    <button
+      type={type}
+      className={className}
+      disabled={disabled}
+      onClick={onClick}
+      {...props}
+    >
       {text}
     </button>
   );
 }
-
-export default ActionButton;

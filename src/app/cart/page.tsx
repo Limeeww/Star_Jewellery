@@ -31,7 +31,7 @@ import {
 import { useAuthStatus } from "@/hooks/useAuthStatus";
 
 export default function CartPage() {
-  const { user, isLoggedIn } = useAuthStatus();
+  const { user } = useAuthStatus();
   const router = useRouter();
 
   const { cartItems, incrementItem, decrementItem, removeItem } =
@@ -45,6 +45,7 @@ export default function CartPage() {
       giftMessageText: "",
     },
   });
+
   const giftOptionsValues = {
     giftPackaging: watch("giftPackaging"),
     giftMessage: watch("giftMessage"),
@@ -61,17 +62,16 @@ export default function CartPage() {
   const originalPriceSum = calculateOriginalPriceSum(cartItems);
 
   const handleProceed = () => {
-    if (!user) return;
-
     const now = new Date();
     const paymentInfo = {
       method: "credit_card",
       transactionId: "",
       paid: false,
     } as unknown as PaymentInfo;
+
     const order: Partial<Order> = {
       orderId: Date.now(),
-      userId: user.uid,
+      userId: user?.uid ?? undefined,
       products: cartItems,
       total,
       orderDate: now,
@@ -86,17 +86,9 @@ export default function CartPage() {
     router.push("/checkout");
   };
 
-  if (!isLoggedIn) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-gray-600">Please sign in to view your cart.</p>
-      </div>
-    );
-  }
-
   return (
     <>
-      <Navbar isScrolled={true} isLoggedIn={isLoggedIn} />
+      <Navbar isScrolled={true} isLoggedIn={!!user && !user.isAnonymous} />
 
       <main
         className="min-h-screen bg-gray-50 p-4 text-gray-800 mt-10"

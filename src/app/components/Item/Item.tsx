@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useCart } from "@/hooks/useCart";
 import WishlistButton from "@/app/components/WishlistButton";
 import RemoveWishlistButton from "@/app/Account/components/RemoveWishlistButton";
 import ActionButton from "@/app/components/FormComponents/ActionButton";
@@ -11,7 +10,7 @@ import type { Product, ProductVariant } from "@/types/product";
 import { badgeLabels } from "@/types/product";
 import type { CartItem } from "@/types/cartItem";
 import TagBadge from "./TagBadge";
-import { useAuthStatus } from "@/hooks/useAuthStatus";
+import { useCartContext } from "@/app/contexts/CartContent";
 
 interface Props {
   product: Product;
@@ -38,9 +37,7 @@ export default function Item({
   onInsertChange,
   onRemove,
 }: Props) {
-  const { user } = useAuthStatus();
-  const userId = user?.uid ?? null;
-  const { addOrIncrement } = useCart(userId);
+  const { addOrIncrement } = useCartContext(); // ← get from context
   const [isAdding, setIsAdding] = useState(false);
 
   const variant: ProductVariant | undefined =
@@ -67,7 +64,6 @@ export default function Item({
   const btnText = isAdding ? "Adding…" : missingText || "Add to Cart";
 
   const handleAddToCart = async () => {
-    if (!userId) return;
     const item: CartItem = {
       productId: product.id,
       slug: product.slug,
@@ -127,7 +123,7 @@ export default function Item({
         </Link>
 
         {(mode === "default" || mode === "wishlist") && (
-          <form className="mt-4 space-y-3">
+          <div className="mt-4 space-y-3">
             {needSize && (
               <SelectField
                 label="Size"
@@ -149,38 +145,32 @@ export default function Item({
               />
             )}
             <ActionButton
+              type="button" // prevent form submit
               text={btnText}
               disabled={btnDisabled}
               onClick={handleAddToCart}
               className="w-full bg-black text-white px-4 py-1 disabled:opacity-50"
             />
-          </form>
+          </div>
         )}
 
         <div className="absolute top-2 right-2 z-10">
           {mode === "default" && (
-            <div className="absolute z-10">
-              <WishlistButton
-                item={{
-                  product,
-                  productId: product.id,
-                  variantId: variant.id,
-                  slug: product.slug,
-                  materialColor: variant.materialColor,
-                  insert: variant.insert,
-                  size: Number(selectedSize) || 0,
-                  price: variant.price,
-                  image: src,
-                }}
-              />
-            </div>
+            <WishlistButton
+              item={{
+                product,
+                productId: product.id,
+                variantId: variant.id,
+                slug: product.slug,
+                materialColor: variant.materialColor,
+                insert: variant.insert,
+                size: Number(selectedSize) || 0,
+                price: variant.price,
+                image: src,
+              }}
+            />
           )}
-
-          {mode === "wishlist" && (
-            <div className="absolute z-10">
-              <RemoveWishlistButton onClick={onRemove!} />
-            </div>
-          )}
+          {mode === "wishlist" && <RemoveWishlistButton onClick={onRemove!} />}
         </div>
       </div>
     </div>

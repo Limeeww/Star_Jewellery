@@ -11,7 +11,11 @@ type UserBlockProps = {
   onClose?: () => void;
 };
 
-export default function UserBlock({ isScrolled, isLoggedIn, onClose }: UserBlockProps) {
+export default function UserBlock({
+  isScrolled,
+  isLoggedIn,
+  onClose,
+}: UserBlockProps) {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
 
@@ -19,7 +23,7 @@ export default function UserBlock({ isScrolled, isLoggedIn, onClose }: UserBlock
     setMounted(true);
   }, []);
 
-    const linkClass = `
+  const linkClass = `
       transition-colors
       duration-300
       hover:underline
@@ -34,6 +38,12 @@ export default function UserBlock({ isScrolled, isLoggedIn, onClose }: UserBlock
 
   if (!mounted) return null;
 
+  const handleSignOut = async () => {
+    await signOutUser();
+    router.replace("/");
+   
+  };
+
   if (isLoggedIn) {
     return (
       <>
@@ -47,7 +57,7 @@ export default function UserBlock({ isScrolled, isLoggedIn, onClose }: UserBlock
         </Link>
         <button
           className={`${linkClass} ${textColor} text-left`}
-          onClick={() => signOutUser(router)}
+          onClick={handleSignOut}
         >
           <LuLogOut size={18} />
           <span>Log out</span>
