@@ -37,7 +37,7 @@ export default function Item({
   onInsertChange,
   onRemove,
 }: Props) {
-  const { addOrIncrement } = useCartContext(); // ← get from context
+  const { addOrIncrement } = useCartContext();
   const [isAdding, setIsAdding] = useState(false);
 
   const variant: ProductVariant | undefined =
@@ -145,7 +145,7 @@ export default function Item({
               />
             )}
             <ActionButton
-              type="button" // prevent form submit
+              type="button"
               text={btnText}
               disabled={btnDisabled}
               onClick={handleAddToCart}
