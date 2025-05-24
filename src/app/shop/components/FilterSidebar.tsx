@@ -1,9 +1,38 @@
-import React, { useState } from "react";
-import { badgeLabels, Product, ProductTag } from "@/types/product";
+import React from "react";
+import { badgeLabels, ProductTag } from "@/types/product";
 import { CollapsibleSection } from "@/app/shop/components/CollapsibleSection";
-import { useCategories } from "@/hooks/useCatergories";
-import { extractUniqueAttributes } from "@/utils/extractUniqueAttributes";
-import { useCollections } from "@/hooks/useCollection";
+import type { Category } from "@/types/product";
+import type { Collection } from "@/types/collection";
+
+export type SortOption = "recommended" | "priceDesc" | "priceAsc";
+
+interface FilterSidebarProps {
+  sortOption: SortOption;
+  onSortChange: (opt: SortOption) => void;
+
+  selectedTags: ProductTag[];
+  onToggleTag: (tag: ProductTag) => void;
+
+  categories: Category[];
+  selectedCats: number[];
+  onToggleCat: (id: number) => void;
+
+  materials: string[];
+  selectedMaterials: string[];
+  onToggleMaterial: (m: string) => void;
+
+  colors: string[];
+  selectedColors: string[];
+  onToggleColor: (c: string) => void;
+
+  inserts: string[];
+  selectedInserts: string[];
+  onToggleInsert: (i: string) => void;
+
+  collections: Collection[];
+  selectedCollections: number[];
+  onToggleCollection: (id: number) => void;
+}
 
 const TAGS: Exclude<ProductTag, "default">[] = [
   "must-have",
@@ -12,35 +41,27 @@ const TAGS: Exclude<ProductTag, "default">[] = [
   "sale",
 ];
 
-interface FilterSidebarProps {
-  products: Product[];
-}
-
-export default function FilterSidebar({ products }: FilterSidebarProps) {
-  const [sortOption, setSortOption] = useState<
-    "recommended" | "priceDesc" | "priceAsc"
-  >("recommended");
-
-  const collections = useCollections();
-  const categories = useCategories();
-  
-  const { materials, colors, inserts } = extractUniqueAttributes(products);
-  const [selectedTags, setSelectedTags] = useState<ProductTag[]>([]);
-  const [selectedCats, setSelectedCats] = useState<string[]>([]);
-  const [selectedMaterials, setSelectedMaterials] = useState<string[]>([]);
-  const [selectedColors, setSelectedColors] = useState<string[]>([]);
-  const [selectedCollections, setSelectedCollections] = useState<string[]>([]);
-
-  function toggleItem<T>(
-    item: T,
-    list: T[],
-    setter: React.Dispatch<React.SetStateAction<T[]>>
-  ) {
-    setter((prev) =>
-      prev.includes(item) ? prev.filter((x) => x !== item) : [...prev, item]
-    );
-  }
-
+export default function FilterSidebar({
+  sortOption,
+  onSortChange,
+  selectedTags,
+  onToggleTag,
+  categories,
+  selectedCats,
+  onToggleCat,
+  materials,
+  selectedMaterials,
+  onToggleMaterial,
+  colors,
+  selectedColors,
+  onToggleColor,
+  inserts,
+  selectedInserts,
+  onToggleInsert,
+  collections,
+  selectedCollections,
+  onToggleCollection,
+}: FilterSidebarProps) {
   return (
     <aside className="w-full space-y-8">
       <div className="space-y-6">
@@ -53,7 +74,7 @@ export default function FilterSidebar({ products }: FilterSidebarProps) {
               className="mr-2"
               value="recommended"
               checked={sortOption === "recommended"}
-              onChange={() => setSortOption("recommended")}
+              onChange={() => onSortChange("recommended")}
             />
             Recommended
           </label>
@@ -64,7 +85,7 @@ export default function FilterSidebar({ products }: FilterSidebarProps) {
               className="mr-2"
               value="priceDesc"
               checked={sortOption === "priceDesc"}
-              onChange={() => setSortOption("priceDesc")}
+              onChange={() => onSortChange("priceDesc")}
             />
             Price High to Low
           </label>
@@ -75,7 +96,7 @@ export default function FilterSidebar({ products }: FilterSidebarProps) {
               className="mr-2"
               value="priceAsc"
               checked={sortOption === "priceAsc"}
-              onChange={() => setSortOption("priceAsc")}
+              onChange={() => onSortChange("priceAsc")}
             />
             Price Low to High
           </label>
@@ -90,11 +111,8 @@ export default function FilterSidebar({ products }: FilterSidebarProps) {
               <input
                 type="checkbox"
                 className="mr-2"
-                value={tag}
                 checked={selectedTags.includes(tag)}
-                onChange={() =>
-                  toggleItem<ProductTag>(tag, selectedTags, setSelectedTags)
-                }
+                onChange={() => onToggleTag(tag)}
               />
               {badgeLabels[tag]}
             </label>
@@ -109,10 +127,8 @@ export default function FilterSidebar({ products }: FilterSidebarProps) {
               <input
                 type="checkbox"
                 className="mr-2"
-                checked={selectedCats.includes(cat.id)}
-                onChange={() =>
-                  toggleItem<string>(cat.id, selectedCats, setSelectedCats)
-                }
+                checked={selectedCats.includes(Number(cat.id))}
+                onChange={() => onToggleCat(Number(cat.id))}
               />
               {cat.name}
             </label>
@@ -126,9 +142,7 @@ export default function FilterSidebar({ products }: FilterSidebarProps) {
                 type="checkbox"
                 className="mr-2"
                 checked={selectedMaterials.includes(m)}
-                onChange={() =>
-                  toggleItem<string>(m, selectedMaterials, setSelectedMaterials)
-                }
+                onChange={() => onToggleMaterial(m)}
               />
               {m}
             </label>
@@ -142,27 +156,23 @@ export default function FilterSidebar({ products }: FilterSidebarProps) {
                 type="checkbox"
                 className="mr-2"
                 checked={selectedColors.includes(c)}
-                onChange={() =>
-                  toggleItem<string>(c, selectedColors, setSelectedColors)
-                }
+                onChange={() => onToggleColor(c)}
               />
               {c}
             </label>
           ))}
         </CollapsibleSection>
 
-        <CollapsibleSection title="Insert" count={selectedColors.length}>
-          {inserts.map((c) => (
-            <label key={c} className="block text-sm">
+        <CollapsibleSection title="Insert" count={selectedInserts.length}>
+          {inserts.map((i) => (
+            <label key={i} className="block text-sm">
               <input
                 type="checkbox"
                 className="mr-2"
-                checked={selectedColors.includes(c)}
-                onChange={() =>
-                  toggleItem<string>(c, selectedColors, setSelectedColors)
-                }
+                checked={selectedInserts.includes(i)}
+                onChange={() => onToggleInsert(i)}
               />
-              {c}
+              {i}
             </label>
           ))}
         </CollapsibleSection>
@@ -176,14 +186,8 @@ export default function FilterSidebar({ products }: FilterSidebarProps) {
               <input
                 type="checkbox"
                 className="mr-2"
-                checked={selectedCollections.includes(col.id)}
-                onChange={() =>
-                  toggleItem<string>(
-                    col.id,
-                    selectedCollections,
-                    setSelectedCollections
-                  )
-                }
+                checked={selectedCollections.includes(Number(col.id))}
+                onChange={() => onToggleCollection(Number(col.id))}
               />
               {col.name}
             </label>

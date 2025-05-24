@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useMemo } from "react";
 import Navbar from "@/app/components/Navbar/Navbar";
 import Footer from "@/app/components/Footer/Footer";
 import FilterSidebar from "./components/FilterSidebar";
@@ -11,12 +11,92 @@ import Image from "next/image";
 import Link from "next/link";
 import Loading from "../components/Loading/Loading";
 import { usePagination } from "@/hooks/usePagination";
-import { Product } from "@/types/product";
+import type { Product, ProductTag } from "@/types/product";
 import { PaginationControls } from "../components/PaginationControls";
+import { useCategories } from "@/hooks/useCatergories";
+import { useCollections } from "@/hooks/useCollection";
+import { extractUniqueAttributes } from "@/utils/extractUniqueAttributes";
 
 export default function ShopPage() {
   const { isLoggedIn } = useAuthStatus();
   const { products, loading } = useProducts(20);
+
+  const [sortOption, setSortOption] = useState<
+    "recommended" | "priceDesc" | "priceAsc"
+  >("recommended");
+  const [selectedTags, setSelectedTags] = useState<ProductTag[]>([]);
+  const [selectedCats, setSelectedCats] = useState<number[]>([]);
+  const [selectedMaterials, setSelectedMaterials] = useState<string[]>([]);
+  const [selectedColors, setSelectedColors] = useState<string[]>([]);
+  const [selectedInserts, setSelectedInserts] = useState<string[]>([]);
+  const [selectedCollections, setSelectedCollections] = useState<number[]>([]);
+
+  const categories = useCategories();
+  const collections = useCollections();
+
+  const { materials, colors, inserts } = extractUniqueAttributes(products);
+
+  const filtered = useMemo(() => {
+    let list = products;
+
+    // by tag
+    if (selectedTags.length) {
+      list = list.filter((p) => selectedTags.includes(p.tag));
+    }
+    // by category
+    if (selectedCats.length) {
+      list = list.filter((p) => selectedCats.includes(p.categoryId));
+    }
+    // by material
+    if (selectedMaterials.length) {
+      list = list.filter((p) =>
+        p.variants.some((v) => selectedMaterials.includes(v.material))
+      );
+    }
+    // by color
+    if (selectedColors.length) {
+      list = list.filter((p) =>
+        p.variants.some((v) => selectedColors.includes(v.materialColor))
+      );
+    }
+    // by insert
+    if (selectedInserts.length) {
+      list = list.filter((p) =>
+        p.variants.some((v) => selectedInserts.includes(v.insert))
+      );
+    }
+    // by collection membership
+    if (selectedCollections.length) {
+      list = list.filter((p) =>
+        collections
+          .filter((c) => selectedCollections.includes(Number(c.id)))
+          .some((c) => c.productIds.includes(p.id))
+      );
+    }
+
+    // sort Price
+    if (sortOption === "priceAsc") {
+      return [...list].sort(
+        (a, b) => a.variants[0].price - b.variants[0].price
+      );
+    }
+    if (sortOption === "priceDesc") {
+      return [...list].sort(
+        (a, b) => b.variants[0].price - a.variants[0].price
+      );
+    }
+    return list;
+  }, [
+    products,
+    selectedTags,
+    selectedCats,
+    selectedMaterials,
+    selectedColors,
+    selectedInserts,
+    selectedCollections,
+    sortOption,
+    collections,
+  ]);
 
   const {
     currentPageItems,
@@ -26,7 +106,7 @@ export default function ShopPage() {
     hasNext,
     prevPage,
     nextPage,
-  } = usePagination<Product>(products, 4);
+  } = usePagination<Product>(filtered, 4);
 
   return (
     <div
@@ -66,13 +146,63 @@ export default function ShopPage() {
           </div>
 
           <div className="flex items-center space-x-6">
-            <div>{products.length} models</div>
+            <div>{filtered.length} models</div>
           </div>
         </div>
 
         <div className="container mx-auto px-4 pb-16 lg:flex lg:space-x-8">
           <aside className="lg:w-1/4 w-full mb-8 lg:mb-0">
-            <FilterSidebar products={products}/>
+            <FilterSidebar
+              sortOption={sortOption}
+              onSortChange={setSortOption}
+              selectedTags={selectedTags}
+              onToggleTag={(tag) =>
+                setSelectedTags((prev) =>
+                  prev.includes(tag)
+                    ? prev.filter((t) => t !== tag)
+                    : [...prev, tag]
+                )
+              }
+              categories={categories}
+              selectedCats={selectedCats}
+              onToggleCat={(id) =>
+                setSelectedCats((prev) =>
+                  prev.includes(id)
+                    ? prev.filter((c) => c !== id)
+                    : [...prev, id]
+                )
+              }
+              materials={materials}
+              selectedMaterials={selectedMaterials}
+              onToggleMaterial={(m) =>
+                setSelectedMaterials((prev) =>
+                  prev.includes(m) ? prev.filter((x) => x !== m) : [...prev, m]
+                )
+              }
+              colors={colors}
+              selectedColors={selectedColors}
+              onToggleColor={(c) =>
+                setSelectedColors((prev) =>
+                  prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c]
+                )
+              }
+              inserts={inserts}
+              selectedInserts={selectedInserts}
+              onToggleInsert={(i) =>
+                setSelectedInserts((prev) =>
+                  prev.includes(i) ? prev.filter((x) => x !== i) : [...prev, i]
+                )
+              }
+              collections={collections}
+              selectedCollections={selectedCollections}
+              onToggleCollection={(id) =>
+                setSelectedCollections((prev) =>
+                  prev.includes(id)
+                    ? prev.filter((x) => x !== id)
+                    : [...prev, id]
+                )
+              }
+            />
           </aside>
 
           <div className="flex-1">
