@@ -17,6 +17,7 @@ import { usePaymentMethods } from "@/hooks/usePaymentMethods";
 import { useLocalOrder, useSubmitOrder } from "@/hooks";
 import { useCartContext } from "@/app/contexts/CartContent";
 import { useBonuses } from "@/hooks/useBonuses";
+import ActionButton from "@/app/components/FormComponents/ActionButton";
 
 import {
   calculateDiscountPercentFromBonuses,
@@ -35,6 +36,7 @@ import type { Address } from "@/types/userTypes";
 import type { GiftOptionsForm } from "@/types/order";
 import { LuCreditCard, LuMapPin } from "react-icons/lu";
 import { useAuthStatus } from "@/hooks/useAuthStatus";
+import { useRouter } from "next/navigation";
 
 export default function CheckoutPage() {
   const { notification, clearNotification } = useNotification();
@@ -43,6 +45,7 @@ export default function CheckoutPage() {
 
   const { cartItems: products } = useCartContext();
   const order = useLocalOrder();
+  const router = useRouter();
 
   const {
     addresses,
@@ -142,8 +145,20 @@ export default function CheckoutPage() {
 
   if (!isLoggedIn) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex flex-col items-center justify-center">
         <p className="text-gray-600">Please sign in to access checkout.</p>
+        <div className="flex justify-center gap-2 mt-4">
+          <ActionButton
+            text="Sign In"
+            onClick={() => router.push("/sign-in")}
+            className="px-6 py-2 bg-black text-white rounded hover:bg-gray-800 transition"
+          />
+          <ActionButton
+            text="Sign Up"
+            onClick={() => router.push("/sign-up")}
+            className="px-6 py-2 border border-black text-black rounded hover:bg-gray-100 transition"
+          />
+        </div>
       </div>
     );
   }

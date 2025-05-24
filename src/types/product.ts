@@ -4,12 +4,11 @@ export type ProductTag = "must-have" | "new" | "exclusive" | "sale" | "default";
 
 export const badgeLabels: Record<NonNullable<ProductTag>, string> = {
   "must-have": "Must have",
-  "new": "New",
-  "exclusive": "Exclusive",
-  "sale": "Sale",
-  default: ""
+  new: "New",
+  exclusive: "Exclusive",
+  sale: "Sale",
+  default: "",
 };
-
 
 export interface Discount {
   id: number;
@@ -24,7 +23,7 @@ export interface Discount {
 }
 
 export interface Category {
-  id: number;
+  id: string;
   name: string;
   image: string;
   parentCategory: number | null;

@@ -1,14 +1,15 @@
+// src/app/contexts/CartContext.tsx
 "use client";
 
 import React, { createContext, useContext, ReactNode } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase/firebaseConfig";
-import { CartItem } from "@/types/cartItem";
+import type { CartItem } from "@/types/cartItem";
 import { useCart as useCartHook, CartItemIdentifier } from "@/hooks/useCart";
 
 interface CartContextType {
-  cartItemCount: number;
   cartItems: CartItem[];
+  cartItemCount: number;
   addOrIncrement: (newItem: CartItem) => Promise<void>;
   incrementItem: (identifier: CartItemIdentifier) => Promise<void>;
   decrementItem: (identifier: CartItemIdentifier) => Promise<void>;
@@ -19,7 +20,8 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [user] = useAuthState(auth);
-  const userId = user ? user.uid : null;
+
+  const userId = user && !user.isAnonymous ? user.uid : null;
 
   const {
     items: cartItems,
@@ -29,13 +31,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
     removeItem,
   } = useCartHook(userId);
 
-  const cartItemCount = cartItems.length;
+  const cartItemCount = cartItems.reduce((sum, it) => sum + it.quantity, 0);
 
   return (
     <CartContext.Provider
       value={{
-        cartItemCount,
         cartItems,
+        cartItemCount,
         addOrIncrement,
         incrementItem,
         decrementItem,
@@ -47,10 +49,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export function useCartContext() {
-  const context = useContext(CartContext);
-  if (context === undefined) {
-    throw new Error("useCartContext must be used within a CartProvider");
+export function useCartContext(): CartContextType {
+  const ctx = useContext(CartContext);
+  if (!ctx) {
+    throw new Error("useCartContext must be used within <CartProvider>");
   }
-  return context;
+  return ctx;
 }

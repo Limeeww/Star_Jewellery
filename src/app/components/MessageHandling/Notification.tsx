@@ -1,4 +1,8 @@
+// src/app/components/MessageHandling/Notification.tsx
+"use client";
+
 import React, { useEffect, useState, useRef } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   AiOutlineCheckCircle,
@@ -32,9 +36,7 @@ const Notification: React.FC<NotificationProps> = ({
     }, duration);
 
     return () => {
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
-      }
+      if (timerRef.current) clearTimeout(timerRef.current);
     };
   }, [duration, onClose]);
 
@@ -63,7 +65,9 @@ const Notification: React.FC<NotificationProps> = ({
 
   const { bg, text, icon } = typeStyles[type];
 
-  return (
+  if (typeof document === "undefined") return null;
+
+  return createPortal(
     <AnimatePresence>
       {visible && (
         <motion.div
@@ -77,7 +81,8 @@ const Notification: React.FC<NotificationProps> = ({
           <span className={`font-medium ${text}`}>{message}</span>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 };
 

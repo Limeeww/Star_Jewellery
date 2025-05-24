@@ -1,5 +1,8 @@
-import { useEffect, useState } from "react";
-import { signInAnonymously, onAuthStateChanged, User } from "firebase/auth";
+// src/hooks/useAnonymousAuth.ts
+"use client";
+
+import { useState, useEffect } from "react";
+import { onAuthStateChanged, signInAnonymously, User } from "firebase/auth";
 import { auth } from "@/firebase/firebaseConfig";
 
 export function useAnonymousAuth() {
@@ -7,14 +10,21 @@ export function useAnonymousAuth() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      if (!currentUser) {
-        await signInAnonymously(auth);
+    const unsubscribe = onAuthStateChanged(auth, async (current) => {
+      if (current == null) {
+        try {
+          const { user: anon } = await signInAnonymously(auth);
+          setUser(anon);
+        } catch (e) {
+          console.error("Anonymous sign-in failed:", e);
+          setUser(null);
+        }
       } else {
-        setUser(currentUser);
+        setUser(current);
       }
       setLoading(false);
     });
+
     return unsubscribe;
   }, []);
 

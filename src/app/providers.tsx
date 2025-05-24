@@ -2,6 +2,8 @@
 
 import React from "react";
 import { useAnonymousAuth } from "@/hooks/useAnonymousAuth";
+import { useNotification } from "@/hooks/useNotification";
+import Notification from "./components/MessageHandling/Notification";
 import Loading from "./components/Loading/Loading";
 import { AuthProvider } from "./contexts/AuthContext";
 import { CartProvider } from "./contexts/CartContent";
@@ -10,16 +12,20 @@ import StripeProvider from "./components/StripeProvider";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAnonymousAuth();
+  const { notification, clearNotification } = useNotification();
 
-  if (loading) {
-    return <Loading />;
-  }
+  if (loading) return <Loading />;
 
   return (
     <AuthProvider user={user} loading={loading}>
       <StripeProvider>
         <CartProvider>
-          <WishlistProvider>{children}</WishlistProvider>
+          <WishlistProvider>
+            {children}
+            {notification && (
+              <Notification {...notification} onClose={clearNotification} />
+            )}
+          </WishlistProvider>
         </CartProvider>
       </StripeProvider>
     </AuthProvider>

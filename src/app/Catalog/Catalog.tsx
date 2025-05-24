@@ -10,9 +10,11 @@ import { useProducts } from "@/hooks/useProducts";
 import { useProduct } from "@/hooks/useProduct";
 import Item from "@/app/components/Item/Item";
 import { Product } from "@/types/product";
+import { useAuthStatus } from "@/hooks";
 
 const OPTIONS: EmblaOptionsType = { dragFree: true };
 
+//DELETE IT
 function ProductCard({ product }: { product: Product }) {
   const {
     displayedVariant,
@@ -38,14 +40,17 @@ function ProductCard({ product }: { product: Product }) {
 }
 
 export default function CatalogPage() {
+  const { user, loading: authLoading } = useAuthStatus();
   const {
     products,
-    loading,
+    loading: productsLoading,
     notification,
     clearNotification,
   } = useProducts(10);
 
-  if (loading) return <Loading />;
+  if (authLoading) return <Loading />;
+
+  if (productsLoading) return <Loading />;
 
   return (
     <div

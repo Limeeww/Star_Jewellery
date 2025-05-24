@@ -1,28 +1,33 @@
 import { useState, useEffect } from "react";
 import {
   collection,
-  getDocs,
   query,
   limit as queryLimit,
+  onSnapshot,
+  QuerySnapshot,
 } from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
-import { Product } from "@/types/product";
 import { useNotification } from "@/hooks/useNotification";
+import { useAuthStatus } from "@/hooks/useAuthStatus";
+import type { Product } from "@/types/product";
 
 export function useProducts(limitNum: number) {
   const { notify, notification, clearNotification } = useNotification();
+  const { user, loading: authLoading } = useAuthStatus();
+
   const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let isMounted = true;
-    setLoading(true);
+    if (authLoading || !user) return;
 
-    (async () => {
-      try {
-        const productsRef = collection(db, "products");
-        const q = query(productsRef, queryLimit(limitNum));
-        const snapshot = await getDocs(q);
+    setLoading(true);
+    const productsRef = collection(db, "products");
+    const q = query(productsRef, queryLimit(limitNum));
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot: QuerySnapshot) => {
         const items: Product[] = snapshot.docs.map((docSnap) => {
           const data = docSnap.data() as Product & {
             imageUrl: string;
@@ -50,29 +55,29 @@ export function useProducts(limitNum: number) {
           };
         });
 
-        if (!isMounted) return;
         setProducts(items);
-
         if (items.length === 0) {
           notify({ type: "warning", message: "No products found" });
         }
-      } catch (err) {
-        console.error("Error loading products:", err);
+        setLoading(false);
+      },
+      (err) => {
+        console.error("Error listening to products:", err);
         notify({ type: "error", message: "Failed to load products" });
-      } finally {
-        if (isMounted) setLoading(false);
+        setLoading(false);
       }
-    })();
+    );
 
     return () => {
-      isMounted = false;
+      unsubscribe();
       clearNotification();
     };
-  }, [limitNum]); // eslint-disable-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [limitNum, authLoading, user]);
 
   return {
     products,
-    loading,
+    loading: authLoading || loading,
     notification,
     clearNotification,
   };

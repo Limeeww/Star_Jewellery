@@ -41,7 +41,7 @@ const ProductPage = () => {
     handleInsertChange,
   } = useProductPage();
 
-  const userId = user?.uid ?? null;
+  const userId = user && !user.isAnonymous ? user.uid : null;
   const {
     items: cartItems,
     addOrIncrement,

@@ -11,6 +11,7 @@ function ActionButton({
   className,
   type = "button",
   onClick,
+  ...rest
 }: ActionButtonProps) {
   return (
     <button
@@ -18,6 +19,7 @@ function ActionButton({
       className={className}
       disabled={disabled}
       onClick={onClick}
+      {...rest}
     >
       {text}
     </button>

@@ -6,21 +6,39 @@ import CartCollection from "../components/CartCollection/CartCollection";
 import { Collection } from "@/types/collection";
 import { fetchCollections } from "@/utils/collection";
 import Link from "next/link";
+import Notification from "@/app/components/MessageHandling/Notification";
+import { useAuthStatus } from "@/hooks";
+import Loading from "../components/Loading/Loading";
 
 export default function CollectionsSection() {
+  const { user, loading: authLoading } = useAuthStatus();
   const [collections, setCollections] = useState<Collection[]>([]);
-
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   useEffect(() => {
-    async function loadCollections() {
-      try {
-        const cols = await fetchCollections(4);
+    if (authLoading) return;
+
+    setLoading(true);
+    fetchCollections(4)
+      .then((cols) => {
         setCollections(cols);
-      } catch (error) {
-        console.error("Error fetching collections:", error);
-      }
-    }
-    loadCollections();
-  }, []);
+        setError(null);
+      })
+      .catch((err) => {
+        console.error("Error fetching collections:", err);
+      })
+      .finally(() => setLoading(false));
+  }, [authLoading, user?.uid]);
+  if (authLoading || loading) return <Loading />;
+
+  if (error)
+    return (
+      <Notification
+        message={error}
+        type="error"
+        onClose={() => setError(null)}
+      />
+    );
 
   return (
     <section

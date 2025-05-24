@@ -2,14 +2,24 @@ import React from "react";
 import { useProduct } from "@/hooks/useProduct";
 import Item from "@/app/components/Item/Item";
 import type { Identifier, WishlistItem } from "@/types/userTypes";
+import type { Product } from "@/types/product";
 
-interface ProductCardProps {
-  item: WishlistItem;
-  userId: string;
-  onRemove?: (id: Identifier) => Promise<void>;
-}
+export type ProductCardProps =
+  | {
+      item: WishlistItem;
+      onRemove: (id: Identifier) => Promise<void>;
+      mode?: "wishlist";
+    }
+  | {
+      item: Product;
+      onRemove?: undefined;
+      mode?: "default";
+    };
 
-export function ProductCard({ item, onRemove }: ProductCardProps) {
+export function ProductCard({ item, onRemove, mode }: ProductCardProps) {
+  const product = "product" in item ? item.product : item;
+  const variantId = "variantId" in item ? item.variantId : item.variants[0].id;
+
   const {
     displayedVariant,
     sizeOptions,
@@ -19,13 +29,13 @@ export function ProductCard({ item, onRemove }: ProductCardProps) {
     handleSizeChange,
     handleInsertChange,
     handleColorChange,
-  } = useProduct(item.product, item.variantId);
+  } = useProduct(product, variantId);
 
   return (
     <Item
-      product={item.product}
+      product={product}
       displayedVariant={displayedVariant}
-      mode="wishlist"
+      mode={mode}
       sizeOptions={sizeOptions}
       insertOptions={insertOptions}
       materialColorOptions={materialColorOptions}

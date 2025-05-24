@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { auth, db } from "@/firebase/firebaseConfig";
 import {
   collection,
@@ -12,7 +11,10 @@ import {
   where,
 } from "firebase/firestore";
 import Notification from "@/app/components/MessageHandling/Notification";
-import { UserProfile } from "firebase/auth";
+import {
+  signInAnonymously,
+  UserProfile,
+} from "firebase/auth";
 
 export type NotificationType = "success" | "info" | "warning" | "error";
 
@@ -29,9 +31,10 @@ export const notify = (props: NotificationProps) => {
 /**
  * Sign out the user and redirect to home page.
  */
-export const signOutUser = async (router: ReturnType<typeof useRouter>) => {
+export const signOutUser = async () => {
   await auth.signOut();
-  router.push("/");
+  await signInAnonymously(auth);
+  
 };
 
 /**
