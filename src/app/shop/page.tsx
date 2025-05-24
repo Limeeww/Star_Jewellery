@@ -36,13 +36,13 @@ export default function ShopPage() {
       <Navbar isScrolled={true} isLoggedIn={isLoggedIn} />
 
       <main className="flex-1">
-        <div className="flex h-[60vh] bg-gray-50">
-          <div className="relative w-1/2 mt-12 h-full">
+        <div className="flex bg-gray-50">
+          <div className="relative h-[45vh]  w-1/2 mt-12 h-full">
             <Image
               src="/images/shop-hero.jpg"
               alt="Shop Hero"
-              width={1000}
-              height={800}
+              width={800}
+              height={600}
               className="object-cover w-full h-full"
             />
           </div>
@@ -72,7 +72,7 @@ export default function ShopPage() {
 
         <div className="container mx-auto px-4 pb-16 lg:flex lg:space-x-8">
           <aside className="lg:w-1/4 w-full mb-8 lg:mb-0">
-            <FilterSidebar />
+            <FilterSidebar products={products}/>
           </aside>
 
           <div className="flex-1">

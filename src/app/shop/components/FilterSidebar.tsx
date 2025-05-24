@@ -1,8 +1,9 @@
-"use client";
-
 import React, { useState } from "react";
-import { badgeLabels, ProductTag } from "@/types/product";
+import { badgeLabels, Product, ProductTag } from "@/types/product";
 import { CollapsibleSection } from "@/app/shop/components/CollapsibleSection";
+import { useCategories } from "@/hooks/useCatergories";
+import { extractUniqueAttributes } from "@/utils/extractUniqueAttributes";
+import { useCollections } from "@/hooks/useCollection";
 
 const TAGS: Exclude<ProductTag, "default">[] = [
   "must-have",
@@ -11,73 +12,122 @@ const TAGS: Exclude<ProductTag, "default">[] = [
   "sale",
 ];
 
-const CATEGORIES = ["Rings", "Bracelets", "Necklaces", "Earrings"];
-const MATERIALS = ["Gold", "Silver", "Rose Gold"];
-const COLORS = ["Yellow", "White", "Rose"];
-const COLLECTIONS = ["Coronation", "Opera", "Pirouette", "Vera", "Pique"];
+interface FilterSidebarProps {
+  products: Product[];
+}
 
-export default function FilterSidebar() {
-  const [selectedTag, setSelectedTag] = useState<ProductTag | null>(null);
+export default function FilterSidebar({ products }: FilterSidebarProps) {
+  const [sortOption, setSortOption] = useState<
+    "recommended" | "priceDesc" | "priceAsc"
+  >("recommended");
 
+  const collections = useCollections();
+  const categories = useCategories();
+  
+  const { materials, colors, inserts } = extractUniqueAttributes(products);
+  const [selectedTags, setSelectedTags] = useState<ProductTag[]>([]);
   const [selectedCats, setSelectedCats] = useState<string[]>([]);
   const [selectedMaterials, setSelectedMaterials] = useState<string[]>([]);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const [selectedCollections, setSelectedCollections] = useState<string[]>([]);
 
-  const toggle = (
-    item: string,
-    list: string[],
-    setter: React.Dispatch<React.SetStateAction<string[]>>
-  ) => {
-    setter(
-      list.includes(item) ? list.filter((x) => x !== item) : [...list, item]
+  function toggleItem<T>(
+    item: T,
+    list: T[],
+    setter: React.Dispatch<React.SetStateAction<T[]>>
+  ) {
+    setter((prev) =>
+      prev.includes(item) ? prev.filter((x) => x !== item) : [...prev, item]
     );
-  };
+  }
 
   return (
     <aside className="w-full space-y-8">
       <div className="space-y-6">
         <div>
+          <h3 className="font-semibold mb-3 text-sm">Sort by</h3>
+          <label className="block mb-2 text-sm">
+            <input
+              type="radio"
+              name="sort"
+              className="mr-2"
+              value="recommended"
+              checked={sortOption === "recommended"}
+              onChange={() => setSortOption("recommended")}
+            />
+            Recommended
+          </label>
+          <label className="block mb-2 text-sm">
+            <input
+              type="radio"
+              name="sort"
+              className="mr-2"
+              value="priceDesc"
+              checked={sortOption === "priceDesc"}
+              onChange={() => setSortOption("priceDesc")}
+            />
+            Price High to Low
+          </label>
+          <label className="block mb-2 text-sm">
+            <input
+              type="radio"
+              name="sort"
+              className="mr-2"
+              value="priceAsc"
+              checked={sortOption === "priceAsc"}
+              onChange={() => setSortOption("priceAsc")}
+            />
+            Price Low to High
+          </label>
+        </div>
+
+        <hr className="border-gray-200" />
+
+        <div>
           <h3 className="font-semibold mb-3 text-sm">Filter by</h3>
           {TAGS.map((tag) => (
             <label key={tag} className="block mb-2 text-sm">
               <input
-                type="radio"
-                name="filterTag"
+                type="checkbox"
                 className="mr-2"
                 value={tag}
-                checked={selectedTag === tag}
-                onChange={() => setSelectedTag(tag)}
+                checked={selectedTags.includes(tag)}
+                onChange={() =>
+                  toggleItem<ProductTag>(tag, selectedTags, setSelectedTags)
+                }
               />
               {badgeLabels[tag]}
             </label>
           ))}
         </div>
+
         <hr className="border-gray-200" />
 
         <CollapsibleSection title="Category" count={selectedCats.length}>
-          {CATEGORIES.map((cat) => (
-            <label key={cat} className="block text-sm">
+          {categories.map((cat) => (
+            <label key={cat.id} className="block text-sm">
               <input
                 type="checkbox"
                 className="mr-2"
-                checked={selectedCats.includes(cat)}
-                onChange={() => toggle(cat, selectedCats, setSelectedCats)}
+                checked={selectedCats.includes(cat.id)}
+                onChange={() =>
+                  toggleItem<string>(cat.id, selectedCats, setSelectedCats)
+                }
               />
-              {cat}
+              {cat.name}
             </label>
           ))}
         </CollapsibleSection>
 
         <CollapsibleSection title="Material" count={selectedMaterials.length}>
-          {MATERIALS.map((m) => (
+          {materials.map((m) => (
             <label key={m} className="block text-sm">
               <input
                 type="checkbox"
                 className="mr-2"
                 checked={selectedMaterials.includes(m)}
                 onChange={() =>
-                  toggle(m, selectedMaterials, setSelectedMaterials)
+                  toggleItem<string>(m, selectedMaterials, setSelectedMaterials)
                 }
               />
               {m}
@@ -86,13 +136,31 @@ export default function FilterSidebar() {
         </CollapsibleSection>
 
         <CollapsibleSection title="Color" count={selectedColors.length}>
-          {COLORS.map((c) => (
+          {colors.map((c) => (
             <label key={c} className="block text-sm">
               <input
                 type="checkbox"
                 className="mr-2"
                 checked={selectedColors.includes(c)}
-                onChange={() => toggle(c, selectedColors, setSelectedColors)}
+                onChange={() =>
+                  toggleItem<string>(c, selectedColors, setSelectedColors)
+                }
+              />
+              {c}
+            </label>
+          ))}
+        </CollapsibleSection>
+
+        <CollapsibleSection title="Insert" count={selectedColors.length}>
+          {inserts.map((c) => (
+            <label key={c} className="block text-sm">
+              <input
+                type="checkbox"
+                className="mr-2"
+                checked={selectedColors.includes(c)}
+                onChange={() =>
+                  toggleItem<string>(c, selectedColors, setSelectedColors)
+                }
               />
               {c}
             </label>
@@ -103,17 +171,21 @@ export default function FilterSidebar() {
           title="Collections"
           count={selectedCollections.length}
         >
-          {COLLECTIONS.map((col) => (
-            <label key={col} className="block text-sm">
+          {collections.map((col) => (
+            <label key={col.id} className="block text-sm">
               <input
                 type="checkbox"
                 className="mr-2"
-                checked={selectedCollections.includes(col)}
+                checked={selectedCollections.includes(col.id)}
                 onChange={() =>
-                  toggle(col, selectedCollections, setSelectedCollections)
+                  toggleItem<string>(
+                    col.id,
+                    selectedCollections,
+                    setSelectedCollections
+                  )
                 }
               />
-              {col}
+              {col.name}
             </label>
           ))}
         </CollapsibleSection>

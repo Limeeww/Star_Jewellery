@@ -18,7 +18,7 @@ export function CollapsibleSection({
     <div>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="flex w-full justify-between items-center font-semibold mb-2 text-sm"
+        className="flex w-full justify-between items-center font-semibold mb-4 text-sm"
       >
         <span className="flex items-center space-x-1">
           <span>{title}</span>
