@@ -1,17 +1,17 @@
 import React from "react";
 
-export interface ActionButtonProps
+interface ActionButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   text: string;
 }
 
-export default function ActionButton({
+function ActionButton({
   text,
-  className,
   disabled,
-  onClick,
+  className,
   type = "button",
-  ...props
+  onClick,
+  ...rest
 }: ActionButtonProps) {
   return (
     <button
@@ -19,9 +19,11 @@ export default function ActionButton({
       className={className}
       disabled={disabled}
       onClick={onClick}
-      {...props}
+      {...rest}
     >
       {text}
     </button>
   );
 }
+
+export default ActionButton;
