@@ -16,6 +16,7 @@ import {
 import SelectVariantField from "@/app/components/FormComponents/ProductForm/SelectVariantField";
 import { v4 as uuidv4 } from "uuid";
 import { uuidToNumber } from "@/hooks/uuidToNumber";
+import InputField from "@/app/components/FormComponents/InputField";
 
 interface Props {
   variants: ProductVariant[];
@@ -73,36 +74,27 @@ export default function EditProductVariantsForm({ variants, onChange }: Props) {
           <h4 className="font-medium text-gray-700">Variant #{variant.id}</h4>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium">Price (₴)</label>
-              <input
+              <InputField
+                label="Price (₴)"
                 type="number"
-                min={0}
                 value={variant.price}
-                onChange={(e) =>
-                  handleVariantChange(
-                    index,
-                    "price",
-                    parseFloat(e.target.value)
-                  )
+                onChange={(val) =>
+                  handleVariantChange(index, "price", parseFloat(val))
                 }
-                className="w-full border p-2 rounded"
+                required
+                placeholder="0"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium">Weight (g)</label>
-              <input
+              <InputField
+                label="Weight (g)"
                 type="number"
-                min={0}
-                step={0.1}
                 value={variant.weight}
-                onChange={(e) =>
-                  handleVariantChange(
-                    index,
-                    "weight",
-                    parseFloat(e.target.value)
-                  )
+                onChange={(val) =>
+                  handleVariantChange(index, "weight", parseFloat(val))
                 }
-                className="w-full border p-2 rounded"
+                required
+                placeholder="0.0"
               />
             </div>
 
@@ -184,7 +176,7 @@ export default function EditProductVariantsForm({ variants, onChange }: Props) {
 
       {variantToDelete !== null && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-          <div className="bg-white rounded-lg shadow-md p-6 max-w-sm w-full">
+          <div className="bg-white shadow-md p-6 max-w-sm w-full">
             <h2 className="text-lg font-semibold mb-3">Delete Variant</h2>
             <p className="text-sm text-gray-700 mb-6">
               Are you sure you want to delete this variant?
@@ -192,13 +184,13 @@ export default function EditProductVariantsForm({ variants, onChange }: Props) {
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setVariantToDelete(null)}
-                className="px-4 py-2 text-sm bg-gray-200 rounded hover:bg-gray-300"
+                className="px-4 py-2 text-sm bg-gray-200 hover:bg-gray-300"
               >
                 Cancel
               </button>
               <button
                 onClick={handleConfirmDelete}
-                className="px-4 py-2 text-sm bg-red-600 text-white rounded hover:bg-red-700"
+                className="px-4 py-2 text-sm bg-red-600 text-white hover:bg-red-700"
               >
                 Delete
               </button>

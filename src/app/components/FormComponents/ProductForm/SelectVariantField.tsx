@@ -15,11 +15,11 @@ export default function SelectVariantField({
 }: SelectVariantFieldProps) {
   return (
     <div>
-      <label className="block text-sm font-medium">{label}</label>
+      <label className="block text-sm font-medium text-gray-700">{label}</label>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full border p-2 rounded"
+        className="w-full border p-2"
         disabled={disabled}
       >
         <option value="">Select {label}</option>

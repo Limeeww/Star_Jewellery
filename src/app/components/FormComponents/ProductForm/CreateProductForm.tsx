@@ -34,6 +34,7 @@ export default function CreateProductForm({
     categoryId: 0,
     isHidden: false,
     variants: [],
+    tag: "default",
   });
 
   const handleChange = <T extends keyof typeof formData>(
@@ -131,14 +132,16 @@ export default function CreateProductForm({
       />
 
       <div>
-        <label className="block text-m font-medium">Category</label>
+        <label className="block text-sm font-medium text-gray-700">
+          Category
+        </label>
         {loadingCategories ? (
           <p className="text-sm text-gray-500">Loading...</p>
         ) : (
           <select
             value={formData.categoryId}
             onChange={(e) => handleChange("categoryId", Number(e.target.value))}
-            className="w-full border p-2"
+            className="w-full p-2 mt-2 border focus:outline-none focus:ring-1 focus:ring-black rounded-none"
           >
             <option value="">Select category</option>
             {categories.map((cat) => (

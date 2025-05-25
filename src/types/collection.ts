@@ -5,7 +5,6 @@ export interface Collection {
   name: string;
   description: string;
   images: string[];
-  parentCategory: number;
   isActive: boolean;
   createdAt: Timestamp;
   productIds: number[];

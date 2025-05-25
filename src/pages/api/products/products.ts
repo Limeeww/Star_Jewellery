@@ -25,6 +25,7 @@ export default async function handler(
           updatedAt: data.updatedAt,
           isHidden: data.isHidden,
           additionalDescription: data.additionalDescription,
+          tag: "default",
         };
       });
 
@@ -42,7 +43,7 @@ export default async function handler(
       const product: Omit<Product, "id"> = req.body;
 
       const numericId = uuidToNumber(uuidv4());
-      const id = numericId.toString(); // document ID должен быть строкой
+      const id = numericId.toString();
 
       await adminDB
         .collection("products")
