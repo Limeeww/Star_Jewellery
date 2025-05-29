@@ -58,7 +58,6 @@ export default function AdminProductsPage() {
 
     return "N/A";
   };
-
   if (loading || role !== "admin" || isLoading) return <Loading />;
 
   return (
@@ -143,11 +142,11 @@ export default function AdminProductsPage() {
                             <strong>Weight:</strong> {variant.weight} g
                           </span>
                           <span>
-                            <strong>Price:</strong> ${variant.price}
+                            <strong>Price:</strong> {variant.price}₴
                           </span>
                         </div>
 
-                        {variant.quantitySize.length > 0 && (
+                        {variant.quantitySize?.length > 0 && (
                           <div className="mt-4">
                             <p className="font-medium text-sm text-gray-800 mb-1">
                               Quantity by Size:

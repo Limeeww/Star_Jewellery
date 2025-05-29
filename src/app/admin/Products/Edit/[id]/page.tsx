@@ -60,6 +60,15 @@ export default function EditProductPage() {
     }
   };
 
+  const handleDelete = async (productId: number) => {
+    try {
+      await fetch(`/api/products/${productId}`, { method: "DELETE" });
+      router.push("/Admin/Products");
+    } catch (error) {
+      console.error("Ошибка при удалении продукта:", error);
+    }
+  };
+
   if (userLoading || loading) return <Loading />;
 
   if (!product) return <p className="text-red-500">Product not found.</p>;
@@ -69,7 +78,11 @@ export default function EditProductPage() {
       <Navbar isScrolled={true} isLoggedIn={isLoggedIn} />
       <div className="p-6">
         <h2 className="text-xl font-semibold mb-4">Edit Product</h2>
-        <EditProductForm product={product} onSave={handleSave} />
+        <EditProductForm
+          product={product}
+          onSave={handleSave}
+          onDelete={handleDelete}
+        />
       </div>
       <Footer />
     </>

@@ -54,8 +54,8 @@ export interface Product {
   slug: string;
   categoryId: number;
   variants: ProductVariant[];
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
+  createdAt?: Timestamp;
+  updatedAt?: Timestamp;
   isHidden: boolean;
   additionalDescription: string;
   tag: ProductTag;

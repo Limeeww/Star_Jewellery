@@ -138,6 +138,11 @@ export default function Overview() {
                 description={"Start managing the products via link."}
                 linkHref="/Admin/Products"
               />
+              <ProfileCard
+                title="MANAGE COLLECTIONS"
+                description={"Start managing the collections via link."}
+                linkHref="/Admin/Collections"
+              />
             </>
           ) : (
             <></>
