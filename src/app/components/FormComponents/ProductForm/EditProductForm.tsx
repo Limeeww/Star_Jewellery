@@ -78,7 +78,9 @@ export default function EditProductForm({
         />
 
         <div>
-          <label className="block text-sm font-medium">Category</label>
+          <label className="block text-sm font-medium text-gray-700">
+            Category
+          </label>
           {loadingCategories ? (
             <p className="text-sm text-gray-500">Loading categories...</p>
           ) : (
@@ -87,7 +89,7 @@ export default function EditProductForm({
               onChange={(e) =>
                 handleChange("categoryId", Number(e.target.value))
               }
-              className="w-full border p-2 rounded"
+              className="w-full border mt-2 p-2 focus:outline-none focus:ring-1 focus:ring-black rounded-none"
             >
               <option value="">Select category</option>
               {categories.map((category) => (
@@ -105,7 +107,7 @@ export default function EditProductForm({
               type="checkbox"
               checked={formData.isHidden}
               onChange={(e) => handleChange("isHidden", e.target.checked)}
-              className="h-4 w-4"
+              className="h-4 w-4 accent-black"
             />
             <span className="text-sm">Hide this product</span>
           </label>
@@ -119,15 +121,9 @@ export default function EditProductForm({
         />
 
         <div className="flex flex-col space-y-2">
-          <LinkButtonForm
-            label="← Back to Products"
-            href="/Admin/Products"
-            className="bg-gray-600 hover:bg-gray-700"
-          />
-
           <button
             type="submit"
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded"
+            className="bg-black hover:bg-gray-800 text-white font-semibold py-2 px-4"
           >
             Save
           </button>
@@ -135,16 +131,22 @@ export default function EditProductForm({
           <button
             type="button"
             onClick={confirmDelete}
-            className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded"
+            className="bg-red-900 hover:bg-red-800 text-white font-semibold py-2 px-4"
           >
             Delete Product
           </button>
+
+          <LinkButtonForm
+            label="← Back to Products"
+            href="/Admin/Products"
+            className="bg-gray-600 hover:bg-gray-700"
+          />
         </div>
       </form>
 
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-          <div className="bg-white rounded-lg shadow-md p-6 max-w-sm w-full">
+          <div className="bg-white shadow-md p-6 max-w-sm w-full">
             <h2 className="text-lg font-semibold mb-3">Confirm Deletion</h2>
             <p className="text-sm text-gray-700 mb-6">
               Are you sure you want to delete this product?
@@ -152,13 +154,13 @@ export default function EditProductForm({
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setShowModal(false)}
-                className="px-4 py-2 text-sm bg-gray-200 rounded hover:bg-gray-300"
+                className="px-4 py-2 text-sm bg-gray-200 hover:bg-gray-300"
               >
                 Cancel
               </button>
               <button
                 onClick={handleConfirmDelete}
-                className="px-4 py-2 text-sm bg-red-600 text-white rounded hover:bg-red-700"
+                className="px-4 py-2 text-sm bg-red-600 text-white hover:bg-red-700"
               >
                 Delete
               </button>
