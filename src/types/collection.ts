@@ -6,6 +6,6 @@ export interface Collection {
   description: string;
   images: string[];
   isActive: boolean;
-  createdAt: Timestamp;
+  createdAt?: Timestamp;
   productIds: number[];
 }

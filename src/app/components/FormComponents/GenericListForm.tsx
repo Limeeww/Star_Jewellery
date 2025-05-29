@@ -58,7 +58,7 @@ export default function GenericListForm<T>({
       <button
         type="button"
         onClick={handleAdd}
-        className="mt-2 px-3 py-1 bg-blue-500 text-white text-sm rounded"
+        className="mt-2 px-3 py-1 bg-black hover:bg-gray-800 text-white text-sm"
       >
         {addButtonLabel}
       </button>

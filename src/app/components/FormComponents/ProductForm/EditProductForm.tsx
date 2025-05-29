@@ -107,7 +107,7 @@ export default function EditProductForm({
               type="checkbox"
               checked={formData.isHidden}
               onChange={(e) => handleChange("isHidden", e.target.checked)}
-              className="h-4 w-4"
+              className="h-4 w-4 accent-black"
             />
             <span className="text-sm">Hide this product</span>
           </label>
@@ -121,15 +121,9 @@ export default function EditProductForm({
         />
 
         <div className="flex flex-col space-y-2">
-          <LinkButtonForm
-            label="← Back to Products"
-            href="/Admin/Products"
-            className="bg-gray-600 hover:bg-gray-700"
-          />
-
           <button
             type="submit"
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded"
+            className="bg-black hover:bg-gray-800 text-white font-semibold py-2 px-4"
           >
             Save
           </button>
@@ -137,10 +131,16 @@ export default function EditProductForm({
           <button
             type="button"
             onClick={confirmDelete}
-            className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded"
+            className="bg-red-900 hover:bg-red-800 text-white font-semibold py-2 px-4"
           >
             Delete Product
           </button>
+
+          <LinkButtonForm
+            label="← Back to Products"
+            href="/Admin/Products"
+            className="bg-gray-600 hover:bg-gray-700"
+          />
         </div>
       </form>
 

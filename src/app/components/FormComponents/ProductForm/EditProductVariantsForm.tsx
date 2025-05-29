@@ -168,7 +168,7 @@ export default function EditProductVariantsForm({ variants, onChange }: Props) {
         <button
           type="button"
           onClick={handleAddVariant}
-          className="bg-green-600 text-white px-4 py-2 rounded text-sm"
+          className="bg-black hover:bg-gray-800 text-white px-4 py-2 text-sm"
         >
           Add Variant
         </button>

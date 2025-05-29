@@ -79,7 +79,7 @@ export default function AdminRolesPage() {
         </h3>
         <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {users
-            .filter((u) => u.uid !== user?.uid)
+            .filter((u) => u.uid !== user?.uid && u.email)
             .map((user) => (
               <li
                 key={user.uid}

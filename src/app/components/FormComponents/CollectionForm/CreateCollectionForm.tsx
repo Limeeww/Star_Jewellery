@@ -6,21 +6,22 @@ import InputField from "@/app/components/FormComponents/InputField";
 import LinkButtonForm from "@/app/components/FormComponents/LinkButtonForm";
 import ActionButton from "@/app/components/FormComponents/ActionButton";
 import CollectionImagesForm from "@/app/components/FormComponents/CollectionForm/CollectionImagesForm";
+import CollectionProductIdForm from "@/app/components/FormComponents/CollectionForm/CollectionProductIdForm";
 
 export default function CreateCollectionForm({
   onCreate,
 }: {
-  onCreate: (newCollection: Omit<Collection, "id" | "createdAt">) => void;
+  onCreate: (newCollection: Omit<Collection, "id">) => void;
 }) {
-  const [formData, setFormData] = useState<
-    Omit<Collection, "id" | "createdAt">
-  >({
+  const [formData, setFormData] = useState<Omit<Collection, "id">>({
     name: "",
     description: "",
     images: [],
     isActive: true,
     productIds: [],
   });
+
+  const [errors, setErrors] = useState<string[]>([]);
 
   const handleChange = <K extends keyof typeof formData>(
     field: K,
@@ -32,27 +33,59 @@ export default function CreateCollectionForm({
   const handleImagesChange = (newImages: string[]) =>
     handleChange("images", newImages);
 
-  const handleProductIdChange = (idx: number, id: number) => {
-    const ids = [...formData.productIds];
-    ids[idx] = id;
-    setFormData((prev) => ({ ...prev, productIds: ids }));
-  };
-  const handleAddProductId = () =>
-    handleChange("productIds", [...formData.productIds, 0]);
-  const handleRemoveProductId = (idx: number) =>
-    handleChange(
-      "productIds",
-      formData.productIds.filter((_, i) => i !== idx)
-    );
+  const handleProductIdsChange = (ids: number[]) =>
+    handleChange("productIds", ids);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onCreate(formData);
+
+    const newErrors: string[] = [];
+
+    if (!formData.name.trim()) newErrors.push("Name is required.");
+    if (!formData.description.trim())
+      newErrors.push("Description is required.");
+    if (formData.images.length === 0)
+      newErrors.push("At least one image is required.");
+    if (formData.productIds.length === 0)
+      newErrors.push("At least one product must be selected.");
+
+    if (newErrors.length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/products/validate-ids", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: formData.productIds }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to validate product IDs.");
+      }
+
+      if (data.invalidIds?.length > 0) {
+        setErrors([`Invalid product IDs: ${data.invalidIds.join(", ")}`]);
+        return;
+      }
+
+      setErrors([]);
+      onCreate(formData);
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : "Unknown error";
+      setErrors([msg]);
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 m-5">
-      <h1 className="uppercase text-xl font-bold mb-6 text-center">
+      <h1
+        className="uppercase text-xl font-bold mb-6 text-center"
+        style={{ fontFamily: "var(--font-playfair)" }}
+      >
         Create New Collection
       </h1>
 
@@ -67,64 +100,51 @@ export default function CreateCollectionForm({
         label="Description"
         value={formData.description}
         onChange={(val) => handleChange("description", val)}
+        required
       />
 
-      {/* Images */}
       <CollectionImagesForm
         images={formData.images}
         onChange={handleImagesChange}
       />
 
-      {/* Active */}
       <div>
         <label className="inline-flex items-center gap-2">
           <input
             type="checkbox"
             checked={formData.isActive}
             onChange={(e) => handleChange("isActive", e.target.checked)}
+            className="accent-black"
           />
           <span className="text-sm">Active</span>
         </label>
       </div>
 
-      {/* Product IDs */}
-      <div className="space-y-2">
-        <h3 className="text-lg font-semibold">Product IDs</h3>
-        {formData.productIds.map((id, idx) => (
-          <div key={idx} className="flex items-center gap-2">
-            <InputField
-              label={`Product ID #${idx + 1}`}
-              type="number"
-              value={id}
-              onChange={(val) => handleProductIdChange(idx, Number(val) || 0)}
-              placeholder="0"
-            />
-            <ActionButton
-              type="button"
-              text="Delete"
-              onClick={() => handleRemoveProductId(idx)}
-              className="text-red-500 hover:underline text-sm"
-            />
-          </div>
-        ))}
-        <ActionButton
-          type="button"
-          text="Add Product ID"
-          onClick={handleAddProductId}
-          className="bg-green-600 text-white px-4 py-2 rounded text-sm"
-        />
-      </div>
+      <CollectionProductIdForm
+        productIds={formData.productIds}
+        onChange={handleProductIdsChange}
+      />
+
+      {errors.length > 0 && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 mb-4">
+          <ul className="list-disc list-inside text-sm">
+            {errors.map((err, i) => (
+              <li key={i}>{err}</li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <div className="space-y-2">
+        <ActionButton
+          type="submit"
+          text="Create Collection"
+          className="bg-black hover:bg-gray-800 text-white font-semibold py-2 px-4 w-full"
+        />
         <LinkButtonForm
           label="← Back to Collections"
           href="/Admin/Collections"
           className="bg-gray-600 hover:bg-gray-700"
-        />
-        <ActionButton
-          type="submit"
-          text="Create Collection"
-          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded"
         />
       </div>
     </form>
