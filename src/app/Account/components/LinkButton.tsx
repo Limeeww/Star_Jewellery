@@ -25,7 +25,7 @@ export default function LinkButton({
     </>
   );
 
-  const baseClasses = `inline-flex items-center justify-center text-center font-medium w-full ${className}`;
+  const baseClasses = `inline-flex items-center space-x-1 font-medium ${className}`;
 
   if (href) {
     return (

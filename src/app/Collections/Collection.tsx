@@ -81,7 +81,7 @@ export default function CollectionsSection() {
             alt="Model wearing jewelry"
             width={600}
             height={800}
-            className="w-full h-[50vh] md:h-[80vh] 2xl:h-[108vh] object-cover"
+            className="w-full h-[50vh] md:h-[80vh] 2xl:h-[103vh] object-cover"
           />
         </div>
       </div>

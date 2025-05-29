@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { LuSearch, LuShoppingBag, LuMenu } from "react-icons/lu";
 import SearchOverlay from "./SearchOverlay";
@@ -12,7 +12,7 @@ import { useCartContext } from "@/app/contexts/CartContent";
 
 const NAV_LINKS = [
   { href: "/about-us", label: "ABOUT US" },
-  { href: "/Catalog", label: "CATALOG" },
+  { href: "/shop", label: "CATALOG" },
   { href: "/Collections", label: "COLLECTIONS" },
 ];
 
@@ -31,9 +31,22 @@ export default function Navbar({
   const [openMenu, setOpenMenu] = useState(false);
   const [openCartModal, setOpenCartModal] = useState(false);
 
-  const { cartItems, incrementItem, decrementItem, removeItem, cartItemCount } =
-    useCartContext();
+  const {
+    cartItems,
+    incrementItem,
+    decrementItem,
+    removeItem,
+    cartItemCount,
+    added,
+    clearAdded,
+  } = useCartContext();
 
+  useEffect(() => {
+    if (added) {
+      setOpenCartModal(true);
+      clearAdded();
+    }
+  }, [added, clearAdded]);
   return (
     <>
       <header
@@ -155,7 +168,7 @@ export default function Navbar({
       <CartSideModal
         isOpen={openCartModal}
         onClose={() => setOpenCartModal(false)}
-        added={false}
+        added={added}
         items={cartItems}
         onIncrement={incrementItem}
         onDecrement={decrementItem}

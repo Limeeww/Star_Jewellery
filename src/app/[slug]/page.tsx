@@ -23,6 +23,7 @@ import { calculateDiscountedPrice, formatPrice } from "@/utils";
 import type { WishlistItem } from "@/types/userTypes";
 import CartSideModal from "../components/SideModal/CartSideModal";
 import { useAuthStatus } from "@/hooks/useAuthStatus";
+import { useCartContext } from "../contexts/CartContent";
 
 const ProductPage = () => {
   const { user, isLoggedIn } = useAuthStatus();
@@ -44,11 +45,12 @@ const ProductPage = () => {
   const userId = user && !user.isAnonymous ? user.uid : null;
   const {
     items: cartItems,
-    addOrIncrement,
     incrementItem,
     decrementItem,
     removeItem,
   } = useCart(userId);
+
+  const { addOrIncrement } = useCartContext();
 
   const [isModalOpen, setModalOpen] = useState(false);
 
@@ -71,7 +73,6 @@ const ProductPage = () => {
   };
 
   const handleAddToCart = async (data: FormValues) => {
-    if (!userId) return;
     const item: CartItem = {
       productId: product.id,
       slug: product.slug!,

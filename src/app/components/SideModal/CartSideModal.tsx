@@ -43,7 +43,7 @@ function CartSideModal({ isOpen, onClose, added = false }: CartSideModalProps) {
             cartItems.map((item) => (
               <div
                 key={`${item.productId}-${item.size}-${item.insert}-${item.materialColor}`}
-                className="my-4"
+                className="my-2"
               >
                 <CartItemComponent
                   mode="cart"

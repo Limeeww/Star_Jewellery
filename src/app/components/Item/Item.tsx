@@ -6,11 +6,12 @@ import WishlistButton from "@/app/components/WishlistButton";
 import RemoveWishlistButton from "@/app/Account/components/RemoveWishlistButton";
 import ActionButton from "@/app/components/FormComponents/ActionButton";
 import SelectField from "@/app/components/FormComponents/SelectField";
-import type { Product, ProductVariant } from "@/types/product";
+import type { Discount, Product, ProductVariant } from "@/types/product";
 import { badgeLabels } from "@/types/product";
 import type { CartItem } from "@/types/cartItem";
 import TagBadge from "./TagBadge";
 import { useCartContext } from "@/app/contexts/CartContent";
+import { calculateDiscountedPrice, formatPrice } from "@/utils";
 
 interface Props {
   product: Product;
@@ -24,6 +25,7 @@ interface Props {
   onInsertChange?: (insert: string) => void;
   onColorChange?: (color: string) => void;
   onRemove?: () => void;
+  activeDiscount?: Discount | null;
 }
 
 export default function Item({
@@ -36,6 +38,7 @@ export default function Item({
   onSizeChange,
   onInsertChange,
   onRemove,
+  activeDiscount = null,
 }: Props) {
   const { addOrIncrement } = useCartContext();
   const [isAdding, setIsAdding] = useState(false);
@@ -63,17 +66,26 @@ export default function Item({
   const btnDisabled = isAdding || !!missingText;
   const btnText = isAdding ? "Adding…" : missingText || "Add to Cart";
 
+  const rawDiscounted = calculateDiscountedPrice(
+    variant,
+    activeDiscount ?? null
+  );
+  const hasDiscount = rawDiscounted !== null;
+  const discountedPrice = hasDiscount
+    ? Number(formatPrice(rawDiscounted!))
+    : variant.price;
+
   const handleAddToCart = async () => {
     const item: CartItem = {
       productId: product.id,
-      slug: product.slug,
+      slug: product.slug!,
       name: product.name,
       description: product.description,
       variantId: variant.id,
       originalPrice: variant.price,
-      discountName: "",
-      imageUrl: src,
-      price: variant.price,
+      discountName: activeDiscount?.name || "",
+      imageUrl: variant.images?.[0] ?? "/placeholder.jpg",
+      price: discountedPrice ?? variant.price,
       quantity: 1,
       size: Number(selectedSize),
       insert: variant.insert,
@@ -90,7 +102,7 @@ export default function Item({
         mode === "wishlist" ? "p-0 max-w" : "p-2"
       } h-full flex flex-col`}
     >
-      <div className="relative border p-2 bg-white text-gray-800 hover:shadow-lg transition-shadow duration-300 flex flex-col flex-1">
+      <div className="relative border p-2 bg-white text-gray-800 hover:shadow-lg transition-shadow duration-300 flex flex-col flex-1 min-h-[28rem]">
         {product.tag && (
           <TagBadge
             variant={product.tag}
@@ -113,11 +125,22 @@ export default function Item({
             <span className="text-sm text-gray-400">#{variant.id}</span>
           </h3>
           {mode !== "recent" && (
-            <p className="text-base md:text-lg mt-1">
-              <span className="font-semibold">
-                {variant.price.toLocaleString()}
-              </span>{" "}
-              ₴
+            <p className="text-base md:text-lg mt-1 flex items-baseline gap-2">
+              {hasDiscount && (
+                <span className="text-sm line-through text-gray-400">
+                  {formatPrice(variant.price)} ₴
+                </span>
+              )}
+              <span className="font-semibold text-lg">
+                {formatPrice(discountedPrice)} ₴
+              </span>
+              {hasDiscount && activeDiscount && (
+                <span className="text-xs text-red-600">
+                  {activeDiscount.type === "percentage"
+                    ? `-${activeDiscount.value}%`
+                    : `-${formatPrice(activeDiscount.value)} ₴`}
+                </span>
+              )}
             </p>
           )}
         </Link>

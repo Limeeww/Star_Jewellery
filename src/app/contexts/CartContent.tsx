@@ -1,7 +1,6 @@
-// src/app/contexts/CartContext.tsx
 "use client";
 
-import React, { createContext, useContext, ReactNode } from "react";
+import React, { createContext, useContext, ReactNode, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase/firebaseConfig";
 import type { CartItem } from "@/types/cartItem";
@@ -14,24 +13,36 @@ interface CartContextType {
   incrementItem: (identifier: CartItemIdentifier) => Promise<void>;
   decrementItem: (identifier: CartItemIdentifier) => Promise<void>;
   removeItem: (identifier: CartItemIdentifier) => Promise<void>;
+  added: boolean;
+  clearAdded: () => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [user] = useAuthState(auth);
-
   const userId = user && !user.isAnonymous ? user.uid : null;
 
   const {
     items: cartItems,
-    addOrIncrement,
+    addOrIncrement: baseAddOrIncrement,
     incrementItem,
     decrementItem,
     removeItem,
   } = useCartHook(userId);
 
+  const [added, setAdded] = useState(false);
+
   const cartItemCount = cartItems.reduce((sum, it) => sum + it.quantity, 0);
+
+  const addOrIncrement = async (newItem: CartItem) => {
+    await baseAddOrIncrement(newItem);
+    setAdded(true);
+  };
+
+  const clearAdded = () => {
+    setAdded(false);
+  };
 
   return (
     <CartContext.Provider
@@ -42,6 +53,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
         incrementItem,
         decrementItem,
         removeItem,
+        added,
+        clearAdded,
       }}
     >
       {children}
