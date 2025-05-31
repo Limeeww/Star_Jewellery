@@ -12,7 +12,7 @@ import EditCollectionForm from "@/app/components/FormComponents/CollectionForm/E
 
 export default function EditCollectionPage() {
   const router = useRouter();
-  const { id } = useParams() as { id: string }; // id всегда строка
+  const { id } = useParams() as { id: string };
   const { user, role, loading: userLoading } = useUserRole();
 
   const [collection, setCollection] = useState<Collection | null>(null);

@@ -13,7 +13,7 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 import LinkButton from "@/app/Account/components/LinkButton";
 import Footer from "@/app/components/Footer/Footer";
 
-export default function AddCollection() {
+export default function AdminCollectionsPage() {
   const pathname = usePathname();
   const router = useRouter();
   const { user, role, loading } = useUserRole();
