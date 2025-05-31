@@ -19,24 +19,16 @@ interface UseCartReturn {
 
 const LOCAL_KEY = "star_cart";
 
-/**
- * Хук корзины, поддерживает:
- * - гостевую: хранение в localStorage
- * - авторизованную: хранение в Firestore /users/{userId}.cartItems
- */
 export function useCart(userId: string | null): UseCartReturn {
   const [items, setItems] = useState<CartItem[]>([]);
 
-  // 1) Слушаем источник правды: Firestore или localStorage
   useEffect(() => {
     if (userId) {
-      // соединяем локальную корзину в базу при первом mount
       const raw = localStorage.getItem(LOCAL_KEY);
       if (raw) {
         const localCart: CartItem[] = JSON.parse(raw);
         localStorage.removeItem(LOCAL_KEY);
         const userRef = doc(db, "users", userId);
-        // если пользователя ещё нет — создаём
         getDoc(userRef).then((snap) => {
           if (!snap.exists()) {
             setDoc(userRef, { cartItems: localCart }, { merge: true });
@@ -58,7 +50,6 @@ export function useCart(userId: string | null): UseCartReturn {
           }
         });
 
-        // теперь подпишемся на базу
         const userRef2 = doc(db, "users", userId);
         const unsub = onSnapshot(userRef2, (snap) => {
           const data = snap.data() as { cartItems?: CartItem[] } | undefined;
@@ -66,7 +57,6 @@ export function useCart(userId: string | null): UseCartReturn {
         });
         return () => unsub();
       } else {
-        // просто слушаем базу
         const userRef = doc(db, "users", userId);
         const unsub = onSnapshot(userRef, (snap) => {
           const data = snap.data() as { cartItems?: CartItem[] } | undefined;
@@ -75,13 +65,11 @@ export function useCart(userId: string | null): UseCartReturn {
         return () => unsub();
       }
     } else {
-      // гость: читаем из localStorage
       const raw = localStorage.getItem(LOCAL_KEY);
       setItems(raw ? JSON.parse(raw) : []);
     }
   }, [userId]);
 
-  // 2) Функция сохранения
   const persist = useCallback(
     async (newCart: CartItem[]) => {
       setItems(newCart);
@@ -101,7 +89,6 @@ export function useCart(userId: string | null): UseCartReturn {
     [userId]
   );
 
-  // 3) Методы манипуляции корзиной
   const addOrIncrement = useCallback(
     async (newItem: CartItem) => {
       const cart = [...items];
