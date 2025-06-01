@@ -1,6 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { adminDB } from "@/lib/firebaseAdmin";
-import admin from "firebase-admin";
 import { Category } from "@/types/product";
 
 export default async function handler(
@@ -29,13 +28,8 @@ export default async function handler(
     if (req.method === "PUT") {
       const updated: Partial<Omit<Category, "id">> = req.body;
 
-      await docRef.set(
-        {
-          ...updated,
-          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-        },
-        { merge: true }
-      );
+      await docRef.set(updated, { merge: true }); // без updatedAt
+
       return res.status(200).json({ success: true });
     }
 

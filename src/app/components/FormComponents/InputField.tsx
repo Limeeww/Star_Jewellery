@@ -3,15 +3,19 @@
 import { useState } from "react";
 
 interface InputFieldProps {
+  min?: number;
+  max?: number;
   label?: string;
   value: string | number;
   onChange: (value: string) => void;
-  type?: "text" | "number";
+  type?: "text" | "number" | "datetime-local";
   required?: boolean;
   placeholder?: string;
 }
 
 export default function InputField({
+  min,
+  max,
   label,
   value,
   onChange,
@@ -35,6 +39,8 @@ export default function InputField({
     <div className="space-y-1 w-full">
       <label className="block text-sm font-medium text-gray-700">{label}</label>
       <input
+        min={min}
+        max={max}
         type={type}
         value={safeValue}
         placeholder={placeholder}
