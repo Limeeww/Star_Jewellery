@@ -119,7 +119,7 @@ export default function ShopPage() {
         <div className="flex bg-gray-50">
           <div className="relative h-[45vh]  w-1/2 mt-12 h-full">
             <Image
-              src="/images/shop-hero.jpg"
+              src="/images/.jpg" // PASTE HERE THE IMAGE
               alt="Shop Hero"
               width={800}
               height={600}
