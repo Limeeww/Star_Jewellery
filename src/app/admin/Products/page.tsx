@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useUserRole } from "@/hooks/useUserRole";
 import Navbar from "@/app/components/Navbar/Navbar";
@@ -12,6 +12,7 @@ import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import LinkButton from "@/app/Account/components/LinkButton";
 import Footer from "@/app/components/Footer/Footer";
+import InputField from "@/app/components/FormComponents/InputField";
 
 export default function AdminProductsPage() {
   const pathname = usePathname();
@@ -22,6 +23,7 @@ export default function AdminProductsPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   const isLoggedIn = !loading && !!user;
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     if (!loading && (!user || role !== "admin")) {
@@ -42,6 +44,12 @@ export default function AdminProductsPage() {
       setIsLoading(false);
     }
   };
+
+  const filteredProducts = useMemo(() => {
+    if (!searchTerm.trim()) return products;
+    const term = searchTerm.toLowerCase();
+    return products.filter((d) => d.name.toLowerCase().includes(term));
+  }, [products, searchTerm]);
 
   const formatTimestamp = (
     timestamp: { toDate?: () => Date; _seconds?: number } | null | undefined
@@ -76,8 +84,16 @@ export default function AdminProductsPage() {
           showArrow={false}
           onClick={() => router.push(`/Admin/Products/Add`)}
         />
-        <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {products.map((product) => (
+        {/* поиск по названию */}
+        <InputField
+          label="Search by Name"
+          value={searchTerm}
+          onChange={setSearchTerm}
+          placeholder="Start typing…"
+        />
+
+        <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+          {filteredProducts.map((product) => (
             <li
               key={product.id}
               className="flex flex-col justify-between border p-4 sm:p-5 rounded-xl bg-white shadow-sm transition hover:shadow-md"
@@ -98,6 +114,9 @@ export default function AdminProductsPage() {
                 </p>
                 <p>
                   <strong>Category ID:</strong> {product.categoryId}
+                </p>
+                <p>
+                  <strong>Tag:</strong> {product.tag || "none"}
                 </p>
                 <p>
                   <strong>Created At:</strong>{" "}

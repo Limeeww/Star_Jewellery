@@ -19,7 +19,7 @@ export default function SelectVariantField({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full border p-2"
+        className="w-full border p-2 focus:outline-none focus:ring-1 focus:ring-black rounded-none"
         disabled={disabled}
       >
         <option value="">Select {label}</option>

@@ -41,7 +41,6 @@ export default function EditCategoryForm({
 
     const err: string[] = [];
     if (!formData.name.trim()) err.push("Name is required.");
-    if (!formData.image.trim()) err.push("Image URL is required.");
 
     if (err.length) {
       setErrors(err);
@@ -66,14 +65,6 @@ export default function EditCategoryForm({
           label="Name"
           value={formData.name}
           onChange={(v) => handleChange("name", v)}
-          required
-        />
-
-        {/* IMAGE URL */}
-        <InputField
-          label="Image URL"
-          value={formData.image}
-          onChange={(v) => handleChange("image", v)}
           required
         />
 

@@ -14,7 +14,6 @@ interface Props {
 export default function CreateCategoryForm({ onCreate }: Props) {
   const [formData, setFormData] = useState<Omit<Category, "id">>({
     name: "",
-    image: "",
     parentCategory: null,
   });
 
@@ -41,7 +40,6 @@ export default function CreateCategoryForm({ onCreate }: Props) {
 
     const errs: string[] = [];
     if (!formData.name.trim()) errs.push("Name is required.");
-    if (!formData.image.trim()) errs.push("Image URL is required.");
 
     if (errs.length) {
       setErrors(errs);
@@ -67,15 +65,6 @@ export default function CreateCategoryForm({ onCreate }: Props) {
         value={formData.name}
         onChange={(v) => handleChange("name", v)}
         required
-      />
-
-      {/* Image */}
-      <InputField
-        label="Image URL"
-        value={formData.image}
-        onChange={(v) => handleChange("image", v)}
-        required
-        placeholder="https://example.com/image.jpg"
       />
 
       {/* Parent category (optional) */}

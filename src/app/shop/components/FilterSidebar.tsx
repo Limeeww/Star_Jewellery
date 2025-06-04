@@ -71,7 +71,7 @@ export default function FilterSidebar({
             <input
               type="radio"
               name="sort"
-              className="mr-2"
+              className="mr-2 accent-black"
               value="recommended"
               checked={sortOption === "recommended"}
               onChange={() => onSortChange("recommended")}
@@ -82,7 +82,7 @@ export default function FilterSidebar({
             <input
               type="radio"
               name="sort"
-              className="mr-2"
+              className="mr-2 accent-black"
               value="priceDesc"
               checked={sortOption === "priceDesc"}
               onChange={() => onSortChange("priceDesc")}
@@ -93,7 +93,7 @@ export default function FilterSidebar({
             <input
               type="radio"
               name="sort"
-              className="mr-2"
+              className="mr-2 accent-black"
               value="priceAsc"
               checked={sortOption === "priceAsc"}
               onChange={() => onSortChange("priceAsc")}
@@ -110,7 +110,7 @@ export default function FilterSidebar({
             <label key={tag} className="block mb-2 text-sm">
               <input
                 type="checkbox"
-                className="mr-2"
+                className="mr-2 accent-black"
                 checked={selectedTags.includes(tag)}
                 onChange={() => onToggleTag(tag)}
               />
@@ -126,7 +126,7 @@ export default function FilterSidebar({
             <label key={cat.id} className="block text-sm">
               <input
                 type="checkbox"
-                className="mr-2"
+                className="mr-2 accent-black"
                 checked={selectedCats.includes(Number(cat.id))}
                 onChange={() => onToggleCat(Number(cat.id))}
               />
@@ -140,7 +140,7 @@ export default function FilterSidebar({
             <label key={m} className="block text-sm">
               <input
                 type="checkbox"
-                className="mr-2"
+                className="mr-2 accent-black"
                 checked={selectedMaterials.includes(m)}
                 onChange={() => onToggleMaterial(m)}
               />
@@ -154,7 +154,7 @@ export default function FilterSidebar({
             <label key={c} className="block text-sm">
               <input
                 type="checkbox"
-                className="mr-2"
+                className="mr-2 accent-black"
                 checked={selectedColors.includes(c)}
                 onChange={() => onToggleColor(c)}
               />
@@ -168,7 +168,7 @@ export default function FilterSidebar({
             <label key={i} className="block text-sm">
               <input
                 type="checkbox"
-                className="mr-2"
+                className="mr-2 accent-black"
                 checked={selectedInserts.includes(i)}
                 onChange={() => onToggleInsert(i)}
               />
@@ -185,7 +185,7 @@ export default function FilterSidebar({
             <label key={col.id} className="block text-sm">
               <input
                 type="checkbox"
-                className="mr-2"
+                className="mr-2 accent-black"
                 checked={selectedCollections.includes(Number(col.id))}
                 onChange={() => onToggleCollection(Number(col.id))}
               />

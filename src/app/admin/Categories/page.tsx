@@ -9,7 +9,6 @@ import AccountLayout from "@/app/Account/components/AccountLayout";
 import Loading from "@/app/components/Loading/Loading";
 import Footer from "@/app/components/Footer/Footer";
 import LinkButton from "@/app/Account/components/LinkButton";
-import Image from "next/image";
 
 import { Category } from "@/types/product";
 
@@ -80,17 +79,6 @@ export default function AdminCategoriesPage() {
                 <p>
                   <strong>Parent ID:</strong> {cat.parentCategory ?? "-"}
                 </p>
-
-                {cat.image && (
-                  <div className="relative w-full h-40 border rounded bg-gray-50 overflow-hidden">
-                    <Image
-                      src={cat.image}
-                      alt={cat.name}
-                      fill
-                      className="object-contain"
-                    />
-                  </div>
-                )}
               </div>
 
               {/* EDIT */}

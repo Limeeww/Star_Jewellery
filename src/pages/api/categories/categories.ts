@@ -16,7 +16,6 @@ export default async function handler(
         return {
           id: d.id.toString(),
           name: d.name,
-          image: d.image,
           parentCategory: d.parentCategory ?? null,
         };
       });

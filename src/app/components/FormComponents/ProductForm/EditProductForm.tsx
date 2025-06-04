@@ -6,6 +6,8 @@ import LinkButtonForm from "@/app/components/FormComponents/LinkButtonForm";
 import EditProductVariantsForm from "@/app/components/FormComponents/ProductForm/EditProductVariantsForm";
 import { useCategories } from "@/hooks/useCategories";
 import InputField from "@/app/components/FormComponents/InputField";
+import SelectVariantField from "./SelectVariantField";
+import { ProductTag, TAG_OPTIONS } from "@/types/product";
 
 interface ProductFormProps {
   product: Product;
@@ -100,6 +102,13 @@ export default function EditProductForm({
             </select>
           )}
         </div>
+
+        <SelectVariantField
+          label="Product Tag"
+          value={formData.tag}
+          onChange={(val) => handleChange("tag", val as ProductTag)}
+          options={[...TAG_OPTIONS]}
+        />
 
         <div>
           <label className="inline-flex items-center space-x-2">

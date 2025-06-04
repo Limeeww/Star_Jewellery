@@ -26,7 +26,7 @@ export function useCollections(): Collection[] {
               description: data.description ?? "",
               images: data.images || [],
               isActive: data.isActive ?? false,
-              parentCategory: data.parentCategory ?? 0,
+              //parentCategory: data.parentCategory ?? 0,
               createdAt: data.createdAt ?? Timestamp.fromDate(new Date()),
               productIds: data.productIds ?? [],
             };

@@ -11,6 +11,7 @@ interface InputFieldProps {
   type?: "text" | "number" | "datetime-local";
   required?: boolean;
   placeholder?: string;
+  className?: string;
 }
 
 export default function InputField({
@@ -22,6 +23,7 @@ export default function InputField({
   type = "text",
   required = false,
   placeholder = "",
+  className = "",
 }: InputFieldProps) {
   const [touched, setTouched] = useState(false);
 
@@ -48,7 +50,7 @@ export default function InputField({
         onBlur={() => setTouched(true)}
         className={`border border-gray-300 p-2 text-m
           focus:outline-none focus:ring-1 focus:ring-black rounded-none w-full 
-          ${showEmptyError ? "border-red-500 ring-red-500" : ""}
+          ${showEmptyError ? "border-red-500 ring-red-500" : ""} ${className}
         `}
       />
 
