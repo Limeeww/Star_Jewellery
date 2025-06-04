@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useUserRole } from "@/hooks/useUserRole";
 import Navbar from "@/app/components/Navbar/Navbar";
@@ -12,14 +12,16 @@ import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import LinkButton from "@/app/Account/components/LinkButton";
 import Footer from "@/app/components/Footer/Footer";
+import InputField from "@/app/components/FormComponents/InputField";
 
-export default function AddCollection() {
+export default function AdminCollectionsPage() {
   const pathname = usePathname();
   const router = useRouter();
   const { user, role, loading } = useUserRole();
 
   const [collections, setCollections] = useState<Collection[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const isLoggedIn = !loading && !!user;
 
@@ -42,6 +44,12 @@ export default function AddCollection() {
       setIsLoading(false);
     }
   };
+
+  const filteredCollections = useMemo(() => {
+    if (!searchTerm.trim()) return collections;
+    const term = searchTerm.toLowerCase();
+    return collections.filter((d) => d.name.toLowerCase().includes(term));
+  }, [collections, searchTerm]);
 
   const formatTimestamp = (
     timestamp: { toDate?: () => Date; _seconds?: number } | null | undefined
@@ -75,9 +83,16 @@ export default function AddCollection() {
           showArrow={false}
           onClick={() => router.push(`/Admin/Collections/Add`)}
         />
+        {/* поиск по названию */}
+        <InputField
+          label="Search by Name"
+          value={searchTerm}
+          onChange={setSearchTerm}
+          placeholder="Start typing…"
+        />
 
-        <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {collections.map((collection) => (
+        <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+          {filteredCollections.map((collection) => (
             <li
               key={collection.id}
               className="flex flex-col justify-between border p-4 sm:p-5 rounded-xl bg-white shadow-sm transition hover:shadow-md"

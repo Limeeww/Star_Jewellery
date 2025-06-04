@@ -28,6 +28,8 @@ const ADMIN_LINKS = [
   { label: "Manage User Roles", href: "/Admin/Roles" },
   { label: "Manage Products", href: "/Admin/Products" },
   { label: "Manage Collections", href: "/Admin/Collections" },
+  { label: "Manage Categories", href: "/Admin/Categories" },
+  { label: "Manage Discounts", href: "/Admin/Discounts" },
 ];
 
 const getLinks = (role?: string | null): NavLink[] => {

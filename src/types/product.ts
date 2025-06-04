@@ -10,6 +10,14 @@ export const badgeLabels: Record<NonNullable<ProductTag>, string> = {
   default: "",
 };
 
+export const TAG_OPTIONS: ProductTag[] = [
+  "must-have",
+  "new",
+  "exclusive",
+  "sale",
+  "default",
+];
+
 export interface Discount {
   id: number;
   name: string;
@@ -25,7 +33,6 @@ export interface Discount {
 export interface Category {
   id: string;
   name: string;
-  image: string;
   parentCategory: number | null;
 }
 

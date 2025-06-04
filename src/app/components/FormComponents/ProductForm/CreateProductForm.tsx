@@ -18,6 +18,7 @@ import SelectVariantField from "@/app/components/FormComponents/ProductForm/Sele
 import { useCategories } from "@/hooks/useCategories";
 import InputField from "@/app/components/FormComponents/InputField";
 import ActionButton from "@/app/components/FormComponents/ActionButton";
+import { ProductTag, TAG_OPTIONS } from "@/types/product";
 
 export default function CreateProductForm({
   onCreate,
@@ -161,6 +162,13 @@ export default function CreateProductForm({
           label="Additional Info"
           value={formData.additionalDescription}
           onChange={(val) => handleChange("additionalDescription", val)}
+        />
+
+        <SelectVariantField
+          label="Product Tag"
+          value={formData.tag}
+          onChange={(val) => handleChange("tag", val as ProductTag)}
+          options={[...TAG_OPTIONS]}
         />
 
         <div>

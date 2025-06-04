@@ -38,7 +38,7 @@ export default function ConfirmModal({
         >
           <motion.div
             ref={modalRef}
-            className="bg-white p-6 rounded-md shadow-md w-full max-w-sm relative"
+            className="bg-white p-6 shadow-md w-full max-w-sm relative"
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.8, opacity: 0 }}
@@ -54,13 +54,13 @@ export default function ConfirmModal({
             <div className="flex justify-end gap-4">
               <button
                 onClick={onClose}
-                className="px-4 py-2 border bg-white hover:bg-gray-100 rounded"
+                className="px-4 py-2 border bg-white hover:bg-gray-100"
               >
                 {cancelLabel}
               </button>
               <button
                 onClick={onConfirm}
-                className="px-4 py-2 bg-red-600 text-white hover:bg-red-700 rounded"
+                className="px-4 py-2 bg-red-600 text-white hover:bg-red-700"
               >
                 {confirmLabel}
               </button>
