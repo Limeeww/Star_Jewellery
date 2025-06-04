@@ -6,43 +6,54 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const { id } = req.query;
+  const { id: orderId } = req.query; // ← сюда приходит orderId (не doc.id)
 
-  const docRef = adminDB.collection("orders").doc(id as string);
+  // ищем документ по полю orderId
+  const querySnap = await adminDB
+    .collection("orders")
+    .where("orderId", "==", Number(orderId)) // если orderId числовой
+    .limit(1)
+    .get();
+
+  if (querySnap.empty) {
+    return res.status(404).json({ error: "Order not found" });
+  }
+
+  // первый (и единственный) найденный документ
+  const docSnap = querySnap.docs[0];
+  const docRef = docSnap.ref;
 
   try {
-    if (req.method === "GET") {
-      const snap = await docRef.get();
-
-      if (!snap.exists) {
-        return res.status(404).json({ error: "Order not found" });
+    switch (req.method) {
+      /* ───── GET ───── */
+      case "GET": {
+        const data = docSnap.data() as Order;
+        return res.status(200).json({ order: data, docId: docSnap.id });
       }
 
-      const data = snap.data() as Order;
-      return res.status(200).json({ order: data });
+      /* ───── PUT ───── */
+      case "PUT": {
+        const updated: Order = req.body;
+        await docRef.set(
+          { ...updated, updatedAt: new Date() },
+          { merge: true }
+        );
+        return res.status(200).json({ ok: true });
+      }
+
+      /* ───── DELETE ───── */
+      case "DELETE": {
+        await docRef.delete();
+        return res.status(204).end();
+      }
+
+      /* ───── Fallback ───── */
+      default:
+        res.setHeader("Allow", ["GET", "PUT", "DELETE"]);
+        return res.status(405).end(`Method ${req.method} Not Allowed`);
     }
-
-    if (req.method === "PUT") {
-      const updated: Order = req.body;
-
-      const updatedWithTimestamp = {
-        ...updated,
-        updatedAt: new Date(),
-      };
-
-      await docRef.set(updatedWithTimestamp, { merge: true });
-      return res.status(200).json({ ok: true });
-    }
-
-    if (req.method === "DELETE") {
-      await docRef.delete();
-      return res.status(204).end();
-    }
-
-    res.setHeader("Allow", ["GET", "PUT", "DELETE"]);
-    return res.status(405).end(`Method ${req.method} Not Allowed`);
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "Unknown error";
-    return res.status(500).json({ error: "API error", details: message });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "Unknown error";
+    return res.status(500).json({ error: "API error", details: msg });
   }
 }

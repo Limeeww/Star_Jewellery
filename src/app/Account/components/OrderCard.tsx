@@ -15,20 +15,40 @@ interface OrderCardProps {
   mode?: "detail";
 }
 
+const SHIPPING_FLOW = [
+  OrderStatusValue.PENDING,
+  OrderStatusValue.SHIPPED,
+  OrderStatusValue.DELIVERED,
+] as const;
+
+const REFUND_FLOW = [
+  OrderStatusValue.REFUND_REQUESTED,
+  OrderStatusValue.REFUNDED,
+] as const;
+
+type RefundStatus = (typeof REFUND_FLOW)[number];
+const isRefundStatus = (s: OrderStatusValue): s is RefundStatus =>
+  (REFUND_FLOW as readonly OrderStatusValue[]).includes(s);
+
 export default function OrderCard({ order, mode }: OrderCardProps) {
   const { orderId, orderDate, products, shippingAddress, paymentInfo, status } =
     order;
 
-  const steps = (Object.values(OrderStatusValue) as OrderStatusValue[]).filter(
-    (s) => s !== OrderStatusValue.CANCELLED
-  );
+  let steps: readonly OrderStatusValue[] = SHIPPING_FLOW;
+  let barClass = "bg-blue-500";
 
-  let progressIndex = steps.indexOf(
-    status as Exclude<OrderStatusValue, OrderStatusValue.CANCELLED>
-  );
-  if (progressIndex < 0) progressIndex = 0;
-  const maxIndex = steps.length - 1;
-  const progressPercent = maxIndex > 0 ? (progressIndex / maxIndex) * 100 : 0;
+  if (status === OrderStatusValue.CANCELLED) {
+    steps = [OrderStatusValue.CANCELLED];
+    barClass = "bg-red-500";
+  } else if (isRefundStatus(status)) {
+    steps = REFUND_FLOW;
+    barClass = "bg-amber-500";
+  }
+
+  const currentIndex = steps.indexOf(status);
+  const progressPercent =
+    steps.length > 1 ? (currentIndex / (steps.length - 1)) * 100 : 100;
+
   return (
     <div className="bg-gray-50 border border-gray-200 p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
@@ -47,7 +67,9 @@ export default function OrderCard({ order, mode }: OrderCardProps) {
 
       <p className="text-sm text-gray-500 mb-6">
         Placed on:{" "}
-        <span className="text-gray-700">{orderDate.toLocaleDateString()}</span>
+        <span className="text-gray-700">
+          {new Date(orderDate).toLocaleDateString()}
+        </span>
       </p>
 
       <div className="space-y-4 mb-6">
@@ -57,10 +79,9 @@ export default function OrderCard({ order, mode }: OrderCardProps) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Shipping address */}
         <div>
-          <h4 className="font-medium text-gray-700 mb-2 font-semibold">
-            Shipping Address
-          </h4>
+          <h4 className="font-medium text-gray-700 mb-2">Shipping Address</h4>
           <p className="text-sm text-gray-600">
             {shippingAddress.addressLabel}
           </p>
@@ -70,10 +91,9 @@ export default function OrderCard({ order, mode }: OrderCardProps) {
           </p>
         </div>
 
+        {/* Payment info */}
         <div>
-          <h4 className="font-medium text-gray-700 mb-2 font-semibold">
-            Payment
-          </h4>
+          <h4 className="font-medium text-gray-700 mb-2">Payment</h4>
           <p className="text-sm text-gray-600 mb-1">
             Status:{" "}
             <span
@@ -94,40 +114,36 @@ export default function OrderCard({ order, mode }: OrderCardProps) {
           </p>
         </div>
 
+        {/* Order / refund / cancel status */}
         <div>
-          <h4 className="font-medium text-gray-700 mb-2 font-semibold">
-            Order Status
+          <h4 className="font-medium text-gray-700 mb-2">
+            {status === OrderStatusValue.CANCELLED
+              ? "Order Cancelled"
+              : isRefundStatus(status)
+              ? "Refund Status"
+              : "Order Status"}
           </h4>
+
           <div className="w-full bg-gray-200 h-2 rounded overflow-hidden mb-2">
             <div
-              className={`h-2 transition-all bg-blue-500`}
+              className={`h-2 transition-all ${barClass}`}
               style={{ width: `${progressPercent}%` }}
             />
           </div>
+
           <div className="flex justify-between text-xs uppercase">
-            <span
-              className={
-                status !== steps[0] ? "text-primary-500" : "text-gray-400"
-              }
-            >
-              {OrderStatusValue.PENDING}
-            </span>
-            <span
-              className={
-                status === steps[1] || status === steps[2]
-                  ? "text-primary-500"
-                  : "text-gray-400"
-              }
-            >
-              {OrderStatusValue.SHIPPED}
-            </span>
-            <span
-              className={
-                status === steps[2] ? "text-primary-500" : "text-gray-400"
-              }
-            >
-              {OrderStatusValue.DELIVERED}
-            </span>
+            {steps.map((step) => (
+              <span
+                key={step}
+                className={
+                  step === status
+                    ? "text-primary-500"
+                    : "text-gray-400 whitespace-nowrap"
+                }
+              >
+                {step}
+              </span>
+            ))}
           </div>
         </div>
       </div>

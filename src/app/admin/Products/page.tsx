@@ -13,6 +13,8 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 import LinkButton from "@/app/Account/components/LinkButton";
 import Footer from "@/app/components/Footer/Footer";
 import InputField from "@/app/components/FormComponents/InputField";
+import { PaginationControls } from "@/app/components/PaginationControls";
+import { usePagination } from "@/hooks/usePagination";
 
 export default function AdminProductsPage() {
   const pathname = usePathname();
@@ -50,6 +52,16 @@ export default function AdminProductsPage() {
     const term = searchTerm.toLowerCase();
     return products.filter((d) => d.name.toLowerCase().includes(term));
   }, [products, searchTerm]);
+
+  const {
+    currentPageItems,
+    page,
+    totalPages,
+    hasPrev,
+    hasNext,
+    prevPage,
+    nextPage,
+  } = usePagination<Product>(filteredProducts, 2); // 8 orders per page
 
   const formatTimestamp = (
     timestamp: { toDate?: () => Date; _seconds?: number } | null | undefined
@@ -93,7 +105,7 @@ export default function AdminProductsPage() {
         />
 
         <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-          {filteredProducts.map((product) => (
+          {currentPageItems.map((product) => (
             <li
               key={product.id}
               className="flex flex-col justify-between border p-4 sm:p-5 rounded-xl bg-white shadow-sm transition hover:shadow-md"
@@ -278,6 +290,19 @@ export default function AdminProductsPage() {
             </li>
           ))}
         </ul>
+        {/* Pagination controls */}
+        {totalPages > 1 && (
+          <div className="mt-8 flex justify-center">
+            <PaginationControls
+              page={page}
+              totalPages={totalPages}
+              hasPrev={hasPrev}
+              hasNext={hasNext}
+              prevPage={prevPage}
+              nextPage={nextPage}
+            />
+          </div>
+        )}
       </AccountLayout>
       <Footer />
     </>

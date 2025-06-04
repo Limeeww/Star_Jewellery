@@ -13,6 +13,8 @@ import ActionButton from "@/app/components/FormComponents/ActionButton";
 import ConfirmModal from "@/app/components/MessageHandling/ConfirmModal";
 import LinkButton from "@/app/Account/components/LinkButton";
 import InputField from "@/app/components/FormComponents/InputField";
+import { PaginationControls } from "@/app/components/PaginationControls";
+import { usePagination } from "@/hooks/usePagination";
 
 import { Discount } from "@/types/product";
 
@@ -72,6 +74,16 @@ export default function AdminDiscountsPage() {
     return discounts.filter((d) => d.name.toLowerCase().includes(term));
   }, [discounts, searchTerm]);
 
+  const {
+    currentPageItems,
+    page,
+    totalPages,
+    hasPrev,
+    hasNext,
+    prevPage,
+    nextPage,
+  } = usePagination<Discount>(filteredDiscounts, 4); // 8 orders per page
+
   /* ───── delete flow ───── */
   const openDeleteModal = (id: number) => {
     setSelectedId(id);
@@ -123,8 +135,8 @@ export default function AdminDiscountsPage() {
         />
 
         <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-          {filteredDiscounts.length ? (
-            filteredDiscounts.map((d) => (
+          {currentPageItems.length ? (
+            currentPageItems.map((d) => (
               <li
                 key={d.id}
                 className="flex flex-col justify-between border p-4 sm:p-5 rounded-xl bg-white shadow-sm transition hover:shadow-md"
@@ -172,6 +184,19 @@ export default function AdminDiscountsPage() {
             </p>
           )}
         </ul>
+        {/* Pagination controls */}
+        {totalPages > 1 && (
+          <div className="mt-8 flex justify-center">
+            <PaginationControls
+              page={page}
+              totalPages={totalPages}
+              hasPrev={hasPrev}
+              hasNext={hasNext}
+              prevPage={prevPage}
+              nextPage={nextPage}
+            />
+          </div>
+        )}
       </AccountLayout>
 
       <Footer />
