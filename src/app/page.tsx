@@ -11,6 +11,7 @@ import AboutUsSection from "./AboutUsSection/AboutUsSection";
 import { FaGift, FaHeadset, FaShippingFast } from "react-icons/fa";
 import Footer from "./components/Footer/Footer";
 import { useAuthStatus } from "@/hooks/useAuthStatus";
+import ChatWidget from "./components/FormComponents/JewelryAssistant/ChatWidget";
 
 const NAV_LINKS = [
   { href: "#about-us", label: "ABOUT US" },
@@ -170,6 +171,7 @@ export default function HomePage() {
       <AboutUsSection />
 
       <Footer />
+      <ChatWidget />
     </>
   );
 }
