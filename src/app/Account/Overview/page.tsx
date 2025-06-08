@@ -153,6 +153,11 @@ export default function Overview() {
                 description={"Start managing the discounts via link."}
                 linkHref="/Admin/Discounts"
               />
+              <ProfileCard
+                title="MANAGE ORDERS"
+                description={"Start managing the orders via link."}
+                linkHref="/Admin/Orders"
+              />
             </>
           ) : (
             <></>

@@ -30,6 +30,7 @@ const ADMIN_LINKS = [
   { label: "Manage Collections", href: "/Admin/Collections" },
   { label: "Manage Categories", href: "/Admin/Categories" },
   { label: "Manage Discounts", href: "/Admin/Discounts" },
+  { label: "Manage Orders", href: "/Admin/Orders" },
 ];
 
 const getLinks = (role?: string | null): NavLink[] => {

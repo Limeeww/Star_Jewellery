@@ -73,9 +73,6 @@ export default function CreateDiscountForm({
     setFormData((prev) => ({ ...prev, [key]: value }));
   };
 
-  /* -------------------------------------------------
-   ВНЕ handleSubmit: вспомогательный creator
---------------------------------------------------*/
   const proceedCreate = async () => {
     try {
       /* если мы уже знаем конфликтующую скидку — обнуляем её priority */

@@ -53,7 +53,7 @@ export interface UserData {
   orders?: Order[];
   addresses?: Address[];
   paymentMethods?: PaymentInfo[];
-  bonuses?: string;
+  bonuses?: number;
   lastBirthdayChange?: Timestamp;
   lastAnniversaryChange?: Timestamp;
   lastRelationshipStatusChange?: Timestamp;

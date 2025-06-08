@@ -76,6 +76,8 @@ export enum OrderStatusValue {
   SHIPPED = "shipped",
   DELIVERED = "delivered",
   CANCELLED = "cancelled",
+  REFUND_REQUESTED = "refund requested",
+  REFUNDED = "refunded",
 }
 
 export const OrderStatusLabel: Record<OrderStatusValue, string> = {
@@ -83,6 +85,8 @@ export const OrderStatusLabel: Record<OrderStatusValue, string> = {
   [OrderStatusValue.SHIPPED]: "Shipped",
   [OrderStatusValue.DELIVERED]: "Delivered",
   [OrderStatusValue.CANCELLED]: "Cancelled",
+  [OrderStatusValue.REFUND_REQUESTED]: "Refund requested",
+  [OrderStatusValue.REFUNDED]: "Refunded",
 };
 export interface Order {
   orderId: number;
