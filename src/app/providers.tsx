@@ -13,8 +13,8 @@ import StripeProvider from "./components/StripeProvider";
 export default function Providers({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAnonymousAuth();
   const { notification, clearNotification } = useNotification();
-
   if (loading) return <Loading />;
+
 
   return (
     <AuthProvider user={user} loading={loading}>

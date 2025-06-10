@@ -75,13 +75,26 @@ export default function CollectionsSection() {
           )}
         </div>
 
-        <div className="overflow-hidden order-1 2xl:order-2">
+        <div
+          className="
+    relative
+    overflow-hidden
+    order-1 2xl:order-2
+    w-full
+    max-w-[410px]      
+    sm:max-w-full      
+    mx-auto            
+    h-[50vh]
+    xl:h-[80vh]
+    2xl:h-[103vh]
+  "
+        >
           <Image
             src="/images/collections/model.jpg"
             alt="Model wearing jewelry"
-            width={600}
-            height={800}
-            className="w-full h-[50vh] md:h-[80vh] 2xl:h-[103vh] object-cover"
+            fill
+            sizes="(max-width: 640px) 300px, 100vw"
+            className="object-cover"
           />
         </div>
       </div>
