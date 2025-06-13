@@ -29,7 +29,7 @@ export default function Overview() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { user: currentUser, role, loading: roleLoading } = useUserRole();
 
-  if (loading || roleLoading || !profileData) {
+  if (loading || roleLoading) {
     return <Loading />;
   }
 

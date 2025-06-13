@@ -1,4 +1,3 @@
-// src/hooks/useAnonymousAuth.ts
 "use client";
 
 import { useState, useEffect } from "react";
@@ -15,8 +14,7 @@ export function useAnonymousAuth() {
         try {
           const { user: anon } = await signInAnonymously(auth);
           setUser(anon);
-        } catch (e) {
-          console.error("Anonymous sign-in failed:", e);
+        } catch {
           setUser(null);
         }
       } else {
