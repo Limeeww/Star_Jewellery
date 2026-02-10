@@ -35,7 +35,7 @@ export function useProductPage() {
   const [activeDiscount, setActiveDiscount] = useState<Discount | null>(null);
   const initialIdFromUrl = searchParams?.get("variantID");
   const [currentVariantId, setCurrentVariantId] = useState<number | null>(
-    initialIdFromUrl ? Number(initialIdFromUrl) : null
+    initialIdFromUrl ? Number(initialIdFromUrl) : null,
   );
   useEffect(() => {
     if (!slug) return;
@@ -85,8 +85,10 @@ export function useProductPage() {
     const map = new Map<number, { size: number; quantity: number }>();
     product.variants.forEach((v) =>
       v.quantitySize?.forEach((q) => {
-        if (!map.has(q.size)) map.set(q.size, q);
-      })
+        if (q.size != null && !map.has(q.size)) {
+          map.set(q.size, { size: q.size, quantity: q.quantity });
+        }
+      }),
     );
     return Array.from(map.values()).map((q) => ({
       value: String(q.size),
@@ -96,13 +98,13 @@ export function useProductPage() {
   const insertOptions = useMemo(() => {
     if (!product) return [];
     return Array.from(new Set(product.variants.map((v) => v.insert))).map(
-      (i) => ({ value: i, label: i })
+      (i) => ({ value: i, label: i }),
     );
   }, [product]);
   const materialColorOptions = useMemo(() => {
     if (!product) return [];
     return Array.from(
-      new Set(product.variants.map((v) => v.materialColor.trim()))
+      new Set(product.variants.map((v) => v.materialColor.trim())),
     ).map((c) => ({ value: c, label: c }));
   }, [product]);
   const handleInsertChange = (val: string) => {
@@ -110,7 +112,7 @@ export function useProductPage() {
     const v = findByVariantAttributes(
       product.variants,
       val,
-      displayedVariant?.materialColor ?? ""
+      displayedVariant?.materialColor ?? "",
     );
     if (v && v.id !== currentVariantId) {
       setCurrentVariantId(v.id);
@@ -122,7 +124,7 @@ export function useProductPage() {
     const v = findByVariantAttributes(
       product.variants,
       displayedVariant?.insert ?? "",
-      val
+      val,
     );
     if (v && v.id !== currentVariantId) {
       setCurrentVariantId(v.id);

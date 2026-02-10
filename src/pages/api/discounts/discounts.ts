@@ -7,7 +7,7 @@ import admin from "firebase-admin";
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
   if (req.method === "GET") {
     try {
@@ -41,12 +41,12 @@ export default async function handler(
             validUntil: data.validUntil,
             priority,
           };
-        })
+        }),
       );
 
       return res.status(200).json({ discounts });
     } catch (error) {
-      console.error("Ошибка при получении скидок:", error);
+      console.error("Error fetching discounts:", error);
       return res.status(500).json({ error: "Failed to fetch discounts" });
     }
   }
@@ -59,19 +59,19 @@ export default async function handler(
       const validFrom =
         discount.validFrom && "seconds" in discount.validFrom
           ? admin.firestore.Timestamp.fromMillis(
-              (discount.validFrom.seconds as number) * 1000
+              (discount.validFrom.seconds as number) * 1000,
             )
           : admin.firestore.Timestamp.fromDate(
-              (discount.validFrom as admin.firestore.Timestamp).toDate()
+              (discount.validFrom as admin.firestore.Timestamp).toDate(),
             );
 
       const validUntil =
         discount.validUntil && "seconds" in discount.validUntil
           ? admin.firestore.Timestamp.fromMillis(
-              (discount.validUntil.seconds as number) * 1000
+              (discount.validUntil.seconds as number) * 1000,
             )
           : admin.firestore.Timestamp.fromDate(
-              (discount.validUntil as admin.firestore.Timestamp).toDate()
+              (discount.validUntil as admin.firestore.Timestamp).toDate(),
             );
 
       await adminDB
@@ -86,7 +86,7 @@ export default async function handler(
 
       return res.status(201).json({ success: true, id: numericId });
     } catch (error) {
-      console.error("Ошибка при создании скидки:", error);
+      console.error("Error creating discount:", error);
       return res.status(500).json({ error: "Failed to create discount" });
     }
   }

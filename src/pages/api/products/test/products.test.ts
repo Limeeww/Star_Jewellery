@@ -39,10 +39,10 @@ describe("Products API Handler", () => {
       tag: "tag1",
     };
 
-    // Мокаем один документ из Firestore
+    // Mock one Firestore document
     const mockedDocs = [
       {
-        id: "1", // Можно указать id, но в тесте мы не будем ожидать его в ответе
+        id: "1", // Can specify id, but in test we won't expect it in response
         data: () => mockProductData,
       },
     ];
@@ -55,17 +55,17 @@ describe("Products API Handler", () => {
     const { req, res } = createMocks({ method: "GET" });
     await handler(
       req as unknown as NextApiRequest,
-      res as unknown as NextApiResponse
+      res as unknown as NextApiResponse,
     );
 
     expect(res._getStatusCode()).toBe(200);
     const json = JSON.parse(res._getData());
 
-    // Убедимся, что пришёл массив длиной 1
+    // Ensure an array of length 1 arrived
     expect(Array.isArray(json.products)).toBe(true);
     expect(json.products).toHaveLength(1);
 
-    // Проверим содержимое первого продукта (игнорируем поле "id", потому что handler его не возвращает)
+    // Check content of the first product (ignore "id" field because handler doesn't return it)
     expect(json.products[0]).toMatchObject({
       name: mockProductData.name,
       description: mockProductData.description,
@@ -83,13 +83,13 @@ describe("Products API Handler", () => {
   it("should return error on GET request failure", async () => {
     const collectionRef = adminDB.collection("products");
     (collectionRef.get as jest.Mock).mockRejectedValue(
-      new Error("Database error")
+      new Error("Database error"),
     );
 
     const { req, res } = createMocks({ method: "GET" });
     await handler(
       req as unknown as NextApiRequest,
-      res as unknown as NextApiResponse
+      res as unknown as NextApiResponse,
     );
 
     expect(res._getStatusCode()).toBe(500);
@@ -112,8 +112,8 @@ describe("Products API Handler", () => {
     };
 
     const collectionRef = adminDB.collection("products");
-    // Когда handler вызовет collectionRef.doc(), он получит объект с методом set
-    // Нам нужно вернуть mockDocRef, у которого есть поле id
+    // When handler calls collectionRef.doc(), it receives an object with set method
+    // We need to return mockDocRef which has an id field
     const mockDocRef = {
       set: jest.fn().mockResolvedValue({}),
       id: "generated-id-123",
@@ -123,13 +123,13 @@ describe("Products API Handler", () => {
     const { req, res } = createMocks({ method: "POST", body: mockProduct });
     await handler(
       req as unknown as NextApiRequest,
-      res as unknown as NextApiResponse
+      res as unknown as NextApiResponse,
     );
 
     expect(res._getStatusCode()).toBe(201);
-    // Убедимся, что set() был вызван с правильными данными
+    // Ensure set() was called with correct data
     expect(mockDocRef.set).toHaveBeenCalledWith(
-      expect.objectContaining(mockProduct)
+      expect.objectContaining(mockProduct),
     );
 
     const data = JSON.parse(res._getData());
@@ -159,7 +159,7 @@ describe("Products API Handler", () => {
     const { req, res } = createMocks({ method: "POST", body: mockProduct });
     await handler(
       req as unknown as NextApiRequest,
-      res as unknown as NextApiResponse
+      res as unknown as NextApiResponse,
     );
 
     expect(res._getStatusCode()).toBe(500);
@@ -174,7 +174,7 @@ describe("Products API Handler", () => {
     const { req, res } = createMocks({ method: "PUT" });
     await handler(
       req as unknown as NextApiRequest,
-      res as unknown as NextApiResponse
+      res as unknown as NextApiResponse,
     );
 
     expect(res._getStatusCode()).toBe(405);

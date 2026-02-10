@@ -64,7 +64,7 @@ export default function AdminProductsPage() {
   } = usePagination<Product>(filteredProducts, 2); // 8 orders per page
 
   const formatTimestamp = (
-    timestamp: { toDate?: () => Date; _seconds?: number } | null | undefined
+    timestamp: { toDate?: () => Date; _seconds?: number } | null | undefined,
   ) => {
     if (!timestamp) return "N/A";
 
@@ -96,7 +96,7 @@ export default function AdminProductsPage() {
           showArrow={false}
           onClick={() => router.push(`/Admin/Products/Add`)}
         />
-        {/* поиск по названию */}
+        {/* search by name */}
         <InputField
           label="Search by Name"
           value={searchTerm}
@@ -205,7 +205,7 @@ export default function AdminProductsPage() {
                               renderArrowPrev={(
                                 onClickHandler,
                                 hasPrev,
-                                label
+                                label,
                               ) =>
                                 hasPrev && (
                                   <button
@@ -234,7 +234,7 @@ export default function AdminProductsPage() {
                               renderArrowNext={(
                                 onClickHandler,
                                 hasNext,
-                                label
+                                label,
                               ) =>
                                 hasNext && (
                                   <button

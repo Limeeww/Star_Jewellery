@@ -36,7 +36,7 @@ export default function ShareButton({ title, text, url }: ShareButtonProps) {
           message: "Link copied to clipboard!",
           duration: 3000,
         });
-      } catch (error) {
+      } catch {
         notify({
           type: "error",
           message: "Failed to copy link.",

@@ -44,7 +44,7 @@ export default function RecentlyViewed() {
   }, []);
 
   if (!mounted) {
-    // на сервере и до первого client-effect вообще не рендерим
+    // Do not render on server and before the first client-effect
     return null;
   }
 
@@ -62,6 +62,7 @@ export default function RecentlyViewed() {
               name: p.name,
               description: "",
               slug: p.slug,
+              tag: "new",
               categoryId: 0,
               variants: [
                 {

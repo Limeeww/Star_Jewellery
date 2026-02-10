@@ -40,7 +40,7 @@ describe("Collections API Handler", () => {
 
   describe("GET /api/collections", () => {
     it("should return collections on GET request", async () => {
-      // Подготовим фейковые документы
+      // Prepare fake documents
       const mockCreatedAt = "2025-01-01T12:00:00Z";
       const mockDocs = [
         {
@@ -77,7 +77,7 @@ describe("Collections API Handler", () => {
       const { req, res } = createMocks({ method: "GET" });
       await handler(
         req as unknown as NextApiRequest,
-        res as unknown as NextApiResponse
+        res as unknown as NextApiResponse,
       );
 
       expect(res._getStatusCode()).toBe(200);
@@ -86,7 +86,7 @@ describe("Collections API Handler", () => {
       expect(Array.isArray(json.collections)).toBe(true);
       expect(json.collections).toHaveLength(2);
 
-      // Проверяем первый объект
+      // Check first object
       expect(json.collections[0]).toEqual({
         id: "100",
         name: "Spring Collection",
@@ -98,7 +98,7 @@ describe("Collections API Handler", () => {
         productIds: ["p1", "p2"],
       });
 
-      // Проверяем второй объект
+      // Check second object
       expect(json.collections[1]).toEqual({
         id: "101",
         name: "Summer Collection",
@@ -118,7 +118,7 @@ describe("Collections API Handler", () => {
       const { req, res } = createMocks({ method: "GET" });
       await handler(
         req as unknown as NextApiRequest,
-        res as unknown as NextApiResponse
+        res as unknown as NextApiResponse,
       );
 
       expect(res._getStatusCode()).toBe(500);
@@ -142,7 +142,7 @@ describe("Collections API Handler", () => {
         productIds: ["p3"],
       };
 
-      // Используем тип FieldValue вместо any
+      // Use FieldValue type instead of any
       const fakeTimestamp = {
         _seconds: 1234567890,
         _nanoseconds: 0,
@@ -159,7 +159,7 @@ describe("Collections API Handler", () => {
       const { req, res } = createMocks({ method: "POST", body: newCol });
       await handler(
         req as unknown as NextApiRequest,
-        res as unknown as NextApiResponse
+        res as unknown as NextApiResponse,
       );
 
       expect(res._getStatusCode()).toBe(201);
@@ -194,7 +194,7 @@ describe("Collections API Handler", () => {
       const { req, res } = createMocks({ method: "POST", body: newCol });
       await handler(
         req as unknown as NextApiRequest,
-        res as unknown as NextApiResponse
+        res as unknown as NextApiResponse,
       );
 
       expect(res._getStatusCode()).toBe(500);
@@ -209,7 +209,7 @@ describe("Collections API Handler", () => {
       const { req, res } = createMocks({ method: "PUT" });
       await handler(
         req as unknown as NextApiRequest,
-        res as unknown as NextApiResponse
+        res as unknown as NextApiResponse,
       );
 
       expect(res._getStatusCode()).toBe(405);

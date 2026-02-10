@@ -10,7 +10,7 @@ type RoleRequestBody = {
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method Not Allowed" });
@@ -42,7 +42,7 @@ export default async function handler(
 
     await adminAuth.setCustomUserClaims(uid, { role });
 
-    console.log(`Установка роли '${role}' для пользователя ${uid}`);
+    console.log(`Setting role '${role}' for user ${uid}`);
 
     return res
       .status(200)

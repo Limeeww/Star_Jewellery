@@ -27,14 +27,14 @@ export default function EditCollectionForm({
   /* ───────── helpers ───────── */
   const handleChange = <K extends keyof Collection>(
     field: K,
-    value: Collection[K]
+    value: Collection[K],
   ) => setFormData((p) => ({ ...p, [field]: value }));
 
   /* ───────── submit with full validation ───────── */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    /* 1) базовые проверки */
+    /* 1) basic checks */
     const newErr: string[] = [];
     if (!formData.name.trim()) newErr.push("Name is required.");
     if (!formData.description.trim()) newErr.push("Description is required.");
@@ -48,7 +48,7 @@ export default function EditCollectionForm({
       return;
     }
 
-    /* 2) серверная проверка существования ID */
+    /* 2) server-side ID existence check */
     try {
       const res = await fetch("/api/products/validate-ids", {
         method: "POST",
@@ -64,7 +64,7 @@ export default function EditCollectionForm({
         return;
       }
 
-      /* 3) всё прошло — сохраняем */
+      /* 3) all good — save */
       setErrors([]);
       onSave(formData);
     } catch (err) {

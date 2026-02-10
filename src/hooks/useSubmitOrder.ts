@@ -177,7 +177,7 @@ export function useSubmitOrder({
         userId: user.uid,
       };
 
-      // 1. Списываем остатки, но каждый item оборачиваем в свой try/catch
+      // 1. Deduct inventory, but wrap each item in its own try/catch
       await Promise.all(
         order.products.map(async (item) => {
           try {
@@ -185,7 +185,7 @@ export function useSubmitOrder({
             const snap = await getDoc(productRef);
             if (!snap.exists()) {
               console.warn(
-                `Product ${item.productId} not found. Skipping inventory update.`
+                `Product ${item.productId} not found. Skipping inventory update.`,
               );
               return;
             }
@@ -197,11 +197,11 @@ export function useSubmitOrder({
             }[];
 
             const variantIndex = variants.findIndex(
-              (v) => String(v.id) === String(item.variantId)
+              (v) => String(v.id) === String(item.variantId),
             );
             if (variantIndex === -1) {
               console.warn(
-                `Variant ${item.variantId} for product ${item.productId} not found. Skipping.`
+                `Variant ${item.variantId} for product ${item.productId} not found. Skipping.`,
               );
               return;
             }
@@ -212,14 +212,14 @@ export function useSubmitOrder({
                   const newQty = q.quantity - item.quantity;
                   if (newQty < 0) {
                     console.warn(
-                      `Not enough stock for size ${q.size} on product ${item.productId}. Skipping.`
+                      `Not enough stock for size ${q.size} on product ${item.productId}. Skipping.`,
                     );
                     return q;
                   }
                   return { ...q, quantity: newQty };
                 }
                 return q;
-              }
+              },
             );
 
             variants[variantIndex].quantitySize = updatedSizes;
@@ -227,37 +227,37 @@ export function useSubmitOrder({
           } catch (eItem) {
             console.error(
               `Error updating inventory for product ${item.productId}, variant ${item.variantId}:`,
-              eItem
+              eItem,
             );
-            // Не кидаем дальше, чтобы остальные шаги продолжились
+            // Do not throw further so other steps continue
           }
-        })
+        }),
       );
 
-      // 2. Создаём заказ
+      // 2. Create order
       const ref = await addDoc(collection(db, "orders"), fullOrder);
       console.log("✅ Order created with ID:", ref.id);
 
-      // 3. Привязываем заказ к пользователю
+      // 3. Link order to user
       await updateDoc(doc(db, "users", user.uid), {
         orders: arrayUnion(ref.id),
       });
 
-      // 4. Списываем бонусы, если использовались
+      // 4. Redeem bonuses if used
       if (usedBonuses > 0) {
         await redeemBonuses(user.uid, usedBonuses);
         console.log("🎯 Bonuses redeemed:", usedBonuses);
       }
 
-      // 5. Начисляем бонусы за покупку
+      // 5. Accrue bonuses for purchase
       await creditBonuses(user.uid, finalTotal);
       console.log("💰 Bonuses credited:", finalTotal);
 
-      // 6. Очищаем корзину
+      // 6. Clear cart
       await clearCart();
       console.log("🧹 Cart cleared");
 
-      // 7. Редирект на страницу успеха
+      // 7. Redirect to success page
       router.push(`/checkout/success?orderId=${ref.id}`);
     } catch (e) {
       console.error("❌ Submit failed:", e);

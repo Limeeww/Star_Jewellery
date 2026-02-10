@@ -4,17 +4,17 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
-    // Разбор тела запроса:
+    // Parse request body:
     const { message } = await req.json();
 
     console.log(
       ">> OPENROUTER_API_KEY:",
       process.env.OPENROUTER_API_KEY?.startsWith("orc-")
         ? "OK"
-        : process.env.OPENROUTER_API_KEY
+        : process.env.OPENROUTER_API_KEY,
     );
 
-    // Запрос к OpenRouter.ai:
+    // Request to OpenRouter.ai:
     const response = await fetch(
       "https://openrouter.ai/api/v1/chat/completions",
       {
@@ -24,7 +24,7 @@ export async function POST(req: Request) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "gpt-3.5-turbo", // или любой доступный в вашем аккаунте OpenRouter
+          model: "gpt-3.5-turbo", // or any available in your OpenRouter account
           temperature: 0.3,
           messages: [
             {
@@ -38,7 +38,7 @@ export async function POST(req: Request) {
             },
           ],
         }),
-      }
+      },
     );
 
     const text = await response.text();
@@ -47,29 +47,29 @@ export async function POST(req: Request) {
     try {
       data = JSON.parse(text);
     } catch (jsonErr) {
-      console.error(">> Ошибка парсинга JSON от OpenRouter:", jsonErr);
+      console.error(">> Error parsing JSON from OpenRouter:", jsonErr);
       return NextResponse.json(
-        { error: "Невозможно разобрать ответ от OpenRouter." },
-        { status: 500 }
+        { error: "Unable to parse response from OpenRouter." },
+        { status: 500 },
       );
     }
 
     if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-      console.warn(">> data.choices отсутствует или неверный формат:", data);
+      console.warn(">> data.choices missing or invalid format:", data);
       return NextResponse.json(
-        { error: "OpenRouter вернул неожиданный формат данных." },
-        { status: 500 }
+        { error: "OpenRouter returned unexpected data format." },
+        { status: 500 },
       );
     }
 
     const reply = data.choices[0].message.content;
-    console.log(">> Ответ ассистента:", reply);
+    console.log(">> Assistant response:", reply);
     return NextResponse.json({ reply });
   } catch (err) {
-    console.error(">> ОШИБКА В API-РОУТЕ:", err);
+    console.error(">> ERROR IN API ROUTE:", err);
     return NextResponse.json(
-      { error: "Произошла внутренняя ошибка сервера." },
-      { status: 500 }
+      { error: "Internal server error occurred." },
+      { status: 500 },
     );
   }
 }

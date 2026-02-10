@@ -245,7 +245,7 @@ export default function OrderCard({ order, mode }: OrderCardProps) {
           </p>
         </div>
 
-        {/* Payment info (не меняем) */}
+        {/* Payment info */}
         <div>
           <h4 className="font-medium text-gray-700 mb-2">Payment</h4>
           <p className="text-sm text-gray-600 mb-1">
@@ -274,8 +274,8 @@ export default function OrderCard({ order, mode }: OrderCardProps) {
             {status === OrderStatusValue.CANCELLED
               ? "Order Cancelled"
               : isRefundStatus(status)
-              ? "Refund Status"
-              : "Order Status"}
+                ? "Refund Status"
+                : "Order Status"}
           </h4>
 
           <div className="w-full bg-gray-200 h-2 rounded overflow-hidden mb-2">

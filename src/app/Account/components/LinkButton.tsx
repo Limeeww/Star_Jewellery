@@ -20,7 +20,7 @@ export default function LinkButton({
 }: LinkButtonProps) {
   const content = (
     <>
-      <span className="text-center w-full">{text}</span>
+      <span className="">{text}</span>
       {showArrow && <span className="ml-1 inline-block">&rarr;</span>}
     </>
   );

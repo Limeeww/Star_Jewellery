@@ -3,7 +3,7 @@ import { db } from "@/firebase/firebaseConfig";
 import { Collection } from "@/types/collection";
 
 export async function fetchCollections(
-  limitCount?: number
+  limitCount?: number,
 ): Promise<Collection[]> {
   try {
     const collectionsRef = collection(db, "collections");
@@ -13,7 +13,7 @@ export async function fetchCollections(
     const snapshot = await getDocs(q);
     const collections: Collection[] = snapshot.docs.map((doc) => {
       return {
-        id: Number(doc.id),
+        id: doc.id,
         ...(doc.data() as Omit<Collection, "id">),
       };
     });

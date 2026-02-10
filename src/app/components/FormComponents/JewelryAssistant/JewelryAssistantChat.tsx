@@ -43,7 +43,7 @@ export default function JewelryAssistantChat() {
     if (!input.trim()) return;
 
     const isJewelryRelated = allowedKeywords.some((word) =>
-      input.toLowerCase().includes(word)
+      input.toLowerCase().includes(word),
     );
 
     if (!isJewelryRelated) {
@@ -63,7 +63,7 @@ export default function JewelryAssistantChat() {
       method: "POST",
       body: JSON.stringify({ message: input }),
     });
-    console.log(">> Статус ответа OpenAI:", res);
+    console.log(">> OpenAI response status:", res);
 
     const data = await res.json();
     setMessages((prev) => [...prev, `Assistant: ${data.reply}`]);

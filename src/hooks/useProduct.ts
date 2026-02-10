@@ -13,11 +13,12 @@ export function useProduct(product: Product, initialVariantId?: number) {
       setCurrentVariantId(initialVariantId);
       setSelectedSize("");
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialVariantId]);
 
   const displayedVariant = useMemo<ProductVariant | undefined>(
     () => product.variants.find((v) => v.id === currentVariantId),
-    [product, currentVariantId]
+    [product, currentVariantId],
   );
 
   const sizeOptions = useMemo(
@@ -28,7 +29,7 @@ export function useProduct(product: Product, initialVariantId?: number) {
           q.quantity > 0 ? ` (${q.quantity} available)` : ""
         }`,
       })),
-    [displayedVariant]
+    [displayedVariant],
   );
 
   const insertOptions = useMemo(
@@ -37,15 +38,15 @@ export function useProduct(product: Product, initialVariantId?: number) {
         value: i,
         label: i,
       })),
-    [product.variants]
+    [product.variants],
   );
 
   const materialColorOptions = useMemo(
     () =>
       Array.from(
-        new Set(product.variants.map((v) => v.materialColor.trim()))
+        new Set(product.variants.map((v) => v.materialColor.trim())),
       ).map((c) => ({ value: c, label: c })),
-    [product.variants]
+    [product.variants],
   );
 
   const handleInsertChange = useCallback(
@@ -53,14 +54,14 @@ export function useProduct(product: Product, initialVariantId?: number) {
       const next = findByVariantAttributes(
         product.variants,
         insert,
-        displayedVariant?.materialColor ?? ""
+        displayedVariant?.materialColor ?? "",
       );
       if (next && next.id !== currentVariantId) {
         setCurrentVariantId(next.id);
         setSelectedSize("");
       }
     },
-    [product.variants, displayedVariant, currentVariantId]
+    [product.variants, displayedVariant, currentVariantId],
   );
 
   const handleColorChange = useCallback(
@@ -68,14 +69,14 @@ export function useProduct(product: Product, initialVariantId?: number) {
       const next = findByVariantAttributes(
         product.variants,
         displayedVariant?.insert ?? "",
-        materialColor
+        materialColor,
       );
       if (next && next.id !== currentVariantId) {
         setCurrentVariantId(next.id);
         setSelectedSize("");
       }
     },
-    [product.variants, displayedVariant, currentVariantId]
+    [product.variants, displayedVariant, currentVariantId],
   );
 
   const handleSizeChange = useCallback((size: string) => {

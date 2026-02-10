@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import { autoUpdate, flip, offset, useFloating } from "@floating-ui/react-dom";
-import { FloatingPortal } from "@floating-ui/react";
 
 interface SelectFieldProps {
   label: string;
@@ -39,8 +38,8 @@ export default function SelectField({
       if (
         refs.reference.current &&
         refs.floating.current &&
-        !refs.reference.current.contains(e.target as Node) &&
-        !refs.floating.current.contains(e.target as Node)
+        !(refs.reference.current as HTMLElement).contains(e.target as Node) &&
+        !(refs.floating.current as HTMLElement).contains(e.target as Node)
       ) {
         setIsOpen(false);
       }
@@ -95,19 +94,19 @@ export default function SelectField({
         <div
           ref={refs.setFloating}
           style={{
-        ...floatingStyles,
-        width: refs.reference.current?.offsetWidth,
+            ...floatingStyles,
+            width: (refs.reference.current as HTMLElement)?.offsetWidth,
           }}
           className="bg-white rounded shadow-lg border border-gray-200 z-20"
         >
           {options.map((opt) => (
-        <div
-          key={opt.value}
-          onClick={() => handleSelect(opt.value)}
-          className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-        >
-          {opt.label}
-        </div>
+            <div
+              key={opt.value}
+              onClick={() => handleSelect(opt.value)}
+              className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+            >
+              {opt.label}
+            </div>
           ))}
         </div>
       )}

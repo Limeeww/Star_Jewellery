@@ -26,13 +26,13 @@ export default function CreateCategoryForm({ onCreate }: Props) {
     fetch("/api/categories/categories")
       .then((r) => r.json())
       .then((d) => setAllCategories(d.categories))
-      .catch((e) => console.error("Не удалось получить категории:", e))
+      .catch((e) => console.error("Failed to fetch categories:", e))
       .finally(() => setLoadingCats(false));
   }, []);
 
   const handleChange = <K extends keyof typeof formData>(
     field: K,
-    value: (typeof formData)[K]
+    value: (typeof formData)[K],
   ) => setFormData((p) => ({ ...p, [field]: value }));
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -80,7 +80,7 @@ export default function CreateCategoryForm({ onCreate }: Props) {
             onChange={(e) =>
               handleChange(
                 "parentCategory",
-                e.target.value === "" ? null : Number(e.target.value)
+                e.target.value === "" ? null : Number(e.target.value),
               )
             }
             className="w-full border p-2 focus:outline-none focus:ring-1 focus:ring-black rounded-none"

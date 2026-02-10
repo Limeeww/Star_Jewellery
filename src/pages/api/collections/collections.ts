@@ -7,7 +7,7 @@ import admin from "firebase-admin";
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
   if (req.method === "GET") {
     try {
@@ -27,7 +27,7 @@ export default async function handler(
       });
       return res.status(200).json({ collections });
     } catch (error) {
-      console.error("Ошибка при чтении коллекций:", error);
+      console.error("Error reading collections:", error);
       return res.status(500).json({ error: "Failed to fetch collections" });
     }
   }
@@ -47,7 +47,7 @@ export default async function handler(
         });
       return res.status(201).json({ success: true, id: idStr });
     } catch (error) {
-      console.error("Ошибка при создании коллекции:", error);
+      console.error("Error creating collection:", error);
       return res.status(500).json({ error: "Failed to create collection" });
     }
   }

@@ -12,7 +12,7 @@ export function useCategories() {
         const data = await res.json();
         setCategories(data.categories);
       } catch (error) {
-        console.error("Ошибка при загрузке категорий:", error);
+        console.error("Error loading categories:", error);
       } finally {
         setLoading(false);
       }

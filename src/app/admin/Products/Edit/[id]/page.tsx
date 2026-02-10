@@ -34,7 +34,7 @@ export default function EditProductPage() {
         const data = await res.json();
         setProduct(data.product);
       } catch (err) {
-        console.error("Ошибка загрузки товара:", err);
+        console.error("Error loading product:", err);
         setProduct(null);
       } finally {
         setLoading(false);
@@ -65,7 +65,7 @@ export default function EditProductPage() {
       await fetch(`/api/products/${productId}`, { method: "DELETE" });
       router.push("/Admin/Products");
     } catch (error) {
-      console.error("Ошибка при удалении продукта:", error);
+      console.error("Error deleting product:", error);
     }
   };
 

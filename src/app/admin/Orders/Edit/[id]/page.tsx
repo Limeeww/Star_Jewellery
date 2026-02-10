@@ -34,7 +34,7 @@ export default function EditOrderPage() {
         const data = await res.json();
         setOrder(data.order);
       } catch (err) {
-        console.error("Ошибка загрузки заказа:", err);
+        console.error("Error loading order:", err);
         setOrder(null);
       } finally {
         setLoading(false);

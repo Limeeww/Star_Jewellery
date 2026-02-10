@@ -12,7 +12,7 @@ export interface GiftOptionsForm {
 
 interface BasePaymentInfo {
   id: string;
-  paymentInfo: BasePaymentInfo;
+  method: string;
   transactionId: string; // transaction ID from payment provider
   paid: boolean;
   isDefault?: boolean;
@@ -21,7 +21,7 @@ interface BasePaymentInfo {
 }
 
 export interface CreditCardPaymentInfo extends BasePaymentInfo {
-  paymentInfo: BasePaymentInfo;
+  method: "credit_card";
   // Token maybe implemented later
   cardToken: PaymentMethod | string;
   // write only last 4 digits of the card number
@@ -32,13 +32,13 @@ export interface CreditCardPaymentInfo extends BasePaymentInfo {
 }
 
 export interface PayPalPaymentInfo extends BasePaymentInfo {
-  paymentInfo: BasePaymentInfo;
+  method: "paypal";
   paypalOrderId: string;
   payerEmail: string;
 }
 
 export interface KlarnaPaymentInfo extends BasePaymentInfo {
-  paymentInfo: BasePaymentInfo;
+  method: "klarna";
   klarnaOrderId: string;
 }
 

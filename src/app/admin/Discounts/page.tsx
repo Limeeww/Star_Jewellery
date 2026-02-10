@@ -26,11 +26,11 @@ export default function AdminDiscountsPage() {
   const [discounts, setDiscounts] = useState<Discount[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  /* state для удаления */
+  /* state for deletion */
   const [showConfirm, setShowConfirm] = useState(false);
   const [selectedId, setSelectedId] = useState<number | null>(null);
 
-  /* state для поиска */
+  /* state for search */
   const [searchTerm, setSearchTerm] = useState("");
 
   const isLoggedIn = !loading && !!user;
@@ -58,7 +58,7 @@ export default function AdminDiscountsPage() {
 
   /* ───── helpers ───── */
   const formatTimestamp = (
-    ts: { toDate?: () => Date; _seconds?: number } | null | undefined
+    ts: { toDate?: () => Date; _seconds?: number } | null | undefined,
   ) => {
     if (!ts) return "N/A";
     if (typeof ts.toDate === "function") return ts.toDate().toLocaleString();
@@ -67,7 +67,7 @@ export default function AdminDiscountsPage() {
     return "N/A";
   };
 
-  /* filtered list в зависимости от searchTerm */
+  /* filtered list depending on searchTerm */
   const filteredDiscounts = useMemo(() => {
     if (!searchTerm.trim()) return discounts;
     const term = searchTerm.toLowerCase();
@@ -118,7 +118,7 @@ export default function AdminDiscountsPage() {
           MANAGING DISCOUNTS
         </h3>
 
-        {/* добавление новой скидки */}
+        {/* add new discount */}
         <LinkButton
           text="Add Discount"
           className="w-full bg-black text-white px-4 py-2 font-medium hover:bg-gray-800 transition-colors my-2"
@@ -126,7 +126,7 @@ export default function AdminDiscountsPage() {
           onClick={() => router.push("/Admin/Discounts/Add")}
         />
 
-        {/* поиск по названию */}
+        {/* search by name */}
         <InputField
           label="Search by Name"
           value={searchTerm}

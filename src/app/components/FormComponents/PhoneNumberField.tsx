@@ -1,9 +1,18 @@
 import React from "react";
-import { Controller, Control, FieldError, FieldValues } from "react-hook-form";
+import {
+  Controller,
+  Control,
+  FieldError,
+  FieldValues,
+  Path,
+  PathValue,
+} from "react-hook-form";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 
-interface PhoneNumberFieldProps<TFieldValues extends FieldValues = FieldValues> {
+interface PhoneNumberFieldProps<
+  TFieldValues extends FieldValues = FieldValues,
+> {
   label: string;
   name: string;
   control: Control<TFieldValues>;
@@ -11,22 +20,24 @@ interface PhoneNumberFieldProps<TFieldValues extends FieldValues = FieldValues> 
   error?: FieldError;
 }
 
-function PhoneNumberField({
+function PhoneNumberField<TFieldValues extends FieldValues = FieldValues>({
   label,
   name,
   control,
   defaultValue = "",
   error,
-}: PhoneNumberFieldProps) {
+}: PhoneNumberFieldProps<TFieldValues>) {
   return (
     <div>
       <label htmlFor={name} className="block text-sm font-semibold mb-1">
         {label}
       </label>
       <Controller
-        name={name}
+        name={name as Path<TFieldValues>}
         control={control}
-        defaultValue={defaultValue}
+        defaultValue={
+          defaultValue as PathValue<TFieldValues, Path<TFieldValues>>
+        }
         render={({ field: { onChange, value } }) => (
           <div>
             <PhoneInput

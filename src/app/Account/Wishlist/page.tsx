@@ -84,7 +84,6 @@ export default function WishListPage() {
                 <ProductCard
                   key={makeKey(item)}
                   item={item}
-                  userId={user!.uid}
                   onRemove={removeItem}
                 />
               ))}

@@ -3,10 +3,10 @@ import { adminAuth } from "@/lib/firebaseAdmin";
 
 export async function GET() {
   try {
-    // Пробуем получить первого пользователя в системе
+    // Try to get the first user in the system
     const list = await adminAuth.listUsers(1);
     return NextResponse.json({
-      message: "✅ Firebase Admin SDK работает!",
+      message: "✅ Firebase Admin SDK works!",
       users: list.users.map((u) => ({
         uid: u.uid,
         email: u.email,

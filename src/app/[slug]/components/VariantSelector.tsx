@@ -32,11 +32,7 @@ export default function VariantSelector({
   onInsertChange,
   onColorChange,
 }: Props) {
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<FormValues>({
+  const { control, handleSubmit } = useForm<FormValues>({
     defaultValues: {
       size: "",
       inserts: variant.insert,

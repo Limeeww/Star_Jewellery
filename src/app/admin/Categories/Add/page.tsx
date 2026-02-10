@@ -27,10 +27,10 @@ export default function AddCategory() {
         router.push("/Admin/Categories");
       } else {
         const errorData = await res.json();
-        console.error("Ошибка при создании категории:", errorData);
+        console.error("Error creating category:", errorData);
       }
     } catch (error) {
-      console.error("Ошибка при отправке категории:", error);
+      console.error("Error submitting category:", error);
     }
   };
 

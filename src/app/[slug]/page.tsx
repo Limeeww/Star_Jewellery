@@ -58,7 +58,7 @@ const ProductPage = () => {
 
   const discountedPrice = calculateDiscountedPrice(
     displayedVariant,
-    activeDiscount
+    activeDiscount,
   );
   const wishlistItem: WishlistItem = {
     product: product,
@@ -67,7 +67,7 @@ const ProductPage = () => {
     slug: product.slug!,
     materialColor: displayedVariant.materialColor,
     insert: displayedVariant.insert,
-    size: (displayedVariant as any).size ?? 0,
+    size: displayedVariant.quantitySize?.[0]?.size ?? 0,
     price: discountedPrice ?? displayedVariant.price,
     image: displayedVariant.images?.[0] ?? "/placeholder.jpg",
   };

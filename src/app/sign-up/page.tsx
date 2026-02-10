@@ -49,7 +49,8 @@ export default function SignUpPage() {
     control,
     formState: { errors },
   } = useForm<UserData>({
-    resolver: yupResolver(validationSchema),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: yupResolver(validationSchema) as any,
   });
 
   useEffect(() => {
@@ -88,7 +89,7 @@ export default function SignUpPage() {
     try {
       const userCredential = await createUserWithEmailAndPassword(
         data.email,
-        data.password
+        data.password,
       );
       if (!userCredential?.user) throw new Error("Registration failed");
 
@@ -338,7 +339,8 @@ export default function SignUpPage() {
 
             <DayInput
               label="Anniversary/Wedding Date"
-              register={register}
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              register={register as any}
               dayName="anniversaryDay"
               monthName="anniversaryMonth"
               yearName="anniversaryYear"

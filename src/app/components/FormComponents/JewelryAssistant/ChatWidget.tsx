@@ -9,7 +9,7 @@ export default function ChatWidget() {
 
   return (
     <>
-      {/* Если виджет открыт, рендерим окно чата */}
+      {/* If widget is open, render chat window */}
       {isOpen && (
         <div
           className="
@@ -23,7 +23,7 @@ export default function ChatWidget() {
             flex flex-col
           "
         >
-          {/* Заголовок окна */}
+          {/* Window header */}
           <div className="flex justify-between items-center px-3 py-2 border-b">
             <h4
               className="font-medium items-center"
@@ -58,7 +58,7 @@ export default function ChatWidget() {
           text-2xl
           z-50
         "
-        aria-label={isOpen ? "Закрыть чат" : "Открыть чат"}
+        aria-label={isOpen ? "Close chat" : "Open chat"}
       >
         ◇
       </button>

@@ -22,7 +22,7 @@ export function useUserRole(): UseUserRoleResult {
           const userRole = tokenResult.claims.role as string | undefined;
           setRole(userRole ?? null);
         } catch (e) {
-          console.error("Ошибка при получении custom claims:", e);
+          console.error("Error getting custom claims:", e);
           setRole(null);
         }
       } else {

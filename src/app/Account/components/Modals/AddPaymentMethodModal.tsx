@@ -59,11 +59,6 @@ export default function AddPaymentMethodModal({
     formState: { isSubmitting },
   } = useForm<FormValues>({ defaultValues: DEFAULT_VALUES });
 
-  const preferredAddr = useMemo(
-    () => addresses.find((a) => a.preferredBillingAddress) ?? null,
-    [addresses]
-  );
-
   const { clientSecret, loading: loadingSecret } = useSetupIntent(isOpen);
 
   const isLoading = loadingAddrs || loadingSecret || isSubmitting;
@@ -90,7 +85,7 @@ export default function AddPaymentMethodModal({
           clientSecret!,
           {
             payment_method: paymentMethod.id,
-          }
+          },
         );
         if (siError || !setupIntent) throw siError || new Error("Setup failed");
 
@@ -107,7 +102,7 @@ export default function AddPaymentMethodModal({
           cardNumberMasked: `**** **** **** ${card.last4}`,
           cardBrand: card.brand,
           cardExpiry: `${String(card.exp_month).padStart(2, "0")}/${String(
-            card.exp_year
+            card.exp_year,
           ).slice(-2)}`,
           cardHolderName: paymentMethod.billing_details.name || "",
         };
@@ -135,7 +130,7 @@ export default function AddPaymentMethodModal({
       onSave,
       notify,
       onClose,
-    ]
+    ],
   );
 
   const BillingSelect = useMemo(
@@ -166,7 +161,7 @@ export default function AddPaymentMethodModal({
         }
       />
     ),
-    [control, loadingAddrs, addresses]
+    [control, loadingAddrs, addresses],
   );
 
   return (

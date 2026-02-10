@@ -22,14 +22,14 @@ export function useSetupIntent(isOpen: boolean) {
             "Content-Type": "application/json",
             Authorization: `Bearer ${idToken}`,
           },
-        })
+        }),
       )
       .then((r) => r.json())
       .then((data: { clientSecret: string }) => {
         setClientSecret(data.clientSecret);
       })
       .catch(() => {
-        notify({ type: "error", message: "Не удалось получить платежный токен" });
+        notify({ type: "error", message: "Failed to retrieve payment token" });
       })
       .finally(() => setLoading(false));
   }, [isOpen, notify]);

@@ -64,7 +64,7 @@ export default function AdminCollectionsPage() {
   } = usePagination<Collection>(filteredCollections, 4); // 8 orders per page
 
   const formatTimestamp = (
-    timestamp: { toDate?: () => Date; _seconds?: number } | null | undefined
+    timestamp: { toDate?: () => Date; _seconds?: number } | null | undefined,
   ) => {
     if (!timestamp) return "N/A";
 
@@ -95,7 +95,7 @@ export default function AdminCollectionsPage() {
           showArrow={false}
           onClick={() => router.push(`/Admin/Collections/Add`)}
         />
-        {/* поиск по названию */}
+        {/* search by name */}
         <InputField
           label="Search by Name"
           value={searchTerm}

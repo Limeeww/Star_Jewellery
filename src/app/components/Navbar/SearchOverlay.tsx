@@ -26,7 +26,7 @@ export default function SearchOverlay({ open, onClose }: SearchOverlayProps) {
   const { products, loading } = useProducts(4);
 
   const filteredItems = products.filter((item) =>
-    item.name.toLowerCase().includes(searchTerm.toLowerCase())
+    item.name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   useEffect(() => {
@@ -62,6 +62,7 @@ export default function SearchOverlay({ open, onClose }: SearchOverlayProps) {
     return () => {
       window.removeEventListener("keydown", handleEnter);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchTerm]);
 
   const handleCategoryClick = (category: string) => {

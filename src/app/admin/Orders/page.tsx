@@ -39,7 +39,7 @@ export default function AdminOrdersPage() {
       setOrders(data.orders);
 
       const uniqueIds: string[] = Array.from(
-        new Set((data.orders as Order[]).map((o) => o.userId))
+        new Set((data.orders as Order[]).map((o) => o.userId)),
       );
       fetchUsers(uniqueIds);
     } catch (err) {
@@ -56,6 +56,7 @@ export default function AdminOrdersPage() {
     } else if (!loading && role === "admin") {
       fetchOrders();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading, role, user, router]);
 
   /* ───── Fetch users by ids ───── */
@@ -70,7 +71,7 @@ export default function AdminOrdersPage() {
           if (!res.ok) return null;
           const data = await res.json();
           return { id, info: data.user as UserInfo };
-        })
+        }),
       );
       setUserMap((prev) => {
         const next = { ...prev };

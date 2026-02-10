@@ -26,7 +26,7 @@ export default function AdminRolesPage() {
       const data = await res.json();
       setUsers(data.users);
     } catch (err) {
-      console.error("Ошибка загрузки пользователей:", err);
+      console.error("Error loading users:", err);
     }
   };
 
@@ -54,7 +54,7 @@ export default function AdminRolesPage() {
 
       const result = await res.json();
 
-      if (!res.ok) throw new Error(result.error || "Ошибка изменения роли");
+      if (!res.ok) throw new Error(result.error || "Error changing role");
 
       await fetchUsers();
     } catch (err) {

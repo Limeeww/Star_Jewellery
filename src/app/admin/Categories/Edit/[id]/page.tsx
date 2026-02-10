@@ -36,7 +36,7 @@ export default function EditCategoryPage() {
         const data = await res.json();
         setCategory(data.category);
       } catch (err) {
-        console.error("Ошибка загрузки категории:", err);
+        console.error("Error loading category:", err);
         setCategory(null);
       } finally {
         setLoading(false);
@@ -65,7 +65,7 @@ export default function EditCategoryPage() {
       await fetch(`/api/categories/${categoryId}`, { method: "DELETE" });
       router.push("/Admin/Categories");
     } catch (err) {
-      console.error("Ошибка при удалении категории:", err);
+      console.error("Error deleting category:", err);
     }
   };
 

@@ -52,7 +52,8 @@ export default function Profile() {
     watch,
     formState: { errors },
   } = useForm<Partial<UserData>>({
-    resolver: yupResolver(validationSchemaProfile),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: yupResolver(validationSchemaProfile) as any,
     defaultValues: {
       firstName: "",
       lastName: "",

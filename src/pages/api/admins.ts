@@ -10,7 +10,7 @@ type AdminUser = {
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
   try {
     const admins: AdminUser[] = [];
@@ -40,7 +40,7 @@ export default async function handler(
     return res.status(200).json({ admins });
   } catch (error: unknown) {
     const err = error instanceof Error ? error.message : "Unknown error";
-    console.error("Ошибка при получении админов:", err);
+    console.error("Error fetching admins:", err);
     return res.status(500).json({ error: "Failed to fetch admin users." });
   }
 }

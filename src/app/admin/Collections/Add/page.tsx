@@ -27,10 +27,10 @@ export default function AddCollection() {
         router.push("/Admin/Collections");
       } else {
         const errorData = await res.json();
-        console.error("Ошибка при создании продукта:", errorData);
+        console.error("Error creating collection:", errorData);
       }
     } catch (error) {
-      console.error("Ошибка при отправке продукта:", error);
+      console.error("Error submitting collection:", error);
     }
   };
 

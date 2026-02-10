@@ -59,17 +59,17 @@ describe("Orders API Handler", () => {
     const { req, res } = createMocks({ method: "GET" });
     await handler(
       req as unknown as NextApiRequest,
-      res as unknown as NextApiResponse
+      res as unknown as NextApiResponse,
     );
 
     expect(res._getStatusCode()).toBe(200);
     const json = JSON.parse(res._getData());
 
-    // Проверяем, что у нас вернулся массив orders длиной 1
+    // Check that we got an orders array of length 1
     expect(Array.isArray(json.orders)).toBe(true);
     expect(json.orders).toHaveLength(1);
 
-    // Проверяем содержимое заказа, переводя даты в ISO-строку
+    // Check order content, converting dates to ISO string
     const returnedOrder: Order = json.orders[0];
     expect(returnedOrder).toMatchObject({
       orderId: mockOrderData.orderId,
@@ -90,13 +90,13 @@ describe("Orders API Handler", () => {
   it("should return error on GET request failure", async () => {
     const collectionRef = adminDB.collection("orders");
     (collectionRef.get as jest.Mock).mockRejectedValue(
-      new Error("Database failure")
+      new Error("Database failure"),
     );
 
     const { req, res } = createMocks({ method: "GET" });
     await handler(
       req as unknown as NextApiRequest,
-      res as unknown as NextApiResponse
+      res as unknown as NextApiResponse,
     );
 
     expect(res._getStatusCode()).toBe(500);
@@ -110,7 +110,7 @@ describe("Orders API Handler", () => {
     const { req, res } = createMocks({ method: "POST" });
     await handler(
       req as unknown as NextApiRequest,
-      res as unknown as NextApiResponse
+      res as unknown as NextApiResponse,
     );
 
     expect(res._getStatusCode()).toBe(405);

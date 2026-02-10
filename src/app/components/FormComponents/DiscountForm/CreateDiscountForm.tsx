@@ -52,14 +52,14 @@ export default function CreateDiscountForm({
         ]);
 
       setExistingProducts(
-        productsRes.products?.map((p: Product) => Number(p.id)) || []
+        productsRes.products?.map((p: Product) => Number(p.id)) || [],
       );
       setExistingCategories(
-        categoriesRes.categories?.map((c: Category) => Number(c.id)) || []
+        categoriesRes.categories?.map((c: Category) => Number(c.id)) || [],
       );
       setExistingCollections(
         collectionsRes.collections?.map((col: Collection) => Number(col.id)) ||
-          []
+          [],
       );
       setExistingDiscounts(discountsRes.discounts || []);
     };
@@ -68,14 +68,14 @@ export default function CreateDiscountForm({
 
   const handleChange = <K extends keyof typeof formData>(
     key: K,
-    value: (typeof formData)[K]
+    value: (typeof formData)[K],
   ) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
   };
 
   const proceedCreate = async () => {
     try {
-      /* если мы уже знаем конфликтующую скидку — обнуляем её priority */
+      /* if we already know the conflicting discount — reset its priority */
       if (conflictId !== null) {
         await fetch(`/api/discounts/${conflictId}`, {
           method: "PUT",
@@ -84,7 +84,7 @@ export default function CreateDiscountForm({
         });
       }
 
-      /* создаём новую скидку */
+      /* create new discount */
       onCreate({
         ...formData,
         applicableTo: applicableRaw
@@ -108,7 +108,7 @@ export default function CreateDiscountForm({
 
     if (!formData.name.trim()) errs.push("Name is required.");
     if (isNaN(formData.value)) errs.push("Value must be a number.");
-    /* Новая валидация значения в зависимости от типа скидки */
+    /* New value validation depending on discount type */
     if (formData.type === "percentage") {
       if (formData.value < 1 || formData.value > 100) {
         errs.push("Percentage discount must be between 1 and 100.");
@@ -143,7 +143,7 @@ export default function CreateDiscountForm({
     }
 
     const conflicting = existingDiscounts.find(
-      (d) => d.priority === formData.priority
+      (d) => d.priority === formData.priority,
     );
 
     if (conflicting) {

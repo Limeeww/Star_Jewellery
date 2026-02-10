@@ -15,7 +15,7 @@ import {
   GiftOptionsForm,
   Order,
   PaymentInfo,
-  PaymentStatusValue,
+  OrderStatusValue,
 } from "@/types/order";
 import { useRouter } from "next/navigation";
 
@@ -79,7 +79,7 @@ export default function CartPage() {
       giftOptions: giftOptionsValues,
       paymentInfo,
       discountsApplied: [],
-      status: PaymentStatusValue.PENDING,
+      status: OrderStatusValue.PENDING,
     };
 
     localStorage.setItem("currentOrder", JSON.stringify(order));

@@ -36,7 +36,7 @@ export default function EditCollectionPage() {
         const data = await res.json();
         setCollection(data.collection);
       } catch (err) {
-        console.error("Ошибка загрузки коллекции:", err);
+        console.error("Error loading collection:", err);
         setCollection(null);
       } finally {
         setLoading(false);
@@ -65,7 +65,7 @@ export default function EditCollectionPage() {
       await fetch(`/api/collections/${collectionId}`, { method: "DELETE" });
       router.push("/Admin/Collections");
     } catch (err) {
-      console.error("Ошибка при удалении коллекции:", err);
+      console.error("Error deleting collection:", err);
     }
   };
 

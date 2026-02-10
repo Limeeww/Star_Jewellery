@@ -4,14 +4,14 @@ import { Order } from "@/types/order";
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
-  const { id: orderId } = req.query; // ← сюда приходит orderId (не doc.id)
+  const { id: orderId } = req.query; // ← orderId comes here (not doc.id)
 
-  // ищем документ по полю orderId
+  // search for document by orderId field
   const querySnap = await adminDB
     .collection("orders")
-    .where("orderId", "==", Number(orderId)) // если orderId числовой
+    .where("orderId", "==", Number(orderId)) // if orderId is numeric
     .limit(1)
     .get();
 
@@ -19,7 +19,7 @@ export default async function handler(
     return res.status(404).json({ error: "Order not found" });
   }
 
-  // первый (и единственный) найденный документ
+  // first (and only) found document
   const docSnap = querySnap.docs[0];
   const docRef = docSnap.ref;
 
@@ -36,7 +36,7 @@ export default async function handler(
         const updated: Order = req.body;
         await docRef.set(
           { ...updated, updatedAt: new Date() },
-          { merge: true }
+          { merge: true },
         );
         return res.status(200).json({ ok: true });
       }

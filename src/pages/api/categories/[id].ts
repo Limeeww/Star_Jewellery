@@ -4,7 +4,7 @@ import { Category } from "@/types/product";
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
   const { id } = req.query;
   const numericId = parseInt(id as string, 10);
@@ -28,7 +28,7 @@ export default async function handler(
     if (req.method === "PUT") {
       const updated: Partial<Omit<Category, "id">> = req.body;
 
-      await docRef.set(updated, { merge: true }); // без updatedAt
+      await docRef.set(updated, { merge: true }); // without updatedAt
 
       return res.status(200).json({ success: true });
     }

@@ -27,10 +27,10 @@ export default function AddProduct() {
         router.push("/Admin/Products");
       } else {
         const errorData = await res.json();
-        console.error("Ошибка при создании продукта:", errorData);
+        console.error("Error creating product:", errorData);
       }
     } catch (error) {
-      console.error("Ошибка при отправке продукта:", error);
+      console.error("Error submitting product:", error);
     }
   };
 

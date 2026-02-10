@@ -1,17 +1,17 @@
-import React from "react";
+import { UseFormRegister, FieldValues, Path } from "react-hook-form";
 
-interface DayInputProps {
+interface DayInputProps<T extends FieldValues> {
   label?: string;
-  register: any; // Передаём `register` из `useForm()`
-  dayName: string; // Название поля для дня
-  monthName: string; // Название поля для месяца
-  yearName: string; // Название поля для года
+  register: UseFormRegister<T>;
+  dayName: Path<T>;
+  monthName: Path<T>;
+  yearName: Path<T>;
   defaultDay?: string | number;
   defaultMonth?: string | number;
   defaultYear?: string | number;
 }
 
-function DayInput({
+function DayInput<T extends FieldValues>({
   label,
   register,
   dayName,
@@ -20,7 +20,7 @@ function DayInput({
   defaultDay = "",
   defaultMonth = "",
   defaultYear = "",
-}: DayInputProps) {
+}: DayInputProps<T>) {
   return (
     <div>
       {label && (
@@ -64,7 +64,7 @@ function DayInput({
           <option value="">Year</option>
           {Array.from(
             { length: 80 },
-            (_, i) => new Date().getFullYear() - i
+            (_, i) => new Date().getFullYear() - i,
           ).map((year) => (
             <option key={year} value={year}>
               {year}

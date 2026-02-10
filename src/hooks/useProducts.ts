@@ -38,20 +38,14 @@ export function useProducts(limitNum: number) {
             id: data.id,
             name: data.name,
             description: data.description,
-            imageUrl: data.imageUrl,
             slug: data.slug,
-            variantID:
-              data.variants && data.variants.length > 0
-                ? String(data.variants[0].id)
-                : "",
-            price: data.price,
             categoryId: data.categoryId,
             variants: data.variants || [],
             createdAt: data.createdAt,
             updatedAt: data.updatedAt,
             isHidden: data.isHidden || false,
             additionalDescription: data.additionalDescription || "",
-            quantitySize: data.quantitySize || 0,
+            tag: "default",
           };
         });
 
@@ -65,7 +59,7 @@ export function useProducts(limitNum: number) {
         console.error("Error listening to products:", err);
         notify({ type: "error", message: "Failed to load products" });
         setLoading(false);
-      }
+      },
     );
 
     return () => {

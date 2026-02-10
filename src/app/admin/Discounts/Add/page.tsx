@@ -27,10 +27,10 @@ export default function AddCollection() {
         router.push("/Admin/Discounts");
       } else {
         const errorData = await res.json();
-        console.error("Ошибка при создании сикдки:", errorData);
+        console.error("Error creating discount:", errorData);
       }
     } catch (error) {
-      console.error("Ошибка при отправке скидки:", error);
+      console.error("Error submitting discount:", error);
     }
   };
 
