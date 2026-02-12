@@ -51,6 +51,7 @@ export default function HomePage() {
           loop
           muted
           playsInline
+          poster="/images/bestseller/bestseller4.jpg"
         >
           <source src="/videos/background.mp4" type="video/mp4" />
           Your browser does not support video format.
@@ -105,6 +106,7 @@ export default function HomePage() {
               alt="Jewelry Image"
               width={600}
               height={800}
+              priority
               className="w-full xl:h-[60vh] sm:h-[40vh] h-auto object-contain"
             />
           </div>
