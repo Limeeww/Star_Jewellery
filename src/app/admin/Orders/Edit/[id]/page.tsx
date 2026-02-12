@@ -52,7 +52,7 @@ export default function EditOrderPage() {
     });
 
     if (res.ok) {
-      router.push("/Admin/Orders");
+      router.push("/admin/Orders");
     } else {
       console.error("Error updating order");
     }

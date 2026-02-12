@@ -24,7 +24,7 @@ export default function AddCategory() {
       });
 
       if (res.ok) {
-        router.push("/Admin/Categories");
+        router.push("/admin/Categories");
       } else {
         const errorData = await res.json();
         console.error("Error creating category:", errorData);

@@ -94,7 +94,7 @@ export default function AdminProductsPage() {
           text="Add Product"
           className="w-full bg-black text-white text-md font-medium px-4 py-2 hover:bg-gray-800 transition-colors my-2"
           showArrow={false}
-          onClick={() => router.push(`/Admin/Products/Add`)}
+          onClick={() => router.push(`/admin/Products/Add`)}
         />
         {/* search by name */}
         <InputField
@@ -284,7 +284,7 @@ export default function AdminProductsPage() {
                 className="w-full bg-black text-white text-md font-medium px-4 py-2 hover:bg-gray-800 transition-colors"
                 showArrow={false}
                 onClick={() =>
-                  router.push(`/Admin/Products/Edit/${product.id}`)
+                  router.push(`/admin/Products/Edit/${product.id}`)
                 }
               />
             </li>

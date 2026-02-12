@@ -33,7 +33,7 @@ export default function EditCategoryForm({
 
   const handleChange = <K extends keyof Category>(
     field: K,
-    value: Category[K]
+    value: Category[K],
   ) => setFormData((p) => ({ ...p, [field]: value }));
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -81,7 +81,7 @@ export default function EditCategoryForm({
               onChange={(e) =>
                 handleChange(
                   "parentCategory",
-                  e.target.value === "" ? null : Number(e.target.value)
+                  e.target.value === "" ? null : Number(e.target.value),
                 )
               }
               className="w-full border p-2 focus:outline-none focus:ring-1 focus:ring-black rounded-none"
@@ -128,7 +128,7 @@ export default function EditCategoryForm({
 
           <LinkButtonForm
             label="← Back to Categories"
-            href="/Admin/Categories"
+            href="/admin/Categories"
             className="bg-gray-600 hover:bg-gray-700"
           />
         </div>

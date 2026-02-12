@@ -257,7 +257,7 @@ export default function CreateDiscountForm({
         />
         <LinkButtonForm
           label="← Back to Discounts"
-          href="/Admin/Discounts"
+          href="/admin/Discounts"
           className="bg-gray-600 hover:bg-gray-700"
         />
       </div>

@@ -54,7 +54,7 @@ export default function EditProductPage() {
     });
 
     if (res.ok) {
-      router.push("/Admin/Products");
+      router.push("/admin/Products");
     } else {
       console.log("Error updating product");
     }
@@ -63,7 +63,7 @@ export default function EditProductPage() {
   const handleDelete = async (productId: number) => {
     try {
       await fetch(`/api/products/${productId}`, { method: "DELETE" });
-      router.push("/Admin/Products");
+      router.push("/admin/Products");
     } catch (error) {
       console.error("Error deleting product:", error);
     }

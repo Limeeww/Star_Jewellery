@@ -93,7 +93,7 @@ export default function AdminCollectionsPage() {
           text="Add Collection"
           className="w-full bg-black text-white text-md font-medium px-4 py-2 hover:bg-gray-800 transition-colors my-2"
           showArrow={false}
-          onClick={() => router.push(`/Admin/Collections/Add`)}
+          onClick={() => router.push(`/admin/Collections/Add`)}
         />
         {/* search by name */}
         <InputField
@@ -207,7 +207,7 @@ export default function AdminCollectionsPage() {
                 className="w-full bg-black text-white text-md font-medium px-4 py-2 hover:bg-gray-800 transition-colors"
                 showArrow={false}
                 onClick={() =>
-                  router.push(`/Admin/Collections/Edit/${collection.id}`)
+                  router.push(`/admin/Collections/Edit/${collection.id}`)
                 }
               />
             </li>

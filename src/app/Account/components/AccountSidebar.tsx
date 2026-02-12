@@ -25,12 +25,12 @@ const SIDE_LINKS = [...COMMON_LINKS];
 
 const ADMIN_LINKS = [
   ...COMMON_LINKS,
-  { label: "Manage User Roles", href: "/Admin/Roles" },
-  { label: "Manage Products", href: "/Admin/Products" },
-  { label: "Manage Collections", href: "/Admin/Collections" },
-  { label: "Manage Categories", href: "/Admin/Categories" },
-  { label: "Manage Discounts", href: "/Admin/Discounts" },
-  { label: "Manage Orders", href: "/Admin/Orders" },
+  { label: "Manage User Roles", href: "/admin/Roles" },
+  { label: "Manage Products", href: "/admin/Products" },
+  { label: "Manage Collections", href: "/admin/Collections" },
+  { label: "Manage Categories", href: "/admin/Categories" },
+  { label: "Manage Discounts", href: "/admin/Discounts" },
+  { label: "Manage Orders", href: "/admin/Orders" },
 ];
 
 const getLinks = (role?: string | null): NavLink[] => {

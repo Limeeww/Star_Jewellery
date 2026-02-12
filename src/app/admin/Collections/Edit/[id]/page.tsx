@@ -54,7 +54,7 @@ export default function EditCollectionPage() {
     });
 
     if (res.ok) {
-      router.push("/Admin/Collections");
+      router.push("/admin/Collections");
     } else {
       console.error("Error updating collection");
     }
@@ -63,7 +63,7 @@ export default function EditCollectionPage() {
   const handleDelete = async (collectionId: string) => {
     try {
       await fetch(`/api/collections/${collectionId}`, { method: "DELETE" });
-      router.push("/Admin/Collections");
+      router.push("/admin/Collections");
     } catch (err) {
       console.error("Error deleting collection:", err);
     }

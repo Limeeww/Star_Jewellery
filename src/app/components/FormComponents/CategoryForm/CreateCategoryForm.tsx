@@ -115,7 +115,7 @@ export default function CreateCategoryForm({ onCreate }: Props) {
         />
         <LinkButtonForm
           label="← Back to Categories"
-          href="/Admin/Categories"
+          href="/admin/Categories"
           className="bg-gray-600 hover:bg-gray-700"
         />
       </div>

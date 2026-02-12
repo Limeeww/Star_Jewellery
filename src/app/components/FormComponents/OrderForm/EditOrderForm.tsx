@@ -22,7 +22,7 @@ export default function EditOrderForm({ order, onSave }: EditOrderFormProps) {
 
   const handleAddressChange = (
     field: keyof Order["shippingAddress"],
-    value: string | boolean
+    value: string | boolean,
   ) => {
     setFormData((prev) => ({
       ...prev,
@@ -169,7 +169,7 @@ export default function EditOrderForm({ order, onSave }: EditOrderFormProps) {
         />
         <LinkButtonForm
           label="← Back to Orders"
-          href="/Admin/Orders"
+          href="/admin/Orders"
           className="bg-gray-600 hover:bg-gray-700"
         />
       </div>

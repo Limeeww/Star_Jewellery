@@ -1,4 +1,4 @@
-// src/app/Admin/Discounts/page.tsx
+// src/app/admin/Discounts/page.tsx
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -123,7 +123,7 @@ export default function AdminDiscountsPage() {
           text="Add Discount"
           className="w-full bg-black text-white px-4 py-2 font-medium hover:bg-gray-800 transition-colors my-2"
           showArrow={false}
-          onClick={() => router.push("/Admin/Discounts/Add")}
+          onClick={() => router.push("/admin/Discounts/Add")}
         />
 
         {/* search by name */}

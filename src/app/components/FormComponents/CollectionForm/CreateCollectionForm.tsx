@@ -25,7 +25,7 @@ export default function CreateCollectionForm({
 
   const handleChange = <K extends keyof typeof formData>(
     field: K,
-    value: (typeof formData)[K]
+    value: (typeof formData)[K],
   ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
@@ -143,7 +143,7 @@ export default function CreateCollectionForm({
         />
         <LinkButtonForm
           label="← Back to Collections"
-          href="/Admin/Collections"
+          href="/admin/Collections"
           className="bg-gray-600 hover:bg-gray-700"
         />
       </div>

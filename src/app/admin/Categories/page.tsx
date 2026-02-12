@@ -61,7 +61,7 @@ export default function AdminCategoriesPage() {
           text="Add Category"
           className="w-full bg-black text-white px-4 py-2 font-medium hover:bg-gray-800 transition-colors my-2"
           showArrow={false}
-          onClick={() => router.push("/Admin/Categories/Add")}
+          onClick={() => router.push("/admin/Categories/Add")}
         />
 
         {/* LIST */}
@@ -86,7 +86,7 @@ export default function AdminCategoriesPage() {
                 text="Edit"
                 className="w-full bg-black text-white px-4 py-2 font-medium hover:bg-gray-800 transition-colors"
                 showArrow={false}
-                onClick={() => router.push(`/Admin/Categories/Edit/${cat.id}`)}
+                onClick={() => router.push(`/admin/Categories/Edit/${cat.id}`)}
               />
             </li>
           ))}

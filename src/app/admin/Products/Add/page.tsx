@@ -24,7 +24,7 @@ export default function AddProduct() {
       });
 
       if (res.ok) {
-        router.push("/Admin/Products");
+        router.push("/admin/Products");
       } else {
         const errorData = await res.json();
         console.error("Error creating product:", errorData);

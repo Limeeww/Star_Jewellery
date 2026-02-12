@@ -24,7 +24,7 @@ export default function AddCollection() {
       });
 
       if (res.ok) {
-        router.push("/Admin/Discounts");
+        router.push("/admin/Discounts");
       } else {
         const errorData = await res.json();
         console.error("Error creating discount:", errorData);

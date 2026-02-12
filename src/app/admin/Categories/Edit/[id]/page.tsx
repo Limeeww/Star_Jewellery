@@ -54,7 +54,7 @@ export default function EditCategoryPage() {
     });
 
     if (res.ok) {
-      router.push("/Admin/Categories");
+      router.push("/admin/Categories");
     } else {
       console.error("Error updating category");
     }
@@ -63,7 +63,7 @@ export default function EditCategoryPage() {
   const handleDelete = async (categoryId: string) => {
     try {
       await fetch(`/api/categories/${categoryId}`, { method: "DELETE" });
-      router.push("/Admin/Categories");
+      router.push("/admin/Categories");
     } catch (err) {
       console.error("Error deleting category:", err);
     }

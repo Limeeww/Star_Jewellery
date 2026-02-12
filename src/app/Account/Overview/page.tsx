@@ -131,32 +131,32 @@ export default function Overview() {
               <ProfileCard
                 title="MANAGE USER ROLES"
                 description={"Start managing the user roles via link."}
-                linkHref="/Admin/Roles"
+                linkHref="/admin/Roles"
               />
               <ProfileCard
                 title="MANAGE PRODUCTS"
                 description={"Start managing the products via link."}
-                linkHref="/Admin/Products"
+                linkHref="/admin/Products"
               />
               <ProfileCard
                 title="MANAGE COLLECTIONS"
                 description={"Start managing the collections via link."}
-                linkHref="/Admin/Collections"
+                linkHref="/admin/Collections"
               />
               <ProfileCard
                 title="MANAGE CATEGORIES"
                 description={"Start managing the categories via link."}
-                linkHref="/Admin/Categories"
+                linkHref="/admin/Categories"
               />
               <ProfileCard
                 title="MANAGE DISCOUNTS"
                 description={"Start managing the discounts via link."}
-                linkHref="/Admin/Discounts"
+                linkHref="/admin/Discounts"
               />
               <ProfileCard
                 title="MANAGE ORDERS"
                 description={"Start managing the orders via link."}
-                linkHref="/Admin/Orders"
+                linkHref="/admin/Orders"
               />
             </>
           ) : (

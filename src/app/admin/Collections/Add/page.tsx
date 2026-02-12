@@ -24,7 +24,7 @@ export default function AddCollection() {
       });
 
       if (res.ok) {
-        router.push("/Admin/Collections");
+        router.push("/admin/Collections");
       } else {
         const errorData = await res.json();
         console.error("Error creating collection:", errorData);

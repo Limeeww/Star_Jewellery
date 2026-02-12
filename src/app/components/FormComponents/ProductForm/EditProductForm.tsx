@@ -26,7 +26,7 @@ export default function EditProductForm({
 
   const handleChange = <T extends keyof Product>(
     field: T,
-    value: Product[T]
+    value: Product[T],
   ) => {
     setFormData((prev) => ({
       ...prev,
@@ -147,7 +147,7 @@ export default function EditProductForm({
 
           <LinkButtonForm
             label="← Back to Products"
-            href="/Admin/Products"
+            href="/admin/Products"
             className="bg-gray-600 hover:bg-gray-700"
           />
         </div>

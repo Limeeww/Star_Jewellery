@@ -155,7 +155,7 @@ export default function EditCollectionForm({
 
           <LinkButtonForm
             label="← Back to Collections"
-            href="/Admin/Collections"
+            href="/admin/Collections"
             className="bg-gray-600 hover:bg-gray-700"
           />
         </div>

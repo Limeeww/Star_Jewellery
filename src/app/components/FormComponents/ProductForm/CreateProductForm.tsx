@@ -41,7 +41,7 @@ export default function CreateProductForm({
 
   const handleChange = <T extends keyof typeof formData>(
     field: T,
-    value: (typeof formData)[T]
+    value: (typeof formData)[T],
   ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
@@ -372,7 +372,7 @@ export default function CreateProductForm({
           />
           <LinkButtonForm
             label="← Back to Products"
-            href="/Admin/Products"
+            href="/admin/Products"
             className="bg-gray-600 hover:bg-gray-700"
           />
         </div>
