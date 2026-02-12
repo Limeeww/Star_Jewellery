@@ -104,7 +104,7 @@ export default function ProductImageBlock({
     newIndex: number,
     current: number,
     setIndex: React.Dispatch<React.SetStateAction<number>>,
-    setDir: React.Dispatch<React.SetStateAction<number>>
+    setDir: React.Dispatch<React.SetStateAction<number>>,
   ) => {
     const dir = newIndex > current ? 1 : -1;
     setDir(dir);
@@ -116,7 +116,7 @@ export default function ProductImageBlock({
       Math.min(Math.max(page + dir, 0), imageCount - 1),
       page,
       setPage,
-      setDirection
+      setDirection,
     );
 
   const modalPaginate = (dir: number) =>
@@ -124,7 +124,7 @@ export default function ProductImageBlock({
       Math.min(Math.max(modalPage + dir, 0), imageCount - 1),
       modalPage,
       setModalPage,
-      setModalDirection
+      setModalDirection,
     );
 
   const handleDragEnd = (_: PointerEvent, info: PanInfo) => {
@@ -138,22 +138,22 @@ export default function ProductImageBlock({
     enter: (dir: number) => ({
       x: dir > 0 ? 300 : -300,
       opacity: 0,
-      transition: { duration: 0.4, ease: "easeInOut" },
+      transition: { duration: 0.4, ease: "easeInOut" as const },
     }),
     center: {
       x: 0,
       opacity: 1,
-      transition: { duration: 0.4, ease: "easeInOut" },
+      transition: { duration: 0.4, ease: "easeInOut" as const },
     },
     exit: (dir: number) => ({
       x: dir < 0 ? 300 : -300,
       opacity: 0,
-      transition: { duration: 0.4, ease: "easeInOut" },
+      transition: { duration: 0.4, ease: "easeInOut" as const },
     }),
   };
 
   const { modalRef, handleOutsideClick } = useModalClose(() =>
-    setModalOpen(false)
+    setModalOpen(false),
   );
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (window.innerWidth >= 768) handleOutsideClick(e);
