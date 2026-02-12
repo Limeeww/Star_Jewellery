@@ -29,20 +29,25 @@ export function useProductPage() {
     params.set("variantID", String(id));
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
   }
-  const { notify, notification, clearNotification } = useNotification();
+  const { notification, clearNotification } = useNotification();
   const [product, setProduct] = useState<Product | null>(null);
   const [collection, setCollection] = useState<Collection | null>(null);
   const [activeDiscount, setActiveDiscount] = useState<Discount | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
   const initialIdFromUrl = searchParams?.get("variantID");
   const [currentVariantId, setCurrentVariantId] = useState<number | null>(
     initialIdFromUrl ? Number(initialIdFromUrl) : null,
   );
   useEffect(() => {
     if (!slug) return;
+    setLoading(true);
+    setNotFound(false);
     (async () => {
       const p = await fetchProductBySlug(slug);
       if (!p) {
-        notify({ type: "warning", message: "Product not found" });
+        setNotFound(true);
+        setLoading(false);
         return;
       }
       setProduct(p);
@@ -55,6 +60,7 @@ export function useProductPage() {
       const d = await fetchActiveDiscounts(p.id);
       setActiveDiscount(d[0] ?? null);
       if (!initialIdFromUrl) setCurrentVariantId(p.variants[0].id);
+      setLoading(false);
     })();
   }, [slug]); // eslint-disable-line react-hooks/exhaustive-deps
   const displayedVariant = useMemo<ProductVariant | undefined>(() => {
@@ -136,6 +142,8 @@ export function useProductPage() {
     collection,
     activeDiscount,
     displayedVariant,
+    loading,
+    notFound,
     notification,
     clearNotification,
     sizeOptions,

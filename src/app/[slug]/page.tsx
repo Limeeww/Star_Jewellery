@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { notFound } from "next/navigation";
 
 import VariantSelector from "./components/VariantSelector";
 import ProductImageSlider from "./components/ProductImageBlock";
@@ -35,6 +36,8 @@ const ProductPage = () => {
     notification,
     clearNotification,
     displayedVariant,
+    loading: productLoading,
+    notFound: isNotFound,
     sizeOptions,
     insertOptions,
     materialColorOptions,
@@ -54,7 +57,11 @@ const ProductPage = () => {
 
   const [isModalOpen, setModalOpen] = useState(false);
 
-  if (!product || !displayedVariant) return <Loading />;
+  if (productLoading) return <Loading />;
+
+  if (isNotFound || !product || !displayedVariant) {
+    return notFound();
+  }
 
   const discountedPrice = calculateDiscountedPrice(
     displayedVariant,
