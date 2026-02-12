@@ -49,7 +49,7 @@ export default function ShareButton({ title, text, url }: ShareButtonProps) {
   return (
     <button
       onClick={handleShare}
-      className="flex items-center gap-2 px-4 py-2 bg-black text-white text-sm font-medium px-4 py-2 hover:bg-gray-800 transition-colors rounded"
+      className="flex items-center gap-2 px-4 py-2 bg-black text-white text-sm font-medium hover:bg-gray-800 transition-colors rounded"
     >
       <IoMdShare />
       Share
