@@ -5,17 +5,202 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
-} 
+}
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
+    --background: #f3f4f6;
     --foreground: #ededed;
   }
 }
 
 body {
-  color: var(--foreground);
+  /* color: var(--foreground); */
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/*EMBLA HUEMBA*/
+
+.embla {
+  position: relative;
+  width: 90vw;
+  margin: 0 auto;
+  overflow: visible;
+  padding: 1rem 1rem;
+  box-sizing: border-box;
+  margin: 10;
+}
+
+.embla__viewport {
+  width: 100%;
+  overflow: hidden;
+}
+
+.embla__container {
+  display: flex;
+  touch-action: pan-y pinch-zoom;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.embla__slide {
+  flex: 0 0 40%;
+  min-width: 40%;
+  box-sizing: border-box;
+  padding: 0.5rem;
+  transition: transform 0.3s ease;
+  aspect-ratio: 3 / 2;
+}
+
+.embla__slide__number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 600;
+  user-select: none;
+  background-color: white;
+  width: 100%;
+  height: 100%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: box-shadow 0.3s ease;
+}
+
+.embla__slide__number:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+.embla__button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  border-radius: 50%;
+  width: 3.6rem;
+  height: 3.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.embla__button--prev {
+  left: 0;
+  transform: translateX(-100%) translateY(-50%);
+}
+
+.embla__button--next {
+  right: 0;
+  transform: translateX(100%) translateY(-50%);
+}
+
+.embla__button__svg {
+  width: 50%;
+  height: 50%;
+}
+
+.embla__button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* phone number input */
+
+.react-tel-input {
+  font-family: var(--font-poppins);
+}
+
+.react-tel-input .form-control {
+  width: 100% !important;
+  height: auto !important;
+  padding: 8px 16px !important;
+  border: none !important;
+  border-bottom: 1px solid #d1d5db !important;
+  border-radius: 0 !important;
+  background-color: transparent !important;
+  font-size: 1rem !important;
+  color: #111827 !important;
+  outline: none !important;
+  box-shadow: none !important;
+  padding-left: 50px !important;
+  font-family: var(--font-poppins) !important;
+}
+
+.react-tel-input .form-control:focus {
+  border-bottom-color: black !important;
+  box-shadow: none !important;
+}
+
+.react-tel-input .flag-dropdown {
+  background-color: transparent !important;
+  border: none !important;
+}
+
+.react-tel-input .selected-flag {
+  border-bottom: 1px solid #d1d5db !important;
+  border-radius: 0 !important;
+  padding-left: 8px !important;
+  width: 40px !important;
+}
+
+/* Country list customization */
+
+.react-tel-input .country-list {
+  border-radius: 0 !important;
+  background-color: #fff !important;
+  border: 1px solid #e5e7eb !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+  font-family: var(--font-poppins) !important;
+  font-size: 14px !important;
+}
+
+.react-tel-input .country-list .country.highlight,
+.react-tel-input .country-list .country:hover {
+  background-color: #f3f4f6 !important;
+}
+
+.react-tel-input .country-list .search-box {
+  border-radius: 0 !important;
+  border: none !important;
+  border-bottom: 1px solid #e5e7eb !important;
+  padding: 8px 12px !important;
+  outline: none !important;
+}
+
+.react-tel-input .country-list .country {
+  padding: 8px 12px !important;
+  color: #374151 !important;
+}
+
+.react-tel-input .country-list .search-box:focus {
+  border-bottom-color: #000 !important;
+}
+
+.react-tel-input .country-list .country-name {
+  color: #111827 !important;
+}
+
+.react-tel-input .country-list .dial-code {
+  color: #6b7280 !important;
+}
+
+.react-tel-input .country-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.react-tel-input .country-list::-webkit-scrollbar-track {
+  background: #f9fafb;
+}
+
+.react-tel-input .country-list::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 2px;
+}
+@layer utilities {
+  @media (min-width: 768px) {
+    .cursor-zoom-out-custom {
+      cursor: url("/cursors/zoom-out.svg") 24 24, auto;
+    }
+  }
 }
