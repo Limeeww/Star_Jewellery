@@ -32,12 +32,26 @@ export default async function handler(
       return res.status(401).json({ error: "Not authenticated" });
     }
     const idToken = authHeader.split("Bearer ")[1];
-    const { uid } = await auth.verifyIdToken(idToken);
+    const decoded = await auth.verifyIdToken(idToken);
+    const uid = decoded.uid;
 
-    const userSnap = await db.collection("users").doc(uid).get();
+    const userRef = db.collection("users").doc(uid);
+    const userSnap = await userRef.get();
     if (!userSnap.exists) throw new Error("User not found");
-    const { stripeCustomerId } = userSnap.data()!;
-    if (!stripeCustomerId) throw new Error("stripeCustomerId is not set");
+
+    let { stripeCustomerId } = userSnap.data()!;
+
+    // Auto-create Stripe Customer if missing (Google sign-in, legacy users, etc.)
+    if (!stripeCustomerId) {
+      const firebaseUser = await auth.getUser(uid);
+      const customer = await stripe.customers.create({
+        email: firebaseUser.email || decoded.email || "",
+        name: firebaseUser.displayName || "",
+        metadata: { firebaseUID: uid },
+      });
+      stripeCustomerId = customer.id;
+      await userRef.update({ stripeCustomerId });
+    }
 
     const intent = await stripe.setupIntents.create({
       customer: stripeCustomerId,
