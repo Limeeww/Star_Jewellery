@@ -1,101 +1,177 @@
+"use client";
+
+import React, { useRef, useEffect, useState } from "react";
+import Navbar from "./components/Navbar/Navbar";
+import Link from "next/link";
 import Image from "next/image";
+import Catalog from "./Catalog/Catalog";
 
-export default function Home() {
+import Collection from "./Collections/Collection";
+import AboutUsSection from "./AboutUsSection/AboutUsSection";
+import { FaGift, FaHeadset, FaShippingFast } from "react-icons/fa";
+import Footer from "./components/Footer/Footer";
+import { useAuthStatus } from "@/hooks/useAuthStatus";
+import ChatWidget from "./components/FormComponents/JewelryAssistant/ChatWidget";
+
+const NAV_LINKS = [
+  { href: "#about-us", label: "ABOUT US" },
+  { href: "#catalog", label: "CATALOG" },
+  { href: "#collections", label: "COLLECTIONS" },
+];
+
+export default function HomePage() {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const header = useRef<HTMLDivElement>(null);
+  const { isLoggedIn } = useAuthStatus();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const videoHeight = header.current?.clientHeight || 0;
+      setIsScrolled(window.scrollY > videoHeight);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <>
+      <Navbar
+        isScrolled={isScrolled}
+        isLoggedIn={isLoggedIn}
+        navLinks={NAV_LINKS}
+      />
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+      <div className="relative w-full h-screen" ref={header}>
+        <video
+          className="absolute top-0 left-0 w-full h-full object-cover -z-10"
+          autoPlay
+          loop
+          muted
+          playsInline
+        >
+          <source src="/videos/background.mp4" type="video/mp4" />
+          Your browser does not support video format.
+        </video>
+
+        <div className="absolute inset-0 bg-black/40 -z-10" />
+
+        <div className="absolute top-0 left-0 w-full h-full flex items-center">
+          <div className="container mx-auto px-4">
+            <h1
+              className="text-6xl font-bold text-white text-left"
+              style={{ fontFamily: "var(--font-playfair)" }}
+            >
+              Welcome to Star Jewellery
+            </h1>
+            <p
+              className="text-lg text-white mt-4 text-left"
+              style={{ fontFamily: "var(--font-poppins)" }}
+            >
+              Discover the beauty and elegance of our jewellery collection.
+            </p>
+            <Link href="/shop">
+              <button
+                className="
+            mt-6 
+            px-6 
+            py-2 
+            border 
+            border-white 
+            text-white 
+            hover:bg-white  
+            hover:text-gray-800 
+            transition-colors 
+            duration-300
+          "
+                style={{ fontFamily: "var(--font-poppins)" }}
+              >
+                Shop Now
+              </button>
+            </Link>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+      </div>
+
+      <Catalog />
+
+      <section className="py-12" style={{ fontFamily: "var(--font-poppins)" }}>
+        <div className="grid grid-cols-1 xl:grid-cols-2">
+          <div className="overflow-hidden order-1 2xl:order-1">
+            <Image
+              src="/images/bestseller/bestseller4.jpg"
+              alt="Jewelry Image"
+              width={600}
+              height={800}
+              className="w-full xl:h-[60vh] sm:h-[40vh] h-auto object-contain"
+            />
+          </div>
+
+          <div className="flex flex-col justify-center items-center lg:p-10 order-2 xl:order-2">
+            <div className="text-center max-w-lg">
+              <h2 className="font-serif text-2xl md:text-3xl tracking-widest text-gray-800 mb-4">
+                LUXURY JEWELRY COLLECTION
+              </h2>
+              <p className="text-base md:text-lg text-gray-600 mb-6 md:mb-10">
+                Discover the elegance of timeless design with our newest luxury
+                jewelry pieces. Celebrate the art of craftsmanship and add a
+                touch of glamour to your style.
+              </p>
+              <Link href="/all-products">
+                <button className="bg-black text-white px-6 py-3 hover:bg-gray-800 transition duration-300">
+                  Explore The Collection
+                </button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <Collection />
+
+      <section
+        className="py-12 px-4 sm:px-6 lg:px-8 bg-white"
+        style={{ fontFamily: "var(--font-poppins)" }}
+      >
+        <h2
+          className="text-center text-3xl sm:text-3xl mb-10 font-bold"
+          style={{ fontFamily: "var(--font-playfair)" }}
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+          Star Services
+        </h2>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+          <div className="flex flex-col items-center space-y-2">
+            <FaShippingFast className="text-3xl text-gray-800 mb-2" />
+            <h3 className="text-md font-semibold">FAST DELIVERY</h3>
+            <p className="text-sm text-gray-600">
+              Enjoy fast and reliable delivery with every order.
+            </p>
+          </div>
+
+          <div className="flex flex-col items-center space-y-2">
+            <FaHeadset className="text-3xl text-gray-800 mb-2" />
+            <h3 className="text-md font-semibold">CUSTOMER SERVICE</h3>
+            <p className="text-sm text-gray-600">
+              Find answers to your frequently asked questions or contact our
+              team of experts.
+            </p>
+          </div>
+
+          <div className="flex flex-col items-center space-y-2">
+            <FaGift className="text-3xl text-gray-800 mb-2" />
+            <h3 className="text-md font-semibold">GIFT SERVICES</h3>
+            <p className="text-sm text-gray-600">Add a personal touch.</p>
+          </div>
+        </div>
+      </section>
+
+      <AboutUsSection />
+
+      <Footer />
+      <ChatWidget />
+    </>
   );
 }

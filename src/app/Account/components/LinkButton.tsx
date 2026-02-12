@@ -1,0 +1,43 @@
+"use client";
+
+import React from "react";
+import Link from "next/link";
+
+type LinkButtonProps = {
+  text: React.ReactNode;
+  href?: string;
+  className?: string;
+  onClick?: () => void;
+  showArrow?: boolean;
+};
+
+export default function LinkButton({
+  text,
+  href,
+  className = "",
+  onClick,
+  showArrow = false,
+}: LinkButtonProps) {
+  const content = (
+    <>
+      <span className="">{text}</span>
+      {showArrow && <span className="ml-1 inline-block">&rarr;</span>}
+    </>
+  );
+
+  const baseClasses = `inline-flex items-center space-x-1 font-medium ${className}`;
+
+  if (href) {
+    return (
+      <Link href={href} className={baseClasses}>
+        {content}
+      </Link>
+    );
+  }
+
+  return (
+    <button type="button" onClick={onClick} className={baseClasses}>
+      {content}
+    </button>
+  );
+}

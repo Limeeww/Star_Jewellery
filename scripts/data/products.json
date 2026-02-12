@@ -1,0 +1,271 @@
+{
+  "products": [
+    {
+      "id": 1,
+      "name": "Elegant Gold Ring",
+      "description": "An exquisite gold ring featuring intricate filigree details and small sparkling diamonds, adding a touch of timeless elegance to any look.",
+      "slug": "elegant-gold-ring",
+      "imageUrl": "https://example.com/images/elegant_gold_ring.png",
+      "categoryId": 1,
+      "variants": [
+        {
+          "id": 1,
+          "price": 15000,
+          "materialColor": "Gold",
+          "insert": "Diamonds",
+          "insertColor": "Transparent",
+          "weight": 5,
+          "quantity": 10
+        }
+      ],
+      "discounts": [
+        {
+          "id": 1,
+          "name": "Spring Discount",
+          "value": 10,
+          "type": "percentage",
+          "applicableTo": [1],
+          "validFrom": "2025-04-01T00:00:00.000Z",
+          "validUntil": "2025-05-01T00:00:00.000Z"
+        }
+      ],
+      "createdAt": "2025-04-01T00:00:00.000Z",
+      "updatedAt": "2025-04-01T00:00:00.000Z",
+      "price": 15000,
+      "isHidden": false,
+      "additionalDescription": "This elegant gold ring is crafted with meticulous attention to detail, featuring intricate filigree work and shimmering small diamonds that catch the light beautifully. Ideal for both everyday wear and special occasions, it serves as a timeless piece that complements any style.",
+      "quantitySize": [
+        { "size": 6, "quantity": 3 },
+        { "size": 7, "quantity": 5 },
+        { "size": 8, "quantity": 2 },
+        { "size": 9, "quantity": 0 }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Delicate Silver Earrings",
+      "description": "Delicate silver earrings adorned with semi-precious stones, designed to enhance both casual and formal outfits with a refined sparkle.",
+      "slug": "delicate-silver-earrings",
+      "imageUrl": "https://example.com/images/delicate_silver_earrings.png",
+      "categoryId": 2,
+      "variants": [
+        {
+          "id": 2,
+          "price": 5000,
+          "materialColor": "Silver",
+          "insert": "Semi-precious stones",
+          "insertColor": "Vibrant",
+          "weight": 3,
+          "quantity": 15
+        }
+      ],
+      "discounts": [
+        {
+          "id": 2,
+          "name": "Summer Discount",
+          "value": 5,
+          "type": "percentage",
+          "applicableTo": [2],
+          "validFrom": "2025-04-01T00:00:00.000Z",
+          "validUntil": "2025-05-01T00:00:00.000Z"
+        }
+      ],
+      "createdAt": "2025-04-01T00:00:00.000Z",
+      "updatedAt": "2025-04-01T00:00:00.000Z",
+      "price": 5000,
+      "isHidden": false,
+      "additionalDescription": "These delicate silver earrings are expertly crafted to combine classic elegance with a modern touch. Featuring vibrant semi-precious stones and refined detailing, they add a subtle yet sophisticated sparkle to any ensemble.",
+      "quantitySize": [{ "size": 1, "quantity": 30 }]
+    },
+    {
+      "id": 3,
+      "name": "Luxurious Diamond Necklace",
+      "description": "A luxurious diamond necklace featuring multiple brilliant-cut stones, offering a dazzling statement piece for special occasions.",
+      "slug": "luxurious-diamond-necklace",
+      "imageUrl": "https://example.com/images/luxurious_diamond_necklace.png",
+      "categoryId": 3,
+      "variants": [
+        {
+          "id": 3,
+          "price": 35000,
+          "materialColor": "White Gold",
+          "insert": "Diamonds",
+          "insertColor": "Transparent",
+          "weight": 10,
+          "quantity": 5
+        }
+      ],
+      "createdAt": "2025-04-01T00:00:00.000Z",
+      "updatedAt": "2025-04-01T00:00:00.000Z",
+      "price": 35000,
+      "isHidden": false,
+      "additionalDescription": "This luxurious diamond necklace exudes opulence and elegance with its dazzling array of brilliant-cut diamonds. Each stone is meticulously set to create a harmonious display of light and sparkle, making it an exquisite statement piece for evening events and celebrations.",
+      "quantitySize": [{ "size": 16, "quantity": 2 }]
+    },
+    {
+      "id": 4,
+      "name": "Unique Platinum Bracelet",
+      "description": "A distinctive platinum bracelet showcasing elaborate patterns and exceptional craftsmanship, perfect for those seeking a sophisticated style.",
+      "slug": "unique-platinum-bracelet",
+      "imageUrl": "https://example.com/images/unique_platinum_bracelet.png",
+      "categoryId": 4,
+      "variants": [
+        {
+          "id": 4,
+          "price": 25000,
+          "materialColor": "Platinum",
+          "insert": "None",
+          "insertColor": "",
+          "weight": 8,
+          "quantity": 7
+        }
+      ],
+      "createdAt": "2025-04-01T00:00:00.000Z",
+      "updatedAt": "2025-04-01T00:00:00.000Z",
+      "price": 25000,
+      "isHidden": false,
+      "additionalDescription": "Crafted with precision, this unique platinum bracelet features intricate, elaborate patterns that highlight its luxurious appeal. Its timeless design and exceptional finish make it a must-have accessory for those with refined taste.",
+      "quantitySize": [{ "size": 7, "quantity": 4 }]
+    },
+    {
+      "id": 5,
+      "name": "Contemporary Minimalist Necklace",
+      "description": "A modern gold necklace with a minimalist design, combining clean lines and subtle elegance suitable for everyday wear.",
+      "slug": "contemporary-minimalist-necklace",
+      "imageUrl": "https://example.com/images/contemporary_minimalist_necklace.png",
+      "categoryId": 3,
+      "variants": [
+        {
+          "id": 5,
+          "price": 12000,
+          "materialColor": "Gold",
+          "insert": "None",
+          "insertColor": "",
+          "weight": 4,
+          "quantity": 12
+        }
+      ],
+      "discounts": [
+        {
+          "id": 3,
+          "name": "Summer Discount",
+          "value": 15,
+          "type": "percentage",
+          "applicableTo": [5],
+          "validFrom": "2025-04-01T00:00:00.000Z",
+          "validUntil": "2025-05-01T00:00:00.000Z"
+        }
+      ],
+      "createdAt": "2025-04-01T00:00:00.000Z",
+      "updatedAt": "2025-04-01T00:00:00.000Z",
+      "price": 12000,
+      "isHidden": false,
+      "additionalDescription": "This contemporary minimalist necklace embodies modern elegance with its clean, smooth lines and polished finish. Ideal for both casual and formal settings, its understated design adds a touch of sophistication to any outfit.",
+      "quantitySize": [{ "size": 18, "quantity": 6 }]
+    },
+    {
+      "id": 6,
+      "name": "Exclusive Men's Cufflinks",
+      "description": "Stylish men's cufflinks with fine engraving, adding a refined touch to any formal attire.",
+      "slug": "exclusive-mens-cufflinks",
+      "imageUrl": "https://example.com/images/exclusive_mens_cufflinks.png",
+      "categoryId": 5,
+      "variants": [
+        {
+          "id": 6,
+          "price": 8000,
+          "materialColor": "Silver",
+          "insert": "Engraving",
+          "insertColor": "Dark Gray",
+          "weight": 2,
+          "quantity": 20
+        }
+      ],
+      "createdAt": "2025-04-01T00:00:00.000Z",
+      "updatedAt": "2025-04-01T00:00:00.000Z",
+      "price": 8000,
+      "isHidden": false,
+      "additionalDescription": "Expertly crafted for the discerning gentleman, these exclusive men's cufflinks boast intricate engraving and a sleek silver finish. They are designed to elevate formal attire with a subtle yet unmistakable touch of sophistication.",
+      "quantitySize": [{ "size": 1, "quantity": 20 }]
+    },
+    {
+      "id": 7,
+      "name": "Comprehensive Jewelry Set",
+      "description": "A harmonious set of jewelry pieces including a ring, a necklace, and earrings that seamlessly blend style and sophistication.",
+      "slug": "comprehensive-jewelry-set",
+      "imageUrl": "https://example.com/images/comprehensive_jewelry_set.png",
+      "categoryId": 6,
+      "variants": [
+        {
+          "id": 7,
+          "price": 50000,
+          "materialColor": "Various",
+          "insert": "Diamonds, Gemstones",
+          "insertColor": "Multicolored",
+          "weight": 15,
+          "quantity": 3
+        }
+      ],
+      "createdAt": "2025-04-01T00:00:00.000Z",
+      "updatedAt": "2025-04-01T00:00:00.000Z",
+      "price": 50000,
+      "isHidden": false,
+      "additionalDescription": "This comprehensive jewelry set includes an exquisitely designed ring, a sophisticated necklace, and elegantly crafted earrings. Each piece is a testament to fine artistry and superior craftsmanship, making this set a perfect choice for those seeking an all-in-one luxury accessory collection.",
+      "quantitySize": [
+        { "size": 7, "quantity": 1 },
+        { "size": 18, "quantity": 1 },
+        { "size": 1, "quantity": 1 }
+      ]
+    },
+    {
+      "id": 8,
+      "name": "Decorative Enamel Brooch",
+      "description": "An artful brooch with vibrant enamel details, adding a colorful accent to any ensemble.",
+      "slug": "decorative-enamel-brooch",
+      "imageUrl": "https://example.com/images/decorative_enamel_brooch.png",
+      "categoryId": 7,
+      "variants": [
+        {
+          "id": 8,
+          "price": 6000,
+          "materialColor": "Gold",
+          "insert": "Enamel",
+          "insertColor": "Blue/Green",
+          "weight": 1.5,
+          "quantity": 12
+        }
+      ],
+      "createdAt": "2025-04-01T00:00:00.000Z",
+      "updatedAt": "2025-04-01T00:00:00.000Z",
+      "price": 6000,
+      "isHidden": false,
+      "additionalDescription": "This decorative enamel brooch is a striking accessory that merges traditional craftsmanship with vibrant contemporary design. Its detailed enamel work in blue and green hues adds a pop of color, making it a perfect accent piece for both formal and casual ensembles.",
+      "quantitySize": [{ "size": 2, "quantity": 12 }]
+    },
+    {
+      "id": 9,
+      "name": "Geometric Pendant",
+      "description": "A bold geometric pendant crafted from precious metal and set with sparkling diamonds, perfect for a modern and refined look.",
+      "slug": "geometric-pendant",
+      "imageUrl": "https://example.com/images/geometric_pendant.png",
+      "categoryId": 8,
+      "variants": [
+        {
+          "id": 9,
+          "price": 9000,
+          "materialColor": "Gold",
+          "insert": "Diamonds",
+          "insertColor": "Transparent",
+          "weight": 3,
+          "quantity": 10
+        }
+      ],
+      "createdAt": "2025-04-01T00:00:00.000Z",
+      "updatedAt": "2025-04-01T00:00:00.000Z",
+      "price": 9000,
+      "isHidden": false,
+      "additionalDescription": "This geometric pendant represents a fusion of modern design and classic elegance. With its bold lines, sleek finish, and sparkling diamond accents, it makes a striking accessory that elevates any look, whether casual or formal.",
+      "quantitySize": [{ "size": 1, "quantity": 10 }]
+    }
+  ]
+}
