@@ -63,6 +63,10 @@ A modern, full-stack e-commerce application built with **Next.js 15**, **TypeScr
 5. **Open locally:**
    Visit [http://localhost:3000](http://localhost:3000) in your browser.
 
+## 🌐 Live Demo
+
+The application is deployed and available at: **[star-jewellery.vercel.app](https://star-jewellery.vercel.app)**
+
 ---
 
-_Developed by Dmytro Tiurin_
+_Developed by Dmytro Tiurin & Anastasiia Starukhina_
