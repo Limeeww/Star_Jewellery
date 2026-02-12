@@ -7,7 +7,6 @@
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
 
-
 // Start writing functions
 // https://firebase.google.com/docs/functions/typescript
 
