@@ -2,13 +2,16 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-03-31.basil",
+  apiVersion: "2025-08-27.basil",
 });
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
   if (req.method !== "POST") return res.status(405).end();
 
-  const { paymentMethodId } = req.body; 
+  const { paymentMethodId } = req.body;
 
   try {
     await stripe.paymentMethods.detach(paymentMethodId);
@@ -16,7 +19,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   } catch (err: unknown) {
     console.error(err);
     res.status(500).json({
-        error: err instanceof Error ? err.message : "An unknown error occurred",
+      error: err instanceof Error ? err.message : "An unknown error occurred",
     });
   }
 }
