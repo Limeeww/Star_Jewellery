@@ -69,4 +69,4 @@ The application is deployed and available at: **[star-jewellery.vercel.app](http
 
 ---
 
-_Developed by Dmytro Tiurin & Anastasia Starukhina_
+_Developed by Dmytro Tiurin & Anastasiia Starukhina_
